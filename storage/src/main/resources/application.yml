@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: lottolearn-filesystem
+server:
+  port: 51206

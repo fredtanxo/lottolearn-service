@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: lottolearn-auth
+server:
+  port: 51200
