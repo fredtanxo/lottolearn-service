@@ -8,12 +8,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.user.service.RoleService;
+import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
-import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
+import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.user.Permission;
 import xo.fredtan.lottolearn.domain.user.Role;
 import xo.fredtan.lottolearn.domain.user.request.ModifyRoleRequest;
+import xo.fredtan.lottolearn.domain.user.response.RoleWithMenuIds;
+import xo.fredtan.lottolearn.user.dao.PermissionMapper;
 import xo.fredtan.lottolearn.user.dao.PermissionRepository;
 import xo.fredtan.lottolearn.user.dao.RoleRepository;
 
@@ -25,6 +28,7 @@ import java.util.Objects;
 public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+    private final PermissionMapper permissionMapper;
 
     @Override
     public QueryResponseData<Role> findAllRoles(Integer page, Integer size) {
@@ -33,6 +37,13 @@ public class RoleServiceImpl implements RoleService {
 
         QueryResult<Role> roleQueryResult = new QueryResult<>(roles.getTotalElements(), roles.getContent());
         return QueryResponseData.ok(roleQueryResult);
+    }
+
+    @Override
+    public UniqueQueryResponseData<RoleWithMenuIds> findRoleById(String roleId) {
+        RoleWithMenuIds roleWithMenuIds = permissionMapper.selectRoleWithMenu(roleId);
+
+        return UniqueQueryResponseData.ok(roleWithMenuIds);
     }
 
     @Override

@@ -6,10 +6,12 @@ import org.springframework.web.bind.annotation.*;
 import xo.fredtan.lottolearn.api.user.controller.RoleControllerApi;
 import xo.fredtan.lottolearn.api.user.service.RoleService;
 import xo.fredtan.lottolearn.common.annotation.ValidatePagination;
-import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
+import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
+import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.user.Role;
 import xo.fredtan.lottolearn.domain.user.request.ModifyRoleRequest;
+import xo.fredtan.lottolearn.domain.user.response.RoleWithMenuIds;
 
 @RestController
 @RequestMapping("/role")
@@ -22,6 +24,12 @@ public class RoleController implements RoleControllerApi {
     @ValidatePagination
     public QueryResponseData<Role> findAllRoles(Integer page, Integer size) {
         return roleService.findAllRoles(page, size);
+    }
+
+    @Override
+    @GetMapping("/id/{roleId}")
+    public UniqueQueryResponseData<RoleWithMenuIds> findRoleById(@PathVariable String roleId) {
+        return roleService.findRoleById(roleId);
     }
 
     @Override

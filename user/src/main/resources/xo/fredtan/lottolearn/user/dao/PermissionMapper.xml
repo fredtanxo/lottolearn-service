@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xo.fredtan.lottolearn.user.dao.PermissionMapper">
+    <resultMap id="permissionResultMap" type="xo.fredtan.lottolearn.domain.user.response.RoleWithMenuIds">
+        <id column="rid" property="id" />
+        <result column="rname" property="name" />
+        <result column="rdescription" property="description" />
+        <result column="rstatus" property="status" />
+        <result column="rcreated_by" property="createdBy" />
+        <result column="rcreated_at" property="createdAt" />
+        <result column="rupdated_by" property="updatedBy" />
+        <result column="rupdated_at" property="updatedAt" />
+        <collection property="menuIds" ofType="string" javaType="list">
+            <result column="mid" />
+        </collection>
+    </resultMap>
+    <select id="selectRoleWithMenu" parameterType="string" resultMap="permissionResultMap">
+        select
+               r.id as rid,
+               r.name as rname,
+               r.description as rdescription,
+               r.status as rstatus,
+               r.created_by as rcreated_by,
+               r.created_at as rcreated_at,
+               r.updated_by as rupdated_by,
+               r.updated_at as rupdated_at,
+               m.id as mid
+        from
+             role r
+                 left join permission p
+                     on (r.id = p.role_id)
+                 left join menu m
+                     on (m.id = p.menu_id)
+        where
+              r.id = #{roleId}
+    </select>
+</mapper>
