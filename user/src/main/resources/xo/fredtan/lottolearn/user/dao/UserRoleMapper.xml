@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xo.fredtan.lottolearn.user.dao.UserRoleMapper">
+    <resultMap id="userRoleResultMap" type="xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds">
+        <id column="uid" property="id" />
+        <result column="unickname" property="nickname" />
+        <result column="ugender" property="gender" />
+        <result column="uavatar" property="avatar" />
+        <result column="udescription" property="description" />
+        <result column="ustatus" property="status" />
+        <result column="ucreated_by" property="createdBy" />
+        <result column="ucreated_at" property="createdAt" />
+        <result column="uupdated_by" property="updatedBy" />
+        <result column="uupdated_at" property="updatedAt" />
+        <collection property="roleIds" ofType="string" javaType="list">
+            <result column="rid" />
+        </collection>
+    </resultMap>
+    
+    <select id="selectUserWithRole" parameterType="string" resultMap="userRoleResultMap">
+        select
+               u.id as uid,
+               u.nickname as unickname,
+               u.gender as ugender,
+               u.avatar as uavatar,
+               u.description as udescription,
+               u.status as ustatus,
+               u.created_by as ucreated_by,
+               u.created_at as ucreated_at,
+               u.updated_by as uupdated_by,
+               u.updated_at as uupdated_at,
+               r.id as rid
+        from `user` u
+            left join user_role ur
+                on (u.id = ur.user_id)
+            left join role r on
+                (r.id = ur.role_id)
+        where u.id = #{userId}
+    </select>
+</mapper>

@@ -4,14 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import xo.fredtan.lottolearn.api.user.controller.UserControllerApi;
+import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.common.annotation.ValidatePagination;
-import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
+import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.user.User;
-import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.domain.user.request.ModifyUserRequest;
 import xo.fredtan.lottolearn.domain.user.request.QueryUserRequest;
+import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
 
 @RestController
 @RequestMapping("/user")
@@ -28,7 +29,7 @@ public class UserController implements UserControllerApi {
 
     @Override
     @GetMapping("/id/{userId}")
-    public UniqueQueryResponseData<User> findUserById(@PathVariable String userId) {
+    public UniqueQueryResponseData<UserWithRoleIds> findUserById(@PathVariable String userId) {
         return userService.findUserById(userId);
     }
 

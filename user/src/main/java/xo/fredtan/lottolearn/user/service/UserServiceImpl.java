@@ -10,24 +10,28 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.user.service.UserService;
+import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
-import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.user.User;
 import xo.fredtan.lottolearn.domain.user.UserRole;
 import xo.fredtan.lottolearn.domain.user.request.ModifyUserRequest;
 import xo.fredtan.lottolearn.domain.user.request.QueryUserRequest;
+import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
 import xo.fredtan.lottolearn.user.dao.UserRepository;
+import xo.fredtan.lottolearn.user.dao.UserRoleMapper;
 import xo.fredtan.lottolearn.user.dao.UserRoleRepository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 @DubboService(version = "0.0.1")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
+    private final UserRoleMapper userRoleMapper;
 
     @Override
     public QueryResponseData<User> findAllUsers(Integer page, Integer size, QueryUserRequest queryUserRequest) {
@@ -52,8 +56,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UniqueQueryResponseData<User> findUserById(String userId) {
-        return userRepository.findById(userId).map(UniqueQueryResponseData<User>::new).orElse(null);
+    public UniqueQueryResponseData<UserWithRoleIds> findUserById(String userId) {
+        UserWithRoleIds userWithRolesIds = userRoleMapper.selectUserWithRole(userId);
+
+        return UniqueQueryResponseData.ok(userWithRolesIds);
     }
 
     @Override
