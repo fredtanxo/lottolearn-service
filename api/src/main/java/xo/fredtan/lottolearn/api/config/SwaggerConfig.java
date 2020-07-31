@@ -42,11 +42,19 @@ public class SwaggerConfig {
     }
 
     private Predicate<String> userPaths() {
-        return regex("/user.*");
+        return regex("/user.*")
+                .or(regex("/role.*"))
+                .or(regex("/menu.*"))
+                .or(regex("/permission.*"));
     }
 
     private Predicate<String> coursePaths() {
-        return regex("/course.*");
+        return regex("/course.*")
+                .or(regex("/announcement.*"))
+                .or(regex("/chapter.*"))
+                .or(regex("/exam.*"))
+                .or(regex("/media.*"))
+                .or(regex("/term.*"));
     }
 
     private ApiInfo apiInfo() {
