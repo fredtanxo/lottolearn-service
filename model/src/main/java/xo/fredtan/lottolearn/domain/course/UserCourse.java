@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -19,5 +20,7 @@ public class UserCourse {
     private String courseId;
     @Column(name = "is_teacher")
     private Boolean isTeacher;
+    @Column(name = "enroll_date")
+    private Date enrollDate;
     private Boolean status;
 }

@@ -18,6 +18,6 @@ public class Chapter {
     private String courseId;
     private String name;
     private Integer lasts;
-    private Date start;
-    private Date end;
+    @Column(name = "pub_date")
+    private Date pub_date;
 }
