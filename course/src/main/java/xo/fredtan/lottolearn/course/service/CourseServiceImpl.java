@@ -63,7 +63,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public QueryResponseData<Course> findUserCourses(Integer page, Integer size, String userId, QueryUserCourseRequest queryUserCourseRequest) {
         PageHelper.startPage(page, size);
-        List<Course> courses = userCourseMapper.selectUserCourses(userId, queryUserCourseRequest.getStatus());
+        List<Course> courses = userCourseMapper.selectUserCourses(userId, queryUserCourseRequest);
         PageInfo<Course> coursePageInfo = new PageInfo<>(courses);
 
         QueryResult<Course> queryResult = new QueryResult<>(coursePageInfo.getTotal(), coursePageInfo.getList());

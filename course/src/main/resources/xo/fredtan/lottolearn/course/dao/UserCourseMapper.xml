@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xo.fredtan.lottolearn.course.dao.UserCourseMapper">
+    <select id="selectUserCourses" resultType="xo.fredtan.lottolearn.domain.course.Course">
+        select
+               c.*
+        from
+             user_course uc
+                 left join course c
+                     on (uc.course_id = c.id)
+        where
+              uc.user_id = #{userId}
+          and c.status = #{query.status}
+          <if test="query.teacher != null">
+                and uc.is_teacher = #{query.teacher}
+          </if>
+    </select>
+</mapper>
