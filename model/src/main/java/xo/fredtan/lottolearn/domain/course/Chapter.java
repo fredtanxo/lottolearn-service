@@ -1,5 +1,6 @@
 package xo.fredtan.lottolearn.domain.course;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -19,5 +20,6 @@ public class Chapter {
     private String name;
     private Integer lasts;
     @Column(name = "pub_date")
-    private Date pub_date;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date pubDate;
 }

@@ -1,5 +1,6 @@
 package xo.fredtan.lottolearn.domain.course;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -24,6 +25,7 @@ public class Course {
     private String termId;
     private Integer credit;
     @Column(name = "pub_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date pubDate;
     private Integer status;
 }

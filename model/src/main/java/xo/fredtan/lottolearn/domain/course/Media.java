@@ -1,5 +1,6 @@
 package xo.fredtan.lottolearn.domain.course;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -21,5 +22,6 @@ public class Media {
     @Column(name = "local_path")
     private String localPath;
     @Column(name = "access_url")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date accessUrl;
 }
