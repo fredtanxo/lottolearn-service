@@ -16,6 +16,7 @@
         <module>api</module>
         <module>api</module>
         <module>model</module>
+        <module>message</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
