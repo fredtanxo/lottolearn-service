@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: lottolearn-message
+server:
+  port: 51218
