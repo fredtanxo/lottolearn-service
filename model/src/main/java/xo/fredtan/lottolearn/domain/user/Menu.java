@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import xo.fredtan.lottolearn.domain.audit.AbstractEntity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Data
@@ -15,11 +16,12 @@ public class Menu extends AbstractEntity implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid")
     private String id;
-
     @Column(name = "parent_id")
     private String parentId;
+    @NotNull(message = "必须提供菜单名称")
     private String name;
     private Boolean type;
+    @NotNull(message = "必须提供菜单代码")
     private String code;
     private String path;
     private String icon;

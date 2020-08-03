@@ -17,12 +17,14 @@ import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.course.dao.CourseRepository;
+import xo.fredtan.lottolearn.course.dao.TermRepository;
 import xo.fredtan.lottolearn.course.dao.UserCourseMapper;
 import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,6 +32,7 @@ import java.util.Objects;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
+    private final TermRepository termRepository;
     private final UserCourseMapper userCourseMapper;
 
     @Override
@@ -76,6 +79,18 @@ public class CourseServiceImpl implements CourseService {
         Course course = new Course();
         BeanUtils.copyProperties(modifyCourseRequest, course);
         course.setId(null);
+        course.setPubDate(new Date());
+
+        // 根据学期判断课程是否应该开始
+        if (Objects.isNull(course.getStatus()) || course.getStatus() <= 0) {
+            termRepository.findById(course.getTermId()).ifPresent(term -> {
+                if (term.getFrom().before(new Date())) {
+                    course.setStatus(1);
+                } else {
+                    course.setStatus(0);
+                }
+            });
+        }
 
         courseRepository.save(course);
         return BasicResponseData.ok();

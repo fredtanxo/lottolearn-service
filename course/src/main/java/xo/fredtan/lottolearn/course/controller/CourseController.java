@@ -14,6 +14,8 @@ import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/course")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -41,7 +43,7 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PostMapping("/new")
-    public BasicResponseData addCourse(@RequestBody ModifyCourseRequest modifyCourseRequest) {
+    public BasicResponseData addCourse(@Valid @RequestBody ModifyCourseRequest modifyCourseRequest) {
         return courseService.addCourse(modifyCourseRequest);
     }
 

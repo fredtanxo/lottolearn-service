@@ -5,6 +5,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 @Data
@@ -15,8 +16,10 @@ public class Chapter {
     @Id
     @GeneratedValue(generator = "uuid")
     private String id;
+    @NotBlank(message = "必须提供课程ID")
     @Column(name = "course_id")
     private String courseId;
+    @NotBlank(message = "必须提供章节名称")
     private String name;
     private Integer lasts;
     @Column(name = "pub_date")

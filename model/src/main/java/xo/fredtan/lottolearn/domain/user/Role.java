@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Data
@@ -18,6 +19,7 @@ public class Role extends AbstractEntity implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid")
     private String id;
+    @NotBlank(message = "必须提供角色名称")
     private String name;
     private String description;
     private Boolean status;
