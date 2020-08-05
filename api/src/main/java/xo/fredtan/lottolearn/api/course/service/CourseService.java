@@ -7,6 +7,8 @@ import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
+import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
+import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
 
 public interface CourseService {
     QueryResponseData<Course> findAllCourses(Integer page, Integer size, QueryCourseRequest queryCourseRequest);
@@ -15,9 +17,11 @@ public interface CourseService {
 
     QueryResponseData<Course> findUserCourses(Integer page, Integer size, String userId, QueryUserCourseRequest queryUserCourseRequest);
 
-    BasicResponseData addCourse(ModifyCourseRequest modifyCourseRequest);
+    AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest);
 
     BasicResponseData updateCourse(String courseId, ModifyCourseRequest modifyCourseRequest);
+
+    JoinCourseResult joinCourse(String invitationCode);
 
     BasicResponseData closeCourse(String courseId);
 }

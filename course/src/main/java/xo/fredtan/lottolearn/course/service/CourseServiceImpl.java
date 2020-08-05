@@ -19,10 +19,15 @@ import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.course.dao.CourseRepository;
 import xo.fredtan.lottolearn.course.dao.TermRepository;
 import xo.fredtan.lottolearn.course.dao.UserCourseMapper;
+import xo.fredtan.lottolearn.course.dao.UserCourseRepository;
 import xo.fredtan.lottolearn.domain.course.Course;
+import xo.fredtan.lottolearn.domain.course.UserCourse;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
+import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
+import xo.fredtan.lottolearn.domain.course.response.CourseCode;
+import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
 
 import java.util.Date;
 import java.util.List;
@@ -33,6 +38,7 @@ import java.util.Objects;
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final TermRepository termRepository;
+    private final UserCourseRepository userCourseRepository;
     private final UserCourseMapper userCourseMapper;
 
     @Override
@@ -75,7 +81,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public BasicResponseData addCourse(ModifyCourseRequest modifyCourseRequest) {
+    public AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest) {
         Course course = new Course();
         BeanUtils.copyProperties(modifyCourseRequest, course);
         course.setId(null);
@@ -84,7 +90,7 @@ public class CourseServiceImpl implements CourseService {
         // 根据学期判断课程是否应该开始
         if (Objects.isNull(course.getStatus()) || course.getStatus() <= 0) {
             termRepository.findById(course.getTermId()).ifPresent(term -> {
-                if (term.getFrom().before(new Date())) {
+                if (term.getTermStart().before(new Date())) {
                     course.setStatus(1);
                 } else {
                     course.setStatus(0);
@@ -92,8 +98,29 @@ public class CourseServiceImpl implements CourseService {
             });
         }
 
-        courseRepository.save(course);
-        return BasicResponseData.ok();
+        Course savedCourse = courseRepository.save(course);
+
+        // 生成课程邀请码
+        int codePre = Objects.hash(
+                savedCourse.getId(),
+                savedCourse.getName(),
+                savedCourse.getCover(),
+                savedCourse.getDescription(),
+                savedCourse.getTeacherId(),
+                savedCourse.getTermId(),
+                savedCourse.getCredit(),
+                savedCourse.getPubDate(),
+                savedCourse.getStatus(),
+                System.nanoTime(),
+                Thread.currentThread()
+        );
+        codePre &= Integer.MAX_VALUE;
+        String code = Integer.toString(codePre, 36);
+        course.setCode(code);
+
+        savedCourse = courseRepository.save(course);
+
+        return new AddCourseResult(CourseCode.ADD_SUCCESS, savedCourse.getCode(), savedCourse.getId());
     }
 
     @Override
@@ -105,6 +132,27 @@ public class CourseServiceImpl implements CourseService {
             courseRepository.save(course);
         });
         return BasicResponseData.ok();
+    }
+
+    @Override
+    @Transactional
+    public JoinCourseResult joinCourse(String invitationCode) {
+        Course course = courseRepository.findByCode(invitationCode);
+        if (Objects.isNull(course)) {
+            return new JoinCourseResult(CourseCode.COURSE_NOT_EXISTS, null);
+        } else if (course.getStatus() == 2) {
+            return new JoinCourseResult(CourseCode.COURSE_IS_CLOSED, null);
+        }
+
+        UserCourse userCourse = new UserCourse();
+        userCourse.setUserId(null);
+        userCourse.setCourseId(course.getId());
+        userCourse.setIsTeacher(false);
+        userCourse.setEnrollDate(new Date());
+        userCourse.setStatus(true);
+
+        userCourseRepository.save(userCourse);
+        return new JoinCourseResult(CourseCode.JOIN_SUCCESS, course.getId());
     }
 
     @Override

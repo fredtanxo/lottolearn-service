@@ -22,7 +22,6 @@ public class Course {
     private String cover;
     private String description;
     private String code;
-    @NotBlank(message = "必须提供教师ID")
     @Column(name = "teacher_id")
     private String teacherId;
     @NotBlank(message = "必须提供学期ID")

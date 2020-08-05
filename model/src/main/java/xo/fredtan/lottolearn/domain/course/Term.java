@@ -5,10 +5,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import xo.fredtan.lottolearn.domain.audit.AbstractEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -25,9 +22,11 @@ public class Term extends AbstractEntity {
     private String name;
     @NotNull(message = "必须提供学期开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date from;
+    @Column(name = "term_start")
+    private Date termStart;
     @NotNull(message = "必须提供学期结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date to;
+    @Column(name = "term_end")
+    private Date termEnd;
     private Boolean status;
 }

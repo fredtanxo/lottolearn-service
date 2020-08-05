@@ -13,6 +13,8 @@ import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
+import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
+import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
 
 import javax.validation.Valid;
 
@@ -43,7 +45,7 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PostMapping("/new")
-    public BasicResponseData addCourse(@Valid @RequestBody ModifyCourseRequest modifyCourseRequest) {
+    public AddCourseResult addCourse(@Valid @RequestBody ModifyCourseRequest modifyCourseRequest) {
         return courseService.addCourse(modifyCourseRequest);
     }
 
@@ -51,6 +53,12 @@ public class CourseController implements CourseControllerApi {
     @PutMapping("/id/{courseId}")
     public BasicResponseData updateCourse(@PathVariable String courseId, @RequestBody ModifyCourseRequest modifyCourseRequest) {
         return courseService.updateCourse(courseId, modifyCourseRequest);
+    }
+
+    @Override
+    @PutMapping("/invitation/{invitationCode}")
+    public JoinCourseResult joinCourse(@PathVariable String invitationCode) {
+        return courseService.joinCourse(invitationCode);
     }
 
     @Override

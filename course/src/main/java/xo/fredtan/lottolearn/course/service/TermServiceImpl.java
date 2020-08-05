@@ -6,6 +6,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.course.service.TermService;
+import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
@@ -13,6 +14,7 @@ import xo.fredtan.lottolearn.course.dao.TermRepository;
 import xo.fredtan.lottolearn.domain.course.Term;
 import xo.fredtan.lottolearn.domain.course.request.ModifyTermRequest;
 
+import java.util.Date;
 import java.util.List;
 
 @DubboService(version = "0.0.1")
@@ -30,9 +32,13 @@ public class TermServiceImpl implements TermService {
     @Override
     @Transactional
     public BasicResponseData addTerm(ModifyTermRequest modifyTermRequest) {
+        if (modifyTermRequest.getTermEnd().before(new Date())) {
+            ApiExceptionCast.invalidParam();
+        }
         Term term = new Term();
         BeanUtils.copyProperties(modifyTermRequest, term);
         term.setId(null);
+        term.setStatus(true);
         termRepository.save(term);
         return BasicResponseData.ok();
     }

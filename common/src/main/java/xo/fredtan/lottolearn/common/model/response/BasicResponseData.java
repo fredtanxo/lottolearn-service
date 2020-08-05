@@ -2,8 +2,10 @@ package xo.fredtan.lottolearn.common.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class BasicResponseData implements ResponseData {
     public Integer code;

@@ -9,6 +9,8 @@ import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
+import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
+import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
 
 @Api("课程相关")
 public interface CourseControllerApi {
@@ -22,10 +24,13 @@ public interface CourseControllerApi {
     QueryResponseData<Course> findUserCourses(Integer page, Integer size, String userId, QueryUserCourseRequest queryUserCourseRequest);
 
     @ApiOperation("增加课程")
-    BasicResponseData addCourse(ModifyCourseRequest modifyCourseRequest);
+    AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest);
 
     @ApiOperation("修改课程")
     BasicResponseData updateCourse(String courseId, ModifyCourseRequest modifyCourseRequest);
+
+    @ApiOperation("凭课程邀请码加入课程")
+    JoinCourseResult joinCourse(String invitationCode);
 
     @ApiOperation("关闭课程")
     BasicResponseData closeCourse(String courseId);
