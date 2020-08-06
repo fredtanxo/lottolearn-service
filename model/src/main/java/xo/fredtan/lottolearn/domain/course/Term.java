@@ -8,13 +8,14 @@ import xo.fredtan.lottolearn.domain.audit.AbstractEntity;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "term")
 @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
-public class Term extends AbstractEntity {
+public class Term extends AbstractEntity implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid")
     private String id;

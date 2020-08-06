@@ -7,13 +7,14 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "course")
 @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
-public class Course {
+public class Course implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid")
     private String id;

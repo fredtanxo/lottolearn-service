@@ -6,13 +6,14 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "chapter")
 @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
-public class Chapter {
+public class Chapter implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid")
     private String id;

@@ -5,19 +5,21 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "resource")
 @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
-public class ChapterResource {
+public class ChapterResource implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid")
     private String id;
     @Column(name = "chapter_id")
     private String chapterId;
     private String name;
+    private String filename;
     private String uploader;
     @Column(name = "local_path")
     private String localPath;

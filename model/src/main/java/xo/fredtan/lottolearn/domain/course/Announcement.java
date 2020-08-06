@@ -5,13 +5,14 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "announcement")
 @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
-public class Announcement {
+public class Announcement implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid")
     private String id;
