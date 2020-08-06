@@ -73,11 +73,6 @@
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.github.tobato</groupId>
-                <artifactId>fastdfs-client</artifactId>
-                <version>${fastdfs-client.version}</version>
-            </dependency>
 
             <!-- Tools -->
             <dependency>
