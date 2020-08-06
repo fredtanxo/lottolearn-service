@@ -9,9 +9,9 @@ import java.util.Date;
 
 @Data
 @Entity
-@Table(name = "media")
+@Table(name = "resource")
 @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
-public class Media {
+public class ChapterResource {
     @Id
     @GeneratedValue(generator = "uuid")
     private String id;
@@ -22,6 +22,9 @@ public class Media {
     @Column(name = "local_path")
     private String localPath;
     @Column(name = "access_url")
+    private String accessUrl;
+    private Integer type;
+    @Column(name = "upload_date")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date accessUrl;
+    private Date uploadDate;
 }

@@ -6,20 +6,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import xo.fredtan.lottolearn.api.course.controller.MediaControllerApi;
-import xo.fredtan.lottolearn.api.course.service.MediaService;
+import xo.fredtan.lottolearn.api.course.controller.ChapterResourceControllerApi;
+import xo.fredtan.lottolearn.api.course.service.ChapterResourceService;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
-import xo.fredtan.lottolearn.domain.course.Media;
+import xo.fredtan.lottolearn.domain.course.ChapterResource;
 
 @RestController
 @RequestMapping("/media")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class MediaController implements MediaControllerApi {
-    private final MediaService mediaService;
+public class ChapterResourceController implements ChapterResourceControllerApi {
+    private final ChapterResourceService chapterResourceService;
 
     @Override
     @GetMapping("/id/{chapterId}")
-    public QueryResponseData<Media> findMediaByChapterId(@PathVariable String chapterId) {
-        return mediaService.findMediaByChapterId(chapterId);
+    public QueryResponseData<ChapterResource> findMediaByChapterId(@PathVariable String chapterId) {
+        return chapterResourceService.findMediaByChapterId(chapterId);
     }
 }

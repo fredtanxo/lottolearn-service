@@ -3,10 +3,10 @@ package xo.fredtan.lottolearn.api.course.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
-import xo.fredtan.lottolearn.domain.course.Media;
+import xo.fredtan.lottolearn.domain.course.ChapterResource;
 
 @Api("课程媒体")
-public interface MediaControllerApi {
+public interface ChapterResourceControllerApi {
     @ApiOperation("根据章节ID查询课程媒体信息")
-    QueryResponseData<Media> findMediaByChapterId(String chapterId);
+    QueryResponseData<ChapterResource> findMediaByChapterId(String chapterId);
 }
