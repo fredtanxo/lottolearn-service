@@ -8,6 +8,7 @@ public class ApiInvocationException extends RuntimeException {
     private final ResultCode resultCode;
 
     public ApiInvocationException(ResultCode resultCode) {
+        super(resultCode.getMessage());
         this.resultCode = resultCode;
     }
 }

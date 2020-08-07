@@ -1,6 +1,9 @@
 package xo.fredtan.lottolearn.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,21 +16,25 @@ import java.util.Objects;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(ApiInvocationException.class)
-    public BasicResponseData handleApiInvocationException(ApiInvocationException e) {
-        log.error("{}\n{}", e.getMessage(), e.getStackTrace());
-        return new BasicResponseData(e.getResultCode());
+    public ResponseEntity<BasicResponseData> handleApiInvocationException(ApiInvocationException e) {
+        log.error("API执行异常：{}", e.getResultCode());
+        log.error(e.getMessage(), e);
+        BasicResponseData responseData = new BasicResponseData(e.getResultCode());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public BasicResponseData handleFieldNotValidException(MethodArgumentNotValidException e) {
+    public HttpEntity<BasicResponseData> handleFieldNotValidException(MethodArgumentNotValidException e) {
         FieldError fieldError = e.getBindingResult().getFieldError();
-        return Objects.nonNull(fieldError) ?
+        BasicResponseData responseData = Objects.nonNull(fieldError) ?
                 new BasicResponseData(400, fieldError.getDefaultMessage()) : BasicResponseData.invalid();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
     }
 
     @ExceptionHandler(Exception.class)
-    public BasicResponseData handleGlobalException(Exception e) {
-        log.error(e.getMessage());
-        return BasicResponseData.error();
+    public HttpEntity<BasicResponseData> handleGlobalException(Exception e) {
+        log.error("未定义异常", e);
+        BasicResponseData responseData = BasicResponseData.error();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
     }
 }
