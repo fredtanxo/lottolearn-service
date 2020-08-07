@@ -53,7 +53,7 @@ public class SwaggerConfig {
                 .or(regex("/announcement.*"))
                 .or(regex("/chapter.*"))
                 .or(regex("/exam.*"))
-                .or(regex("/media.*"))
+                .or(regex("/resource.*"))
                 .or(regex("/term.*"));
     }
 
