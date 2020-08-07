@@ -3,3 +3,14 @@ spring:
     name: lottolearn-filesystem
 server:
   port: 51206
+dubbo:
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: nacos://127.0.0.1:8848
+lottolearn:
+  storage:
+    base-path: ${STORAGE_BASE_PATH:/tmp/lottolearn/storage}
+  media:
+    base-path: ${MEDIA_BASE_PATH:/tmp/lottolearn/media}
