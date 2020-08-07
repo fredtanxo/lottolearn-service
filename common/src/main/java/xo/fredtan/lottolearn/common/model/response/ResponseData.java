@@ -1,4 +1,6 @@
 package xo.fredtan.lottolearn.common.model.response;
 
-public interface ResponseData {
+import java.io.Serializable;
+
+public interface ResponseData extends Serializable {
 }

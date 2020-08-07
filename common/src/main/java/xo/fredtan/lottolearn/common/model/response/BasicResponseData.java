@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BasicResponseData implements ResponseData {
-    public Integer code;
-    public String message;
+    private Integer code;
+    private String message;
 
     public BasicResponseData(ResultCode resultCode) {
         this.code = resultCode.getCode();
