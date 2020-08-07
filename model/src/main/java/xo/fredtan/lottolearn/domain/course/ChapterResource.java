@@ -20,6 +20,9 @@ public class ChapterResource implements Serializable {
     private String chapterId;
     private String name;
     private String filename;
+    private Long size;
+    @Column(name = "mime_type")
+    private String mimeType;
     private String uploader;
     @Column(name = "local_path")
     private String localPath;

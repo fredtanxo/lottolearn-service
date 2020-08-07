@@ -9,17 +9,24 @@ import org.springframework.web.bind.annotation.RestController;
 import xo.fredtan.lottolearn.api.course.controller.ChapterResourceControllerApi;
 import xo.fredtan.lottolearn.api.course.service.ChapterResourceService;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
+import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.ChapterResource;
 
 @RestController
-@RequestMapping("/media")
+@RequestMapping("/resource")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ChapterResourceController implements ChapterResourceControllerApi {
     private final ChapterResourceService chapterResourceService;
 
     @Override
-    @GetMapping("/id/{chapterId}")
-    public QueryResponseData<ChapterResource> findMediaByChapterId(@PathVariable String chapterId) {
+    @GetMapping("/media/chapter/{chapterId}")
+    public UniqueQueryResponseData<ChapterResource> findMediaByChapterId(@PathVariable String chapterId) {
         return chapterResourceService.findMediaByChapterId(chapterId);
+    }
+
+    @Override
+    @GetMapping("/file/chapter/{chapterId}")
+    public QueryResponseData<ChapterResource> findFilesByChapterId(@PathVariable String chapterId) {
+        return chapterResourceService.findFilesByChapterId(chapterId);
     }
 }
