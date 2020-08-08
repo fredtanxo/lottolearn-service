@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xo.fredtan.lottolearn.user.dao.UserAccountMapper">
+    <resultMap id="userOfAccountMap" type="xo.fredtan.lottolearn.domain.user.response.UserOfAccount">
+        <id column="uid" property="id" />
+        <result column="ustatus" property="status" />
+        <association property="userAccount" javaType="xo.fredtan.lottolearn.domain.user.UserAccount">
+            <id column="uaid" property="id" />
+            <result column="uaaccount" property="account" />
+            <result column="uatype" property="type" />
+            <result column="uacredential" property="credential" />
+            <result column="uastatus" property="status" />
+        </association>
+        <collection property="roleList" ofType="xo.fredtan.lottolearn.domain.user.Role" javaType="list">
+            <id column="rid" property="id" />
+            <result column="rcode" property="code" />
+            <result column="rstatus" property="status" />
+        </collection>
+        <collection property="menuList" ofType="xo.fredtan.lottolearn.domain.user.Menu" javaType="list">
+            <id column="mid" property="id" />
+            <result column="mcode" property="code" />
+            <result column="mstatus" property="status" />
+        </collection>
+    </resultMap>
+    <select id="selectUserByAccountAndType" resultMap="userOfAccountMap">
+        select
+               ua.id as uaid,
+               ua.account as uaaccount,
+               ua.type as uatype,
+               ua.credential as uacredential,
+               ua.`status` as uastatus,
+               u.id as uid,
+               u.`status` as ustatus,
+               r.id as rid,
+               r.code as rcode,
+               r.`status` as rstatus,
+               m.id as mid,
+               m.code as mcode,
+               m.`status` as mstatus
+        from
+             user_account ua
+                 left join user u
+                     on (ua.user_id = u.id)
+                 left join user_role ur
+                     on (u.id = ur.user_id)
+                 left join role r
+                     on (ur.role_id = r.id)
+                 left join permission p
+                     on (r.id = p.role_id)
+                 left join menu m
+                     on (p.menu_id = m.id)
+        where
+              ua.account = #{account} and ua.type = #{type}
+    </select>
+</mapper>
