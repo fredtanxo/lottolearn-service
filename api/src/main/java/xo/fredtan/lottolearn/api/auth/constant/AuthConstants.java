@@ -10,7 +10,7 @@ public class AuthConstants {
     public static final String ISSUER = "https://lottolearn.com";
     public static final Long EXPIRATION_OFFSET = TimeUnit.DAYS.toMillis(7L);
     public static final String LOGIN_URL = "/auth/login";
-    public static final String TOKEN_CLAIM_KEY = "auth";
+    public static final String TOKEN_CLAIM_KEY = "scope";
     public static final String TOKEN_RESPONSE_HEADER = "Authorization";
     public static final String TOKEN_RESPONSE_PREFIX = "Bearer ";
 }
