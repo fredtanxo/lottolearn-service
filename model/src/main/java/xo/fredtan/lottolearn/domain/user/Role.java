@@ -21,6 +21,8 @@ public class Role extends AbstractEntity implements Serializable {
     private String id;
     @NotBlank(message = "必须提供角色名称")
     private String name;
+    @NotBlank(message = "必须提供角色代码")
+    private String code;
     private String description;
     private Boolean status;
 }
