@@ -14,7 +14,7 @@ import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import xo.fredtan.lottolearn.api.auth.constant.AuthConstants;
-import xo.fredtan.lottolearn.utils.RedisLockUtil;
+import xo.fredtan.lottolearn.auth.util.RedisLockUtil;
 
 import java.text.ParseException;
 import java.time.Duration;

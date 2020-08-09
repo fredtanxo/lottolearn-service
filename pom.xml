@@ -8,15 +8,12 @@
         <module>auth</module>
         <module>common</module>
         <module>course</module>
-        <module>storage</module>
         <module>media</module>
-        <module>system</module>
-        <module>user</module>
-        <module>utils</module>
-        <module>api</module>
-        <module>api</module>
-        <module>model</module>
         <module>message</module>
+        <module>model</module>
+        <module>system</module>
+        <module>storage</module>
+        <module>user</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

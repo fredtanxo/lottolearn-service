@@ -10,8 +10,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import xo.fredtan.lottolearn.api.auth.constant.AuthConstants;
 import xo.fredtan.lottolearn.auth.domain.JwtUser;
+import xo.fredtan.lottolearn.auth.util.JwtUtil;
 import xo.fredtan.lottolearn.domain.auth.request.FormLoginRequest;
-import xo.fredtan.lottolearn.utils.JwtUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;

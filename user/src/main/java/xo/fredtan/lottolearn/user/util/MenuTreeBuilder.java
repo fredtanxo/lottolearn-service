@@ -1,4 +1,4 @@
-package xo.fredtan.lottolearn.utils;
+package xo.fredtan.lottolearn.user.util;
 
 import xo.fredtan.lottolearn.domain.user.response.MenuTree;
 

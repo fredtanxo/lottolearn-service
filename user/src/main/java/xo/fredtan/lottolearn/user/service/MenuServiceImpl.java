@@ -13,7 +13,7 @@ import xo.fredtan.lottolearn.domain.user.request.ModifyMenuRequest;
 import xo.fredtan.lottolearn.domain.user.response.MenuTree;
 import xo.fredtan.lottolearn.user.dao.MenuMapper;
 import xo.fredtan.lottolearn.user.dao.MenuRepository;
-import xo.fredtan.lottolearn.utils.MenuTreeBuilder;
+import xo.fredtan.lottolearn.user.util.MenuTreeBuilder;
 
 import java.util.List;
 

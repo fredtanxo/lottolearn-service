@@ -1,4 +1,4 @@
-package xo.fredtan.lottolearn.utils;
+package xo.fredtan.lottolearn.auth.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.ReturnType;

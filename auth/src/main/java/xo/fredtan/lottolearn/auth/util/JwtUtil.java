@@ -1,4 +1,4 @@
-package xo.fredtan.lottolearn.utils;
+package xo.fredtan.lottolearn.auth.util;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
