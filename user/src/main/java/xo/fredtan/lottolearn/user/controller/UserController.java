@@ -14,6 +14,8 @@ import xo.fredtan.lottolearn.domain.user.request.ModifyUserRequest;
 import xo.fredtan.lottolearn.domain.user.request.QueryUserRequest;
 import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -29,8 +31,11 @@ public class UserController implements UserControllerApi {
 
     @Override
     @GetMapping("/id/{userId}")
-    public UniqueQueryResponseData<UserWithRoleIds> findUserById(@PathVariable String userId) {
-        return userService.findUserById(userId);
+    public UniqueQueryResponseData<UserWithRoleIds> findUserById(@PathVariable String userId, Boolean withRoles) {
+        if (Objects.isNull(withRoles) || !withRoles) {
+            return userService.findUserById(userId);
+        }
+        return userService.findUserByIdWithRoleIds(userId);
     }
 
     @Override

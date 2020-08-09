@@ -15,6 +15,8 @@ public interface CourseService {
 
     UniqueQueryResponseData<Course> findCourseById(String courseId);
 
+    UniqueQueryResponseData<Course> requestLiveCourse(String courseId);
+
     QueryResponseData<Course> findUserCourses(Integer page, Integer size, String userId, QueryUserCourseRequest queryUserCourseRequest);
 
     AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest);
@@ -24,4 +26,5 @@ public interface CourseService {
     JoinCourseResult joinCourse(String invitationCode);
 
     BasicResponseData closeCourse(String courseId);
+
 }

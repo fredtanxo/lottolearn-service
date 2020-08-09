@@ -14,5 +14,7 @@
           <if test="query.teacher != null">
                 and uc.is_teacher = #{query.teacher}
           </if>
+        order by
+                 uc.enroll_date desc
     </select>
 </mapper>

@@ -57,8 +57,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UniqueQueryResponseData<UserWithRoleIds> findUserById(String userId) {
-        UserWithRoleIds userWithRolesIds = userRoleMapper.selectUserWithRole(userId);
+        return userRepository.findById(userId).map(user -> {
+            UserWithRoleIds userWithRoleIds = new UserWithRoleIds();
+            BeanUtils.copyProperties(user, userWithRoleIds);
+            return UniqueQueryResponseData.ok(userWithRoleIds);
+        }).orElseGet(() -> UniqueQueryResponseData.ok(null));
+    }
 
+    @Override
+    public UniqueQueryResponseData<UserWithRoleIds> findUserByIdWithRoleIds(String userId) {
+        UserWithRoleIds userWithRolesIds = userRoleMapper.selectUserWithRole(userId);
         return UniqueQueryResponseData.ok(userWithRolesIds);
     }
 

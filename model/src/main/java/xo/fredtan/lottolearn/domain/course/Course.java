@@ -23,6 +23,7 @@ public class Course implements Serializable {
     private String cover;
     private String description;
     private String code;
+    private String live;
     @Column(name = "teacher_id")
     private String teacherId;
     @NotBlank(message = "必须提供学期ID")

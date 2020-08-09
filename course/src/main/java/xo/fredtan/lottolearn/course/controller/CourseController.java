@@ -2,6 +2,7 @@ package xo.fredtan.lottolearn.course.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import xo.fredtan.lottolearn.api.course.controller.CourseControllerApi;
 import xo.fredtan.lottolearn.api.course.service.CourseService;
@@ -23,6 +24,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CourseController implements CourseControllerApi {
     private final CourseService courseService;
+
     @Override
     @GetMapping("/all")
     @ValidatePagination
@@ -37,9 +39,15 @@ public class CourseController implements CourseControllerApi {
     }
 
     @Override
-    @GetMapping("/user/{userId}")
+    public UniqueQueryResponseData<Course> requestLiveCourse(String courseId) {
+        return courseService.requestLiveCourse(courseId);
+    }
+
+    @Override
+    @GetMapping("/user")
     @ValidatePagination
-    public QueryResponseData<Course> findUserCourses(Integer page, Integer size, @PathVariable String userId, QueryUserCourseRequest queryUserCourseRequest) {
+    public QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         return courseService.findUserCourses(page, size, userId, queryUserCourseRequest);
     }
 

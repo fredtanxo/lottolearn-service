@@ -10,7 +10,9 @@ public interface AnnouncementService {
 
     BasicResponseData addAnnouncement(String courseId, ModifyAnnouncementRequest modifyAnnouncementRequest);
 
-    BasicResponseData updateAnnouncement(String announcementId, ModifyAnnouncementRequest modifyAnnouncementRequest);
+    BasicResponseData updateAnnouncement(String courseId,
+                                         String announcementId,
+                                         ModifyAnnouncementRequest modifyAnnouncementRequest);
 
-    BasicResponseData deleteAnnouncement(String announcementId);
+    BasicResponseData deleteAnnouncement(String courseId, String announcementId);
 }

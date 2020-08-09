@@ -10,7 +10,7 @@ public interface ChapterService {
 
     BasicResponseData addChapter(String courseId, ModifyChapterRequest modifyChapterRequest);
 
-    BasicResponseData updateChapter(String chapterId, ModifyChapterRequest modifyChapterRequest);
+    BasicResponseData updateChapter(String courseId, String chapterId, ModifyChapterRequest modifyChapterRequest);
 
     BasicResponseData deleteChapter(String chapterId);
 }

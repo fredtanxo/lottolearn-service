@@ -18,27 +18,33 @@ public class AnnouncementController implements AnnouncementControllerApi {
     private final AnnouncementService announcementService;
 
     @Override
-    @GetMapping("/id/{courseId}")
+    @GetMapping("/course/{courseId}")
     @ValidatePagination
-    public QueryResponseData<Announcement> findAnnouncementByCourseId(Integer page, Integer size, @PathVariable String courseId) {
+    public QueryResponseData<Announcement> findAnnouncementByCourseId(Integer page,
+                                                                      Integer size,
+                                                                      @PathVariable String courseId) {
         return announcementService.findAnnouncementByCourseId(page, size, courseId);
     }
 
     @Override
-    @PostMapping("/id/{courseId}")
-    public BasicResponseData addAnnouncement(@PathVariable String courseId, @RequestBody ModifyAnnouncementRequest modifyAnnouncementRequest) {
+    @PostMapping("/course/{courseId}")
+    public BasicResponseData addAnnouncement(@PathVariable String courseId,
+                                             @RequestBody ModifyAnnouncementRequest modifyAnnouncementRequest) {
         return announcementService.addAnnouncement(courseId, modifyAnnouncementRequest);
     }
 
     @Override
-    @PutMapping("/id/{announcementId}")
-    public BasicResponseData updateAnnouncement(@PathVariable String announcementId, @RequestBody ModifyAnnouncementRequest modifyAnnouncementRequest) {
-        return announcementService.updateAnnouncement(announcementId, modifyAnnouncementRequest);
+    @PutMapping("/course/{courseId}/{announcementId}")
+    public BasicResponseData updateAnnouncement(@PathVariable String courseId,
+                                                @PathVariable String announcementId,
+                                                @RequestBody ModifyAnnouncementRequest modifyAnnouncementRequest) {
+        return announcementService.updateAnnouncement(courseId, announcementId, modifyAnnouncementRequest);
     }
 
     @Override
-    @DeleteMapping("/id/{announcementId}")
-    public BasicResponseData deleteAnnouncement(@PathVariable String announcementId) {
-        return announcementService.deleteAnnouncement(announcementId);
+    @DeleteMapping("/course/{courseId}/{announcementId}")
+    public BasicResponseData deleteAnnouncement(@PathVariable String courseId,
+                                                @PathVariable String announcementId) {
+        return announcementService.deleteAnnouncement(courseId, announcementId);
     }
 }

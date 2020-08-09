@@ -20,8 +20,11 @@ public interface CourseControllerApi {
     @ApiOperation("根据ID查询课程")
     UniqueQueryResponseData<Course> findCourseById(String courseId);
 
+    @ApiOperation("请求课程直播")
+    UniqueQueryResponseData<Course> requestLiveCourse(String courseId);
+
     @ApiOperation("查询用户课程")
-    QueryResponseData<Course> findUserCourses(Integer page, Integer size, String userId, QueryUserCourseRequest queryUserCourseRequest);
+    QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest);
 
     @ApiOperation("增加课程")
     AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest);

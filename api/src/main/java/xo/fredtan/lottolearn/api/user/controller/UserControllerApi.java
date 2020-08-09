@@ -15,8 +15,8 @@ public interface UserControllerApi {
     @ApiOperation("查询所有用户")
     QueryResponseData<User> findAllUsers(Integer page, Integer size, QueryUserRequest queryUserRequest);
 
-    @ApiOperation("根据用户ID查询用户信息（包含角色信息）")
-    UniqueQueryResponseData<UserWithRoleIds> findUserById(String userId);
+    @ApiOperation("根据用户ID查询用户信息")
+    UniqueQueryResponseData<UserWithRoleIds> findUserById(String userId, Boolean withRoles);
 
     @ApiOperation("增加用户")
     BasicResponseData addUser(ModifyUserRequest modifyUserRequest);

@@ -8,12 +8,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.course.service.ChapterService;
+import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
+import xo.fredtan.lottolearn.common.model.response.CommonCode;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
 import xo.fredtan.lottolearn.course.dao.ChapterRepository;
+import xo.fredtan.lottolearn.course.util.WithUserValidationUtil;
 import xo.fredtan.lottolearn.domain.course.Chapter;
 import xo.fredtan.lottolearn.domain.course.request.ModifyChapterRequest;
+import xo.fredtan.lottolearn.domain.course.response.CourseCode;
 
 import java.util.Date;
 
@@ -22,11 +26,16 @@ import java.util.Date;
 public class ChapterServiceImpl implements ChapterService {
     private final ChapterRepository chapterRepository;
 
+    private final WithUserValidationUtil withUserValidationUtil;
+
     @Override
     public QueryResponseData<Chapter> findChaptersByCourseId(Integer page, Integer size, String courseId) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        if (withUserValidationUtil.notParticipate(courseId)) {
+            ApiExceptionCast.cast(CourseCode.NOT_JOIN_COURSE);
+        }
 
-        Page<Chapter> chapters = chapterRepository.findByCourseId(pageRequest, courseId);
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Chapter> chapters = chapterRepository.findByCourseIdOrderByPubDateDesc(pageRequest, courseId);
 
         QueryResult<Chapter> queryResult = new QueryResult<>(chapters.getTotalElements(), chapters.getContent());
         return QueryResponseData.ok(queryResult);
@@ -35,6 +44,10 @@ public class ChapterServiceImpl implements ChapterService {
     @Override
     @Transactional
     public BasicResponseData addChapter(String courseId, ModifyChapterRequest modifyChapterRequest) {
+        if (withUserValidationUtil.notCourseOwner(courseId)) {
+            ApiExceptionCast.cast(CommonCode.FORBIDDEN);
+        }
+
         Chapter chapter = new Chapter();
         BeanUtils.copyProperties(modifyChapterRequest, chapter);
         chapter.setId(null);
@@ -48,12 +61,21 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     @Transactional
-    public BasicResponseData updateChapter(String chapterId, ModifyChapterRequest modifyChapterRequest) {
-        Chapter chapter = new Chapter();
-        BeanUtils.copyProperties(modifyChapterRequest, chapter);
-        chapter.setId(chapterId);
+    public BasicResponseData updateChapter(String courseId,
+                                           String chapterId,
+                                           ModifyChapterRequest modifyChapterRequest) {
+        if (withUserValidationUtil.notCourseOwner(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
 
-        chapterRepository.save(chapter);
+        chapterRepository.findById(chapterId).ifPresent(chapter -> {
+            // 确保课程ID和发布时间一致
+            modifyChapterRequest.setCourseId(chapter.getCourseId());
+            modifyChapterRequest.setPubDate(chapter.getPubDate());
+            BeanUtils.copyProperties(modifyChapterRequest, chapter);
+            chapter.setId(chapterId);
+            chapterRepository.save(chapter);
+        });
 
         return BasicResponseData.ok();
     }
@@ -61,7 +83,14 @@ public class ChapterServiceImpl implements ChapterService {
     @Override
     @Transactional
     public BasicResponseData deleteChapter(String chapterId) {
-        chapterRepository.findById(chapterId).ifPresent(chapterRepository::delete);
+        chapterRepository.findById(chapterId).ifPresent(chapter -> {
+            String courseId = chapter.getCourseId();
+            if (withUserValidationUtil.notCourseOwner(courseId)) {
+                ApiExceptionCast.forbidden();
+            }
+            chapterRepository.delete(chapter);
+        });
+
         return BasicResponseData.ok();
     }
 }

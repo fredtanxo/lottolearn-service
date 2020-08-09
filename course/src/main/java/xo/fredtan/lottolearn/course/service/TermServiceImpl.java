@@ -24,7 +24,7 @@ public class TermServiceImpl implements TermService {
 
     @Override
     public QueryResponseData<Term> findAllTerms() {
-        List<Term> terms = termRepository.findAll();
+        List<Term> terms = termRepository.findAllByOrderByStatusDescTermEndDesc();
         QueryResult<Term> queryResult = new QueryResult<>((long) terms.size(), terms);
         return QueryResponseData.ok(queryResult);
     }
@@ -35,6 +35,7 @@ public class TermServiceImpl implements TermService {
         if (modifyTermRequest.getTermEnd().before(new Date())) {
             ApiExceptionCast.invalidParam();
         }
+
         Term term = new Term();
         BeanUtils.copyProperties(modifyTermRequest, term);
         term.setId(null);

@@ -16,8 +16,10 @@ public interface AnnouncementControllerApi {
     BasicResponseData addAnnouncement(String courseId, ModifyAnnouncementRequest modifyAnnouncementRequest);
 
     @ApiOperation("修改课程公告")
-    BasicResponseData updateAnnouncement(String announcementId, ModifyAnnouncementRequest modifyAnnouncementRequest);
+    BasicResponseData updateAnnouncement(String courseId,
+                                         String announcementId,
+                                         ModifyAnnouncementRequest modifyAnnouncementRequest);
 
     @ApiOperation("删除课程公告")
-    BasicResponseData deleteAnnouncement(String announcementId);
+    BasicResponseData deleteAnnouncement(String courseId, String announcementId);
 }

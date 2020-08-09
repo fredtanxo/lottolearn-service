@@ -18,22 +18,27 @@ public class ChapterController implements ChapterControllerApi {
     private final ChapterService chapterService;
 
     @Override
-    @GetMapping("/id/{courseId}")
+    @GetMapping("/course/{courseId}")
     @ValidatePagination
-    public QueryResponseData<Chapter> findChaptersByCourseId(Integer page, Integer size, @PathVariable String courseId) {
+    public QueryResponseData<Chapter> findChaptersByCourseId(Integer page,
+                                                             Integer size,
+                                                             @PathVariable String courseId) {
         return chapterService.findChaptersByCourseId(page, size, courseId);
     }
 
     @Override
-    @PostMapping("/new/{courseId}")
-    public BasicResponseData addChapter(@PathVariable String courseId, @RequestBody ModifyChapterRequest modifyChapterRequest) {
+    @PostMapping("/course/{courseId}")
+    public BasicResponseData addChapter(@PathVariable String courseId,
+                                        @RequestBody ModifyChapterRequest modifyChapterRequest) {
         return chapterService.addChapter(courseId, modifyChapterRequest);
     }
 
     @Override
-    @PutMapping("/id/{chapterId}")
-    public BasicResponseData updateChapter(@PathVariable String chapterId, @RequestBody ModifyChapterRequest modifyChapterRequest) {
-        return chapterService.updateChapter(chapterId, modifyChapterRequest);
+    @PutMapping("/course/{courseId}/{chapterId}")
+    public BasicResponseData updateChapter(@PathVariable String courseId,
+                                           @PathVariable String chapterId,
+                                           @RequestBody ModifyChapterRequest modifyChapterRequest) {
+        return chapterService.updateChapter(courseId, chapterId, modifyChapterRequest);
     }
 
     @Override

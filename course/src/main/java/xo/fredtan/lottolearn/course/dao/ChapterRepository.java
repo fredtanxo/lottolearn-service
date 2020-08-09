@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import xo.fredtan.lottolearn.domain.course.Chapter;
 
 public interface ChapterRepository extends JpaRepository<Chapter, String> {
-    Page<Chapter> findByCourseId(Pageable pageable, String courseId);
+    Page<Chapter> findByCourseIdOrderByPubDateDesc(Pageable pageable, String courseId);
 }
