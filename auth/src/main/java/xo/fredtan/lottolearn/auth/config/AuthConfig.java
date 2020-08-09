@@ -3,10 +3,12 @@ package xo.fredtan.lottolearn.auth.config;
 import com.nimbusds.jose.jwk.RSAKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import xo.fredtan.lottolearn.auth.filter.JwtAuthenticationFilter;
@@ -38,10 +40,12 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+            .csrf(AbstractHttpConfigurer::disable)
             .authorizeRequests(authorizeRequests ->
                 authorizeRequests
-                    .antMatchers("/auth/login", "/auth/logout", "/auth/refresh").permitAll()
-                    .antMatchers("/.well-known/jwks.json").permitAll()
+                    .antMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
+                    .antMatchers(HttpMethod.DELETE, "/auth/logout").permitAll()
+                    .antMatchers(HttpMethod.GET, "/.well-known/jwks.json").permitAll()
                     .anyRequest().authenticated()
             )
             .addFilter(new JwtAuthenticationFilter(authenticationManager(), rsaKey))

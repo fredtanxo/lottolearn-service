@@ -60,10 +60,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     /**
      * 登录信息校验成功后生成JWT令牌
-     * @param request
-     * @param response
-     * @param chain
-     * @param authResult
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @param chain FilterChain
+     * @param authResult Authentication
      */
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
@@ -82,6 +82,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setHeader(AuthConstants.TOKEN_RESPONSE_HEADER, AuthConstants.TOKEN_RESPONSE_PREFIX + jwt);
     }
 
+    /**
+     * 登录信息校验失败发送401状态码
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @param failed AuthenticationException
+     */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,
                                               HttpServletResponse response,
