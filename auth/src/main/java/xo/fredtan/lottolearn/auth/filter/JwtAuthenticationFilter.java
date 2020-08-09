@@ -76,7 +76,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         String jwt = JwtUtil.issueRSAToken(rsaKey, AuthConstants.ISSUER, principal.getUserId(),
-                Map.entry(AuthConstants.TOKEN_CLAIM_KEY, String.join(",", authorities)),
+                Map.entry(AuthConstants.TOKEN_CLAIM_KEY, String.join(" ", authorities)),
                 AuthConstants.EXPIRATION_OFFSET);
 
         response.setHeader(AuthConstants.TOKEN_RESPONSE_HEADER, AuthConstants.TOKEN_RESPONSE_PREFIX + jwt);
