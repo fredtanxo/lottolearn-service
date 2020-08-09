@@ -16,6 +16,8 @@ import java.util.Objects;
 public class JwtUser implements UserDetails {
     @Getter
     private String userId;
+    @Getter
+    private String nickname;
     private String username;
     private String password;
     private Boolean enabled;
@@ -26,6 +28,7 @@ public class JwtUser implements UserDetails {
 
         if (Objects.nonNull(userOfAccount)) {
             jwtUser.setUserId(userOfAccount.getId());
+            jwtUser.setNickname(userOfAccount.getNickname());
             jwtUser.setUsername(userOfAccount.getUserAccount().getAccount());
             jwtUser.setPassword(userOfAccount.getUserAccount().getCredential());
             jwtUser.setEnabled(userOfAccount.getStatus());

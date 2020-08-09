@@ -26,25 +26,30 @@ public class JwtUtil {
      * @param rsaKey 私钥
      * @param issuer 签发者
      * @param subject 签发对象
-     * @param claims 其他信息
+     * @param claims Claims
      * @param expirationOffset 过期时间
      * @return JWT
      */
     public static String issueRSAToken(RSAKey rsaKey,
                                        String issuer,
                                        String subject,
-                                       Map.Entry<String, ?> claims,
+                                       Map<String, ?> claims,
                                        Long expirationOffset) {
         Date now = new Date();
         try {
             JWSSigner signer = new RSASSASigner(rsaKey);
-            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+            JWTClaimsSet.Builder claimsSetBuilder = new JWTClaimsSet.Builder()
                     .subject(subject)
-                    .claim(claims.getKey(), claims.getValue())
                     .issuer(issuer)
                     .issueTime(now)
-                    .expirationTime(new Date(now.getTime() + expirationOffset))
-                    .build();
+                    .expirationTime(new Date(now.getTime() + expirationOffset));
+
+            for (Map.Entry<String, ?> entry : claims.entrySet()) {
+                claimsSetBuilder.claim(entry.getKey(), entry.getValue());
+            }
+
+            JWTClaimsSet claimsSet = claimsSetBuilder.build();
+
             String kid = rsaKey.getKeyID();
             SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(kid).build(), claimsSet);
             signedJWT.sign(signer);

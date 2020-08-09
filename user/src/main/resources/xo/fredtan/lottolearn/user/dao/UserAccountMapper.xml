@@ -3,6 +3,7 @@
 <mapper namespace="xo.fredtan.lottolearn.user.dao.UserAccountMapper">
     <resultMap id="userOfAccountMap" type="xo.fredtan.lottolearn.domain.user.response.UserOfAccount">
         <id column="uid" property="id" />
+        <result column="unickname" property="nickname" />
         <result column="ustatus" property="status" />
         <association property="userAccount" javaType="xo.fredtan.lottolearn.domain.user.UserAccount">
             <id column="uaid" property="id" />
@@ -30,6 +31,7 @@
                ua.credential as uacredential,
                ua.`status` as uastatus,
                u.id as uid,
+               u.nickname as unickname,
                u.`status` as ustatus,
                r.id as rid,
                r.code as rcode,
