@@ -5,4 +5,5 @@ import xo.fredtan.lottolearn.domain.course.Course;
 
 public interface CourseRepository extends JpaRepository<Course, String> {
     Course findByCode(String code);
+    Course findByLive(String live);
 }

@@ -12,8 +12,10 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import xo.fredtan.lottolearn.api.course.constant.CourseConstants;
 import xo.fredtan.lottolearn.api.course.service.CourseService;
 import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
@@ -48,6 +50,8 @@ public class CourseServiceImpl implements CourseService {
     private final UserCourseRepository userCourseRepository;
     private final UserCourseMapper userCourseMapper;
 
+    private final RedisTemplate<String, String> redisTemplate;
+
     @DubboReference(version = "0.0.1")
     private UserService userService;
 
@@ -77,6 +81,12 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public UniqueQueryResponseData<Course> findCourseByLive(String liveId) {
+        Course course = courseRepository.findByLive(liveId);
+        return UniqueQueryResponseData.ok(course);
+    }
+
+    @Override
     public UniqueQueryResponseData<Course> findCourseById(String courseId) {
         if (withUserValidationUtil.notParticipate(courseId)) {
             ApiExceptionCast.forbidden();
@@ -94,10 +104,15 @@ public class CourseServiceImpl implements CourseService {
             ApiExceptionCast.forbidden();
         }
 
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         return courseRepository.findById(courseId).map(course -> {
             String roomId = UUID.randomUUID().toString().replace("-", "");
             course.setLive(roomId);
-            return UniqueQueryResponseData.ok(courseRepository.save(course));
+            Course savedCourse = courseRepository.save(course);
+
+            redisTemplate.boundSetOps(CourseConstants.LIVE_KEY_PREFIX + courseId + ":" + roomId).add(userId);
+
+            return UniqueQueryResponseData.ok(savedCourse);
         }).orElseThrow(() -> new ApiInvocationException(CommonCode.INVALID_PARAM));
     }
 
@@ -109,6 +124,12 @@ public class CourseServiceImpl implements CourseService {
 
         QueryResult<Course> queryResult = new QueryResult<>(coursePageInfo.getTotal(), coursePageInfo.getList());
         return QueryResponseData.ok(queryResult);
+    }
+
+    @Override
+    public UniqueQueryResponseData<UserCourse> findUserCourse(String userId, String courseId) {
+        UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(userId, courseId);
+        return UniqueQueryResponseData.ok(userCourse);
     }
 
     @Override
