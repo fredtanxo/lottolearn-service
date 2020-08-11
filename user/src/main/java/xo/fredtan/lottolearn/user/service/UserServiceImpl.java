@@ -8,6 +8,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
@@ -68,6 +69,14 @@ public class UserServiceImpl implements UserService {
     public UniqueQueryResponseData<UserWithRoleIds> findUserByIdWithRoleIds(String userId) {
         UserWithRoleIds userWithRolesIds = userRoleMapper.selectUserWithRole(userId);
         return UniqueQueryResponseData.ok(userWithRolesIds);
+    }
+
+    @Override
+    public UniqueQueryResponseData<User> findCurrentUser() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findById(userId)
+                .map(UniqueQueryResponseData::ok)
+                .orElseGet(() -> UniqueQueryResponseData.ok(null));
     }
 
     @Override

@@ -39,6 +39,12 @@ public class UserController implements UserControllerApi {
     }
 
     @Override
+    @GetMapping("/current")
+    public UniqueQueryResponseData<User> findCurrentUser() {
+        return userService.findCurrentUser();
+    }
+
+    @Override
     @PostMapping("/new")
     public BasicResponseData addUser(@RequestBody ModifyUserRequest modifyUserRequest) {
         return userService.addUser(modifyUserRequest);

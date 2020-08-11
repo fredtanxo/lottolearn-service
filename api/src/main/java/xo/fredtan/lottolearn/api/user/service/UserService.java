@@ -15,6 +15,8 @@ public interface UserService {
 
     UniqueQueryResponseData<UserWithRoleIds> findUserByIdWithRoleIds(String userId);
 
+    UniqueQueryResponseData<User> findCurrentUser();
+
     BasicResponseData addUser(ModifyUserRequest modifyUserRequest);
 
     BasicResponseData updateUser(String userId, ModifyUserRequest modifyUserRequest);

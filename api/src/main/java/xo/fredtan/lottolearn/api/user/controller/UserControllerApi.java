@@ -18,6 +18,9 @@ public interface UserControllerApi {
     @ApiOperation("根据用户ID查询用户信息")
     UniqueQueryResponseData<UserWithRoleIds> findUserById(String userId, Boolean withRoles);
 
+    @ApiOperation("查询当前用户")
+    UniqueQueryResponseData<User> findCurrentUser();
+
     @ApiOperation("增加用户")
     BasicResponseData addUser(ModifyUserRequest modifyUserRequest);
 
