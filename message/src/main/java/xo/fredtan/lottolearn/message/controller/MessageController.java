@@ -2,21 +2,18 @@ package xo.fredtan.lottolearn.message.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Controller;
+import xo.fredtan.lottolearn.api.message.constant.MessageConstants;
 import xo.fredtan.lottolearn.api.message.controller.MessageControllerApi;
-import xo.fredtan.lottolearn.api.message.service.MessageService;
 import xo.fredtan.lottolearn.domain.message.ChatMessage;
 
 @Controller
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MessageController implements MessageControllerApi {
-    private final MessageService messageService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
-    private final SimpUserRegistry simpUserRegistry;
+    private final RedisTemplate<String, ChatMessage> template;
 
     /**
      * 消息发送端 -> /in/{roomId} ---
@@ -30,7 +27,7 @@ public class MessageController implements MessageControllerApi {
     @MessageMapping("/in/{roomId}")
     public void classroomChat(@DestinationVariable String roomId, ChatMessage chatMessage) {
         System.out.println(chatMessage);
-        simpMessagingTemplate.convertAndSend("/out/" + roomId, chatMessage);
+        template.convertAndSend(MessageConstants.LIVE_DISTRIBUTION_CHANNEL, chatMessage);
     }
 
 //    @SubscribeMapping("/members/{roomId}")

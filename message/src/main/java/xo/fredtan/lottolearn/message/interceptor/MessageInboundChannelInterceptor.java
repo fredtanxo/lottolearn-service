@@ -110,7 +110,7 @@ public class MessageInboundChannelInterceptor implements ChannelInterceptor {
     }
 
     private void userSubscribeEvent(StompHeaderAccessor accessor, Boolean flag) {
-        String roomId = this.extractRoomId(accessor);
+        String roomId = accessor.getSubscriptionId();
         String courseId = (String) accessor.getHeader(MessageConstants.COURSE_ID);
         if (StringUtils.isEmpty(courseId) || StringUtils.isEmpty(roomId)) {
             return;

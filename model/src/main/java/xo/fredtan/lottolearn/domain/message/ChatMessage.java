@@ -12,4 +12,5 @@ public class ChatMessage implements Serializable {
     private String avatar;
     private String content;
     private String date;
+    private String roomId;
 }
