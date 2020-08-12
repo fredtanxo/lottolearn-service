@@ -18,7 +18,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiInvocationException.class)
     public ResponseEntity<BasicResponseData> handleApiInvocationException(ApiInvocationException e) {
         log.error("API执行异常：{}", e.getResultCode());
-        log.error(e.getMessage(), e);
         BasicResponseData responseData = new BasicResponseData(e.getResultCode());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
     }
