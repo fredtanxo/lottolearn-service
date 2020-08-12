@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
 import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -12,6 +13,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import xo.fredtan.lottolearn.api.message.constant.MessageConstants;
 import xo.fredtan.lottolearn.api.message.service.MessageService;
 import xo.fredtan.lottolearn.message.interceptor.MessageInboundChannelInterceptor;
 
@@ -41,12 +43,20 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
                 .addEndpoint("/classroom")
-                .setAllowedOrigins("*");
+                .setAllowedOrigins("https://lottolearn.com");
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/in", "/out");
+        // 10秒发送心跳（Stompjs默认设置）
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(1);
+        scheduler.setThreadNamePrefix("wss-heartbeat-");
+        scheduler.initialize();
+
+        registry.enableSimpleBroker("/in", "/out")
+                .setHeartbeatValue(new long[] {MessageConstants.HEARTBEAT_INCOMING, MessageConstants.HEARTBEAT_OUTGOING})
+                .setTaskScheduler(scheduler);
         registry.setUserDestinationPrefix("/user");
     }
 
