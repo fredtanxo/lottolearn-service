@@ -1,4 +1,6 @@
 package xo.fredtan.lottolearn.common.model.request;
 
-public interface RequestData {
+import java.io.Serializable;
+
+public interface RequestData extends Serializable {
 }

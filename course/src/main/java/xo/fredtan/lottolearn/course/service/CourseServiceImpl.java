@@ -1,11 +1,13 @@
 package xo.fredtan.lottolearn.course.service;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -15,31 +17,32 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import xo.fredtan.lottolearn.api.course.constant.CourseConstants;
 import xo.fredtan.lottolearn.api.course.service.CourseService;
+import xo.fredtan.lottolearn.api.message.constant.MessageConstants;
 import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
 import xo.fredtan.lottolearn.common.exception.ApiInvocationException;
 import xo.fredtan.lottolearn.common.model.response.*;
-import xo.fredtan.lottolearn.course.dao.CourseRepository;
-import xo.fredtan.lottolearn.course.dao.TermRepository;
-import xo.fredtan.lottolearn.course.dao.UserCourseMapper;
-import xo.fredtan.lottolearn.course.dao.UserCourseRepository;
+import xo.fredtan.lottolearn.course.config.RabbitMqConfig;
+import xo.fredtan.lottolearn.course.dao.*;
 import xo.fredtan.lottolearn.course.util.WithUserValidationUtil;
 import xo.fredtan.lottolearn.domain.course.Course;
+import xo.fredtan.lottolearn.domain.course.Sign;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
+import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.CourseCode;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
+import xo.fredtan.lottolearn.domain.message.ChatMessage;
 import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @DubboService(version = "0.0.1")
@@ -49,8 +52,12 @@ public class CourseServiceImpl implements CourseService {
     private final TermRepository termRepository;
     private final UserCourseRepository userCourseRepository;
     private final UserCourseMapper userCourseMapper;
+    private final SignRepository signRepository;
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
+    private final RedisTemplate<String, ChatMessage> chatMessageRedisTemplate;
+
+    private final RabbitTemplate rabbitTemplate;
 
     @DubboReference(version = "0.0.1")
     private UserService userService;
@@ -97,6 +104,20 @@ public class CourseServiceImpl implements CourseService {
                 .orElseGet(() -> UniqueQueryResponseData.ok(null));
     }
 
+
+    @Override
+    public QueryResponseData<Course> findUserCourses(Integer page,
+                                                     Integer size,
+                                                     String userId,
+                                                     QueryUserCourseRequest queryUserCourseRequest) {
+        PageHelper.startPage(page, size);
+        List<Course> courses = userCourseMapper.selectUserCourses(userId, queryUserCourseRequest);
+        PageInfo<Course> coursePageInfo = new PageInfo<>(courses);
+
+        QueryResult<Course> queryResult = new QueryResult<>(coursePageInfo.getTotal(), coursePageInfo.getList());
+        return QueryResponseData.ok(queryResult);
+    }
+
     @Override
     @Transactional
     public UniqueQueryResponseData<Course> requestLiveCourse(String courseId) {
@@ -110,20 +131,52 @@ public class CourseServiceImpl implements CourseService {
             course.setLive(roomId);
             Course savedCourse = courseRepository.save(course);
 
-            redisTemplate.boundSetOps(CourseConstants.LIVE_KEY_PREFIX + courseId + ":" + roomId).add(userId);
-
             return UniqueQueryResponseData.ok(savedCourse);
         }).orElseThrow(() -> new ApiInvocationException(CommonCode.INVALID_PARAM));
     }
 
     @Override
-    public QueryResponseData<Course> findUserCourses(Integer page, Integer size, String userId, QueryUserCourseRequest queryUserCourseRequest) {
-        PageHelper.startPage(page, size);
-        List<Course> courses = userCourseMapper.selectUserCourses(userId, queryUserCourseRequest);
-        PageInfo<Course> coursePageInfo = new PageInfo<>(courses);
+    @Transactional
+    public BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, String courseId, Long timeout) {
+        if (timeout < 0) { // fail safe
+            timeout = 15L;
+        }
 
-        QueryResult<Course> queryResult = new QueryResult<>(coursePageInfo.getTotal(), coursePageInfo.getList());
-        return QueryResponseData.ok(queryResult);
+        Sign sign = new Sign();
+        sign.setCourseId(courseId);
+        sign.setTimeout(timeout);
+        sign.setSignDate(new Date());
+
+        sign = signRepository.save(sign);
+
+        String content = JSON.toJSONString(Map.of("timeout", timeout, "signId", sign.getId()));
+        chatMessage.setContent(content);
+
+        chatMessageRedisTemplate.convertAndSend(MessageConstants.LIVE_DISTRIBUTION_CHANNEL, chatMessage);
+        stringRedisTemplate.boundValueOps(CourseConstants.LIVE_SIGN_KEY_PREFIX + sign.getId())
+                .set(courseId, timeout, TimeUnit.SECONDS);
+
+        return BasicResponseData.ok();
+    }
+
+    @Override
+    public BasicResponseData handleLiveCourseSign(CourseSignRequest courseSignRequest) {
+        String courseId = stringRedisTemplate
+                .boundValueOps(CourseConstants.LIVE_SIGN_KEY_PREFIX + courseSignRequest.getSignId())
+                .get();
+
+        boolean success = StringUtils.hasText(courseId);
+
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        courseSignRequest.setUserId(userId);
+        courseSignRequest.setId(null);
+        courseSignRequest.setSignTime(new Date());
+        courseSignRequest.setSuccess(success);
+
+        rabbitTemplate.convertAndSend(
+                RabbitMqConfig.EXCHANGE_COURSE_SIGN, RabbitMqConfig.ROUTING_KEY_COURSE_SIGN, courseSignRequest);
+
+        return success ? BasicResponseData.ok() : BasicResponseData.invalid();
     }
 
     @Override

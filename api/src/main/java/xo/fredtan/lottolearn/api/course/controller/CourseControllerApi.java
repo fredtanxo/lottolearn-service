@@ -6,11 +6,13 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.Course;
+import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
+import xo.fredtan.lottolearn.domain.message.ChatMessage;
 
 @Api("课程相关")
 public interface CourseControllerApi {
@@ -20,11 +22,17 @@ public interface CourseControllerApi {
     @ApiOperation("根据ID查询课程")
     UniqueQueryResponseData<Course> findCourseById(String courseId);
 
+    @ApiOperation("查询用户课程")
+    QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest);
+
     @ApiOperation("请求课程直播")
     UniqueQueryResponseData<Course> requestLiveCourse(String courseId);
 
-    @ApiOperation("查询用户课程")
-    QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest);
+    @ApiOperation("请求课程直播签到")
+    BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, String courseId, Long timeout);
+
+    @ApiOperation("处理课程直播签到")
+    BasicResponseData handleLiveCourseSign(CourseSignRequest courseSignRequest);
 
     @ApiOperation("增加课程")
     AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest);

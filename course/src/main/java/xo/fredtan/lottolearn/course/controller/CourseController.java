@@ -11,11 +11,13 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.Course;
+import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
+import xo.fredtan.lottolearn.domain.message.ChatMessage;
 
 import javax.validation.Valid;
 
@@ -38,10 +40,6 @@ public class CourseController implements CourseControllerApi {
         return courseService.findCourseById(courseId);
     }
 
-    @Override
-    public UniqueQueryResponseData<Course> requestLiveCourse(String courseId) {
-        return courseService.requestLiveCourse(courseId);
-    }
 
     @Override
     @GetMapping("/user")
@@ -49,6 +47,26 @@ public class CourseController implements CourseControllerApi {
     public QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         return courseService.findUserCourses(page, size, userId, queryUserCourseRequest);
+    }
+
+    @Override
+    @PostMapping("/live/{courseId}")
+    public UniqueQueryResponseData<Course> requestLiveCourse(@PathVariable String courseId) {
+        return courseService.requestLiveCourse(courseId);
+    }
+
+    @Override
+    @PostMapping("/live/sign/{courseId}/{timeout}")
+    public BasicResponseData requestLiveCourseSign(@RequestBody ChatMessage chatMessage,
+                                                   @PathVariable String courseId,
+                                                   @PathVariable Long timeout) {
+        return courseService.requestLiveCourseSign(chatMessage, courseId, timeout);
+    }
+
+    @Override
+    @PostMapping("/live/student/sign")
+    public BasicResponseData handleLiveCourseSign(@RequestBody CourseSignRequest courseSignRequest) {
+        return courseService.handleLiveCourseSign(courseSignRequest);
     }
 
     @Override
