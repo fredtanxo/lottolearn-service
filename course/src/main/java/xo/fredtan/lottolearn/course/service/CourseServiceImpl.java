@@ -137,6 +137,16 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
+    public BasicResponseData requestLiveCourseEnd(String courseId) {
+        courseRepository.findById(courseId).ifPresent(course -> {
+            course.setLive(null);
+            courseRepository.save(course);
+        });
+        return BasicResponseData.ok();
+    }
+
+    @Override
+    @Transactional
     public BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, String courseId, Long timeout) {
         if (timeout < 0) { // fail safe
             timeout = 15L;

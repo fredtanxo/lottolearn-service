@@ -28,6 +28,9 @@ public interface CourseControllerApi {
     @ApiOperation("请求课程直播")
     UniqueQueryResponseData<Course> requestLiveCourse(String courseId);
 
+    @ApiOperation("结束课程直播")
+    BasicResponseData requestLiveCourseEnd(String courseId);
+
     @ApiOperation("请求课程直播签到")
     BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, String courseId, Long timeout);
 

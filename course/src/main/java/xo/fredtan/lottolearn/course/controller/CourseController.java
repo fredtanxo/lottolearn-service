@@ -56,6 +56,12 @@ public class CourseController implements CourseControllerApi {
     }
 
     @Override
+    @DeleteMapping("/live/{courseId}")
+    public BasicResponseData requestLiveCourseEnd(@PathVariable String courseId) {
+        return courseService.requestLiveCourseEnd(courseId);
+    }
+
+    @Override
     @PostMapping("/live/sign/{courseId}/{timeout}")
     public BasicResponseData requestLiveCourseSign(@RequestBody ChatMessage chatMessage,
                                                    @PathVariable String courseId,

@@ -28,6 +28,8 @@ public interface CourseService {
 
     UniqueQueryResponseData<Course> requestLiveCourse(String courseId);
 
+    BasicResponseData requestLiveCourseEnd(String courseId);
+
     BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, String courseId, Long timeout);
 
     BasicResponseData handleLiveCourseSign(@RequestBody CourseSignRequest courseSignRequest);
