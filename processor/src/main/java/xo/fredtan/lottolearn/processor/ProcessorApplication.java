@@ -1,11 +1,11 @@
-package xo.fredtan.lottolearn.media;
+package xo.fredtan.lottolearn.processor;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MediaApplication {
+public class ProcessorApplication {
     public static void main(String[] args) {
-        SpringApplication.run(MediaApplication.class, args);
+        SpringApplication.run(ProcessorApplication.class, args);
     }
 }

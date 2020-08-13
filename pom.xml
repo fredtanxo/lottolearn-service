@@ -8,9 +8,9 @@
         <module>auth</module>
         <module>common</module>
         <module>course</module>
-        <module>media</module>
         <module>message</module>
         <module>model</module>
+        <module>processor</module>
         <module>system</module>
         <module>storage</module>
         <module>user</module>

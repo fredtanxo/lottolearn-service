@@ -3,3 +3,4 @@ spring:
     name: lottolearn-media
 server:
   port: 51209
+
