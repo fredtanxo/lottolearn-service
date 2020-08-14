@@ -27,7 +27,7 @@ public class RegularFileController implements RegularFileControllerApi {
     }
 
     @Override
-    @GetMapping("/chapter/{chapterId}/{resourceId}")
+    @GetMapping("/chapter/{chapterId}/resource/{resourceId}")
     public void chapterFileDownload(@PathVariable String chapterId,
                                     @PathVariable String resourceId,
                                     HttpServletResponse response) {

@@ -4,13 +4,12 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.ChapterResource;
+import xo.fredtan.lottolearn.domain.course.ResourceLibrary;
 
 public interface ChapterResourceService {
-    UniqueQueryResponseData<ChapterResource> findMediaByChapterId(String chapterId);
+    UniqueQueryResponseData<ResourceLibrary> findMediaByChapterId(String chapterId);
 
-    QueryResponseData<ChapterResource> findFilesByChapterId(String chapterId);
-
-    UniqueQueryResponseData<ChapterResource> findChapterResourceById(String resourceId);
+    QueryResponseData<ResourceLibrary> findFilesByChapterId(String chapterId);
 
     BasicResponseData uploadChapterFile(ChapterResource chapterResource);
 }

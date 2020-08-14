@@ -10,7 +10,7 @@ import xo.fredtan.lottolearn.api.course.controller.ChapterResourceControllerApi;
 import xo.fredtan.lottolearn.api.course.service.ChapterResourceService;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
-import xo.fredtan.lottolearn.domain.course.ChapterResource;
+import xo.fredtan.lottolearn.domain.course.ResourceLibrary;
 
 @RestController
 @RequestMapping("/resource")
@@ -20,13 +20,13 @@ public class ChapterResourceController implements ChapterResourceControllerApi {
 
     @Override
     @GetMapping("/media/chapter/{chapterId}")
-    public UniqueQueryResponseData<ChapterResource> findMediaByChapterId(@PathVariable String chapterId) {
+    public UniqueQueryResponseData<ResourceLibrary> findMediaByChapterId(@PathVariable String chapterId) {
         return chapterResourceService.findMediaByChapterId(chapterId);
     }
 
     @Override
     @GetMapping("/file/chapter/{chapterId}")
-    public QueryResponseData<ChapterResource> findFilesByChapterId(@PathVariable String chapterId) {
+    public QueryResponseData<ResourceLibrary> findFilesByChapterId(@PathVariable String chapterId) {
         return chapterResourceService.findFilesByChapterId(chapterId);
     }
 }

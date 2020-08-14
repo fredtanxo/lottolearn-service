@@ -1,6 +1,14 @@
 spring:
   application:
-    name: lottolearn-filesystem
+    name: lottolearn-storage
+  servlet:
+    multipart:
+      max-file-size: 2GB
+      max-request-size: 2GB
+  rabbitmq:
+    host: localhost
+    port: 5672
+    virtual-host: /
 server:
   port: 51206
 dubbo:
@@ -12,5 +20,6 @@ dubbo:
 lottolearn:
   storage:
     base-path: ${STORAGE_BASE_PATH:/tmp/lottolearn/storage}
+    base-url: https://storage.lottolearn.com
   media:
     base-path: ${MEDIA_BASE_PATH:/tmp/lottolearn/media}

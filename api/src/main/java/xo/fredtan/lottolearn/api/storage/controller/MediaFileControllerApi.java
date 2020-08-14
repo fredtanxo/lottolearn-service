@@ -8,5 +8,5 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 @Api("媒体文件上传")
 public interface MediaFileControllerApi {
     @ApiOperation("媒体文件上传")
-    BasicResponseData mediaUpload(String courseId, String chapterId, MultipartFile files, String name, String type);
+    BasicResponseData mediaUpload(String courseId, MultipartFile files, String name, String type);
 }

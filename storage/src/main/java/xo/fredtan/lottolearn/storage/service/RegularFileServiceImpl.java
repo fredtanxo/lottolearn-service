@@ -7,13 +7,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import xo.fredtan.lottolearn.api.course.service.ChapterResourceService;
+import xo.fredtan.lottolearn.api.course.service.ResourceLibraryService;
 import xo.fredtan.lottolearn.api.storage.constant.FileCode;
 import xo.fredtan.lottolearn.api.storage.service.RegularFileService;
 import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.CommonCode;
-import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.ChapterResource;
+import xo.fredtan.lottolearn.domain.course.ResourceLibrary;
+import xo.fredtan.lottolearn.domain.storage.constant.FileStatus;
 import xo.fredtan.lottolearn.domain.storage.constant.FileUploadType;
 
 import javax.servlet.ServletOutputStream;
@@ -23,6 +25,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -30,8 +33,13 @@ public class RegularFileServiceImpl implements RegularFileService {
     @DubboReference(version = "0.0.1")
     private ChapterResourceService chapterResourceService;
 
+    @DubboReference(version = "0.0.1")
+    private ResourceLibraryService resourceLibraryService;
+
     @Value("${lottolearn.storage.base-path}")
     private String basePath;
+    @Value("${lottolearn.storage.base-url}")
+    private String baseUrl;
 
     /**
      * 文件保存路径构成：{basePath}/course/{courseId}/chapter/{chapterId}/{filename}
@@ -45,12 +53,10 @@ public class RegularFileServiceImpl implements RegularFileService {
      */
     @Override
     public BasicResponseData chapterFileUpload(String courseId, String chapterId, MultipartFile files, String name, String type) {
+        String uuid = UUID.randomUUID().toString();
         String filename = files.getOriginalFilename();
         try (InputStream inputStream = files.getInputStream()) {
-            File file = new File(basePath + "/course/" + courseId + "/chapter/" + chapterId + "/" + filename);
-            if (file.exists()) {
-                ApiExceptionCast.cast(FileCode.FILE_ALREADY_EXISTS);
-            }
+            File file = new File(basePath + "/course/" + courseId + "/chapter/" + chapterId + "/" + uuid);
             File parentFile = file.getParentFile();
             if (!parentFile.exists()) {
                 boolean mkdirs = parentFile.mkdirs();
@@ -65,16 +71,24 @@ public class RegularFileServiceImpl implements RegularFileService {
             FileOutputStream outputStream = new FileOutputStream(file);
             IOUtils.copy(inputStream, outputStream);
 
+            ResourceLibrary resourceItem = new ResourceLibrary();
+            resourceItem.setCourseId(courseId);
+            resourceItem.setName(filename);
+            resourceItem.setFilename(uuid);
+            resourceItem.setSize(file.length());
+            resourceItem.setMimeType(type);
+            resourceItem.setUploader(null);
+            resourceItem.setLocalPath(file.getPath());
+            resourceItem.setType(FileUploadType.REGULAR.getType());
+            resourceItem.setUploadDate(new Date());
+            resourceItem.setStatus(FileStatus.NO_NEED_PROCESS.getType());
+
+            String accessBaseUrl = baseUrl + "/file/chapter/" + chapterId + "/resource/";
+            resourceItem = resourceLibraryService.saveResourceItem(resourceItem, accessBaseUrl);
+
             ChapterResource chapterResource = new ChapterResource();
             chapterResource.setChapterId(chapterId);
-            chapterResource.setName(name);
-            chapterResource.setFilename(filename);
-            chapterResource.setSize(file.length());
-            chapterResource.setMimeType(type);
-            chapterResource.setUploader("");
-            chapterResource.setLocalPath(file.getPath());
-            chapterResource.setType(FileUploadType.REGULAR.getType());
-            chapterResource.setUploadDate(new Date());
+            chapterResource.setResourceId(resourceItem.getId());
 
             BasicResponseData responseData = chapterResourceService.uploadChapterFile(chapterResource);
             if (CommonCode.OK.getCode().equals(responseData.getCode())) {
@@ -91,12 +105,10 @@ public class RegularFileServiceImpl implements RegularFileService {
 
     @Override
     public void chapterFileDownload(String chapterId, String resourceId, HttpServletResponse response) {
-
-        UniqueQueryResponseData<ChapterResource> resource = chapterResourceService.findChapterResourceById(resourceId);
-        ChapterResource payload = resource.getPayload();
-        if (Objects.nonNull(payload) && payload.getChapterId().equals(chapterId)) {
+        ResourceLibrary resourceItem = resourceLibraryService.findResourceItemById(resourceId);
+        if (Objects.nonNull(resourceItem)) {
             try (ServletOutputStream outputStream = response.getOutputStream()) {
-                String localPath = payload.getLocalPath();
+                String localPath = resourceItem.getLocalPath();
                 File file = new File(localPath);
                 if (!file.exists()) {
                     ApiExceptionCast.cast(FileCode.FILE_NOT_FOUND);
@@ -104,7 +116,7 @@ public class RegularFileServiceImpl implements RegularFileService {
 
                 try (InputStream inputStream = new FileInputStream(file)) {
                     response.setHeader("content-disposition",
-                            "attachment;filename=" + URLEncoder.encode(payload.getFilename(), StandardCharsets.UTF_8));
+                            "attachment;filename=" + URLEncoder.encode(resourceItem.getName(), StandardCharsets.UTF_8));
                     IOUtils.copy(inputStream, outputStream);
                 }
             } catch (IOException e) {
