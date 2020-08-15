@@ -17,7 +17,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserOfAccount userOfAccount = userAccountService.findUserByAccountAndType(username, UserAccountType.INTERNAL);
+        UserOfAccount userOfAccount = userAccountService.findUserByAccountAndType(username, UserAccountType.PASSWORD);
         return JwtUser.of(userOfAccount);
     }
 }

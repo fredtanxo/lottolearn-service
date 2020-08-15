@@ -5,9 +5,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xo.fredtan.lottolearn.api.auth.constant.AuthConstants;
+import xo.fredtan.lottolearn.api.auth.controller.JwkControllerApi;
 
 @RestController
-public class JwkController {
+public class JwkController implements JwkControllerApi {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Autowired
@@ -16,7 +17,7 @@ public class JwkController {
     }
 
     @GetMapping("/.well-known/jwks.json")
-    public String fetchJWKS() {
+    public String fetchJWKSet() {
         return redisTemplate.opsForValue().get(AuthConstants.JWK_STORE_KEY);
     }
 }

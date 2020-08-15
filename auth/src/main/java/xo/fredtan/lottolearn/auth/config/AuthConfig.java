@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import xo.fredtan.lottolearn.api.auth.constant.AuthConstants;
 import xo.fredtan.lottolearn.auth.filter.JwtAuthenticationFilter;
 import xo.fredtan.lottolearn.auth.service.UserDetailsServiceImpl;
 
@@ -28,6 +31,23 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 第三方OAuth2登录成功的handler
+     * 跳转到{@link /login/third-party}进行授权跳转
+     */
+    private SavedRequestAwareAuthenticationSuccessHandler thirdPartyAuthenticationSuccessHandler() {
+        SavedRequestAwareAuthenticationSuccessHandler handler = new SavedRequestAwareAuthenticationSuccessHandler();
+        handler.setDefaultTargetUrl("/login/third-party");
+        return handler;
+    }
+
+    /**
+     * 登录失败跳转回首页
+     */
+    private AuthenticationFailureHandler thirdPartyAuthenticationFailureHandler() {
+        return (request, response, exception) -> response.sendRedirect(AuthConstants.LOTTOLEARN_HOME_PAGE + "?failure=true");
     }
 
     @Override
@@ -48,10 +68,15 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers(HttpMethod.GET, "/.well-known/jwks.json").permitAll()
                     .anyRequest().authenticated()
             )
+            .oauth2Login(oauth2 ->
+                oauth2
+                    .successHandler(thirdPartyAuthenticationSuccessHandler())
+                    .failureHandler(thirdPartyAuthenticationFailureHandler())
+            )
             .addFilter(new JwtAuthenticationFilter(authenticationManager(), rsaKey))
             .sessionManagement(sessionManagement ->
                 sessionManagement
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 第三方登录跳转需要Session保持Authentication
             );
     }
 }

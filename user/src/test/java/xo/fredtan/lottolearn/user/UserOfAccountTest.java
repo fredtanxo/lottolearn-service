@@ -15,7 +15,7 @@ public class UserOfAccountTest {
     @Test
     public void testGetUserOfAccount() {
         String account = "fred";
-        UserAccountType type = UserAccountType.INTERNAL;
+        UserAccountType type = UserAccountType.PASSWORD;
         UserOfAccount userByAccountAndType = userAccountService.findUserByAccountAndType(account, type);
         System.out.println(userByAccountAndType);
     }

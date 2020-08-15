@@ -13,4 +13,10 @@ public class AuthConstants {
     public static final String TOKEN_CLAIM_KEY = "scope";
     public static final String TOKEN_RESPONSE_HEADER = "Authorization";
     public static final String TOKEN_RESPONSE_PREFIX = "Bearer ";
+
+    public static final String TOKEN_COOKIE_KEY = "token";
+    public static final String TOKEN_COOKIE_PATH = "/";
+    public static final String TOKEN_COOKIE_DOMAIN = "lottolearn.com";
+
+    public static final String LOTTOLEARN_HOME_PAGE = "https://lottolearn.com";
 }
