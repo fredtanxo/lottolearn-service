@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.*;
 import xo.fredtan.lottolearn.api.course.controller.CourseControllerApi;
 import xo.fredtan.lottolearn.api.course.service.CourseService;
 import xo.fredtan.lottolearn.common.annotation.ValidatePagination;
+import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
+import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
@@ -27,6 +29,8 @@ import javax.validation.Valid;
 public class CourseController implements CourseControllerApi {
     private final CourseService courseService;
 
+    private final WithUserValidationUtils withUserValidationUtils;
+
     @Override
     @GetMapping("/all")
     @ValidatePagination
@@ -37,6 +41,9 @@ public class CourseController implements CourseControllerApi {
     @Override
     @GetMapping("/id/{courseId}")
     public UniqueQueryResponseData<Course> findCourseById(@PathVariable String courseId) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
         return courseService.findCourseById(courseId);
     }
 
@@ -52,6 +59,9 @@ public class CourseController implements CourseControllerApi {
     @Override
     @PostMapping("/live/{courseId}")
     public UniqueQueryResponseData<Course> requestLiveCourse(@PathVariable String courseId) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
         return courseService.requestLiveCourse(courseId);
     }
 
@@ -66,6 +76,9 @@ public class CourseController implements CourseControllerApi {
     public BasicResponseData requestLiveCourseSign(@RequestBody ChatMessage chatMessage,
                                                    @PathVariable String courseId,
                                                    @PathVariable Long timeout) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
         return courseService.requestLiveCourseSign(chatMessage, courseId, timeout);
     }
 
@@ -84,6 +97,9 @@ public class CourseController implements CourseControllerApi {
     @Override
     @PutMapping("/id/{courseId}")
     public BasicResponseData updateCourse(@PathVariable String courseId, @RequestBody ModifyCourseRequest modifyCourseRequest) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
         return courseService.updateCourse(courseId, modifyCourseRequest);
     }
 
@@ -96,6 +112,9 @@ public class CourseController implements CourseControllerApi {
     @Override
     @DeleteMapping("/id/{courseId}")
     public BasicResponseData closeCourse(@PathVariable String courseId) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
         return courseService.closeCourse(courseId);
     }
 }

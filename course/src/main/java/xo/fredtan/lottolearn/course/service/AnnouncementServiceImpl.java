@@ -10,15 +10,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.course.service.AnnouncementService;
-import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
 import xo.fredtan.lottolearn.course.dao.AnnouncementRepository;
-import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Announcement;
 import xo.fredtan.lottolearn.domain.course.request.ModifyAnnouncementRequest;
-import xo.fredtan.lottolearn.domain.course.response.CourseCode;
 
 import java.util.Date;
 
@@ -27,14 +24,9 @@ import java.util.Date;
 public class AnnouncementServiceImpl implements AnnouncementService {
     private final AnnouncementRepository announcementRepository;
 
-    private final WithUserValidationUtils withUserValidationUtils;
 
     @Override
     public QueryResponseData<Announcement> findAnnouncementByCourseId(Integer page, Integer size, String courseId) {
-        if (withUserValidationUtils.notParticipate(courseId)) {
-            ApiExceptionCast.cast(CourseCode.NOT_JOIN_COURSE);
-        }
-
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Announcement> announcements = announcementRepository.findByCourseId(pageRequest, courseId);
 
@@ -45,10 +37,6 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     @Override
     @Transactional
     public BasicResponseData addAnnouncement(String courseId, ModifyAnnouncementRequest modifyAnnouncementRequest) {
-        if (withUserValidationUtils.notCourseOwner(courseId)) {
-            ApiExceptionCast.forbidden();
-        }
-
         Announcement announcement = new Announcement();
         announcement.setCourseId(courseId);
         announcement.setTitle(modifyAnnouncementRequest.getTitle());
@@ -65,10 +53,6 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     public BasicResponseData updateAnnouncement(String courseId,
                                                 String announcementId,
                                                 ModifyAnnouncementRequest modifyAnnouncementRequest) {
-        if (withUserValidationUtils.notCourseOwner(courseId)) {
-            ApiExceptionCast.forbidden();
-        }
-
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String publisher = "";
         if (principal instanceof Jwt) {
@@ -90,10 +74,6 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     @Override
     @Transactional
     public BasicResponseData deleteAnnouncement(String courseId, String announcementId) {
-        if (withUserValidationUtils.notCourseOwner(courseId)) {
-            ApiExceptionCast.forbidden();
-        }
-
         announcementRepository.findById(announcementId).ifPresent(announcementRepository::delete);
         return BasicResponseData.ok();
     }

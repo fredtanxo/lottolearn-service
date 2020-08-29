@@ -19,5 +19,5 @@ public interface ChapterControllerApi {
     BasicResponseData updateChapter(String courseId, String chapterId, ModifyChapterRequest modifyChapterRequest);
 
     @ApiOperation("删除课程章节")
-    BasicResponseData deleteChapter(String chapterId);
+    BasicResponseData deleteChapter(String courseId, String chapterId);
 }

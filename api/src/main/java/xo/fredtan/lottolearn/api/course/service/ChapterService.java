@@ -12,5 +12,5 @@ public interface ChapterService {
 
     BasicResponseData updateChapter(String courseId, String chapterId, ModifyChapterRequest modifyChapterRequest);
 
-    BasicResponseData deleteChapter(String chapterId);
+    BasicResponseData deleteChapter(String courseId, String chapterId);
 }

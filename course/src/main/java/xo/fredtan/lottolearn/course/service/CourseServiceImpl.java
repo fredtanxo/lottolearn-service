@@ -27,7 +27,6 @@ import xo.fredtan.lottolearn.common.exception.ApiInvocationException;
 import xo.fredtan.lottolearn.common.model.response.*;
 import xo.fredtan.lottolearn.course.config.RabbitMqConfig;
 import xo.fredtan.lottolearn.course.dao.*;
-import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.Sign;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
@@ -62,8 +61,6 @@ public class CourseServiceImpl implements CourseService {
     @DubboReference(version = "0.0.1")
     private UserService userService;
 
-    private final WithUserValidationUtils withUserValidationUtils;
-
     @Override
     public QueryResponseData<Course> findAllCourses(Integer page, Integer size, QueryCourseRequest queryCourseRequest) {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -95,10 +92,6 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public UniqueQueryResponseData<Course> findCourseById(String courseId) {
-        if (withUserValidationUtils.notParticipate(courseId)) {
-            ApiExceptionCast.forbidden();
-        }
-
         return courseRepository.findById(courseId)
                 .map(UniqueQueryResponseData::ok)
                 .orElseGet(() -> UniqueQueryResponseData.ok(null));
@@ -121,11 +114,6 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public UniqueQueryResponseData<Course> requestLiveCourse(String courseId) {
-        if (withUserValidationUtils.notCourseOwner(courseId)) {
-            ApiExceptionCast.forbidden();
-        }
-
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         return courseRepository.findById(courseId).map(course -> {
             String roomId = UUID.randomUUID().toString().replace("-", "");
             course.setLive(roomId);
@@ -256,10 +244,6 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public BasicResponseData updateCourse(String courseId, ModifyCourseRequest modifyCourseRequest) {
-        if (withUserValidationUtils.notCourseOwner(courseId)) {
-            ApiExceptionCast.forbidden();
-        }
-
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         courseRepository.findById(courseId).ifPresent(course -> {
             // 确保课程ID、邀请码、教师ID、发布日期、状态一致
@@ -313,10 +297,6 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public BasicResponseData closeCourse(String courseId) {
-        if (withUserValidationUtils.notCourseOwner(courseId)) {
-            ApiExceptionCast.forbidden();
-        }
-
         courseRepository.findById(courseId).ifPresent(course -> {
             course.setStatus(3);
             courseRepository.save(course);
