@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import xo.fredtan.lottolearn.api.auth.constant.AuthConstants;
+import xo.fredtan.lottolearn.api.auth.constants.AuthConstants;
 import xo.fredtan.lottolearn.auth.domain.JwtUser;
 import xo.fredtan.lottolearn.auth.util.JwtUtil;
 import xo.fredtan.lottolearn.domain.auth.request.FormLoginRequest;

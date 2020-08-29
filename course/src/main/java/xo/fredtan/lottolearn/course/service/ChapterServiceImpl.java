@@ -14,7 +14,7 @@ import xo.fredtan.lottolearn.common.model.response.CommonCode;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
 import xo.fredtan.lottolearn.course.dao.ChapterRepository;
-import xo.fredtan.lottolearn.course.util.WithUserValidationUtil;
+import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Chapter;
 import xo.fredtan.lottolearn.domain.course.request.ModifyChapterRequest;
 import xo.fredtan.lottolearn.domain.course.response.CourseCode;
@@ -26,11 +26,11 @@ import java.util.Date;
 public class ChapterServiceImpl implements ChapterService {
     private final ChapterRepository chapterRepository;
 
-    private final WithUserValidationUtil withUserValidationUtil;
+    private final WithUserValidationUtils withUserValidationUtils;
 
     @Override
     public QueryResponseData<Chapter> findChaptersByCourseId(Integer page, Integer size, String courseId) {
-        if (withUserValidationUtil.notParticipate(courseId)) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
             ApiExceptionCast.cast(CourseCode.NOT_JOIN_COURSE);
         }
 
@@ -44,7 +44,7 @@ public class ChapterServiceImpl implements ChapterService {
     @Override
     @Transactional
     public BasicResponseData addChapter(String courseId, ModifyChapterRequest modifyChapterRequest) {
-        if (withUserValidationUtil.notCourseOwner(courseId)) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.cast(CommonCode.FORBIDDEN);
         }
 
@@ -64,7 +64,7 @@ public class ChapterServiceImpl implements ChapterService {
     public BasicResponseData updateChapter(String courseId,
                                            String chapterId,
                                            ModifyChapterRequest modifyChapterRequest) {
-        if (withUserValidationUtil.notCourseOwner(courseId)) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
 
@@ -85,7 +85,7 @@ public class ChapterServiceImpl implements ChapterService {
     public BasicResponseData deleteChapter(String chapterId) {
         chapterRepository.findById(chapterId).ifPresent(chapter -> {
             String courseId = chapter.getCourseId();
-            if (withUserValidationUtil.notCourseOwner(courseId)) {
+            if (withUserValidationUtils.notCourseOwner(courseId)) {
                 ApiExceptionCast.forbidden();
             }
             chapterRepository.delete(chapter);

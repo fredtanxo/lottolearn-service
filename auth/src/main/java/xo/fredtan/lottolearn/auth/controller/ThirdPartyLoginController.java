@@ -8,9 +8,10 @@ import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2Aut
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import xo.fredtan.lottolearn.api.auth.constant.AuthConstants;
+import xo.fredtan.lottolearn.api.auth.constants.AuthConstants;
 import xo.fredtan.lottolearn.api.auth.controller.ThirdPartyControllerApi;
 import xo.fredtan.lottolearn.auth.service.ThirdPartyLoginServiceImpl;
+import xo.fredtan.lottolearn.common.constant.LotToLearnConstants;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +36,6 @@ public class ThirdPartyLoginController implements ThirdPartyControllerApi {
 
         response.addCookie(cookie);
 
-        return "redirect:" + AuthConstants.LOTTOLEARN_HOME_PAGE;
+        return "redirect:%s".formatted(LotToLearnConstants.HOME_PAGE);
     }
 }

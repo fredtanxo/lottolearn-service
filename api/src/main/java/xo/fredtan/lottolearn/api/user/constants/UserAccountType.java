@@ -1,4 +1,4 @@
-package xo.fredtan.lottolearn.api.user.constant;
+package xo.fredtan.lottolearn.api.user.constants;
 
 public enum UserAccountType {
     GITHUB(0),

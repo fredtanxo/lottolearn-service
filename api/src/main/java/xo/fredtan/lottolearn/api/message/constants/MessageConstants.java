@@ -1,4 +1,4 @@
-package xo.fredtan.lottolearn.api.message.constant;
+package xo.fredtan.lottolearn.api.message.constants;
 
 import java.util.concurrent.TimeUnit;
 

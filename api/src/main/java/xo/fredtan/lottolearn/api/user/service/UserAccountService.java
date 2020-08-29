@@ -1,6 +1,6 @@
 package xo.fredtan.lottolearn.api.user.service;
 
-import xo.fredtan.lottolearn.api.user.constant.UserAccountType;
+import xo.fredtan.lottolearn.api.user.constants.UserAccountType;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.domain.user.UserAccount;

@@ -1,4 +1,4 @@
-package xo.fredtan.lottolearn.api.auth.constant;
+package xo.fredtan.lottolearn.api.auth.constants;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +17,4 @@ public class AuthConstants {
     public static final String TOKEN_COOKIE_KEY = "token";
     public static final String TOKEN_COOKIE_PATH = "/";
     public static final String TOKEN_COOKIE_DOMAIN = "lottolearn.com";
-
-    public static final String LOTTOLEARN_HOME_PAGE = "https://lottolearn.com";
 }

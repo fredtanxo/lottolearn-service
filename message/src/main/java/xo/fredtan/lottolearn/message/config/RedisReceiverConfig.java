@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import xo.fredtan.lottolearn.api.message.constant.MessageConstants;
+import xo.fredtan.lottolearn.api.message.constants.MessageConstants;
 import xo.fredtan.lottolearn.message.interceptor.RedisMessageListener;
 
 import java.util.Collections;

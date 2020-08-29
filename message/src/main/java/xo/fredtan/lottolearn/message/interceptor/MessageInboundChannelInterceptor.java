@@ -16,8 +16,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.util.StringUtils;
-import xo.fredtan.lottolearn.api.course.constant.CourseConstants;
-import xo.fredtan.lottolearn.api.message.constant.MessageConstants;
+import xo.fredtan.lottolearn.api.course.constants.CourseConstants;
+import xo.fredtan.lottolearn.api.message.constants.MessageConstants;
 import xo.fredtan.lottolearn.api.message.service.MessageService;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
 

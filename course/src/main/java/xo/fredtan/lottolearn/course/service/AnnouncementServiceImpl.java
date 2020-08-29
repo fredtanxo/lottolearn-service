@@ -15,7 +15,7 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
 import xo.fredtan.lottolearn.course.dao.AnnouncementRepository;
-import xo.fredtan.lottolearn.course.util.WithUserValidationUtil;
+import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Announcement;
 import xo.fredtan.lottolearn.domain.course.request.ModifyAnnouncementRequest;
 import xo.fredtan.lottolearn.domain.course.response.CourseCode;
@@ -27,11 +27,11 @@ import java.util.Date;
 public class AnnouncementServiceImpl implements AnnouncementService {
     private final AnnouncementRepository announcementRepository;
 
-    private final WithUserValidationUtil withUserValidationUtil;
+    private final WithUserValidationUtils withUserValidationUtils;
 
     @Override
     public QueryResponseData<Announcement> findAnnouncementByCourseId(Integer page, Integer size, String courseId) {
-        if (withUserValidationUtil.notParticipate(courseId)) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
             ApiExceptionCast.cast(CourseCode.NOT_JOIN_COURSE);
         }
 
@@ -45,7 +45,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     @Override
     @Transactional
     public BasicResponseData addAnnouncement(String courseId, ModifyAnnouncementRequest modifyAnnouncementRequest) {
-        if (withUserValidationUtil.notCourseOwner(courseId)) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
 
@@ -65,7 +65,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     public BasicResponseData updateAnnouncement(String courseId,
                                                 String announcementId,
                                                 ModifyAnnouncementRequest modifyAnnouncementRequest) {
-        if (withUserValidationUtil.notCourseOwner(courseId)) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
 
@@ -90,7 +90,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     @Override
     @Transactional
     public BasicResponseData deleteAnnouncement(String courseId, String announcementId) {
-        if (withUserValidationUtil.notCourseOwner(courseId)) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
 

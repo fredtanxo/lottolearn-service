@@ -18,16 +18,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import xo.fredtan.lottolearn.api.course.constant.CourseConstants;
+import xo.fredtan.lottolearn.api.course.constants.CourseConstants;
 import xo.fredtan.lottolearn.api.course.service.CourseService;
-import xo.fredtan.lottolearn.api.message.constant.MessageConstants;
+import xo.fredtan.lottolearn.api.message.constants.MessageConstants;
 import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
 import xo.fredtan.lottolearn.common.exception.ApiInvocationException;
 import xo.fredtan.lottolearn.common.model.response.*;
 import xo.fredtan.lottolearn.course.config.RabbitMqConfig;
 import xo.fredtan.lottolearn.course.dao.*;
-import xo.fredtan.lottolearn.course.util.WithUserValidationUtil;
+import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.Sign;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
@@ -62,7 +62,7 @@ public class CourseServiceImpl implements CourseService {
     @DubboReference(version = "0.0.1")
     private UserService userService;
 
-    private final WithUserValidationUtil withUserValidationUtil;
+    private final WithUserValidationUtils withUserValidationUtils;
 
     @Override
     public QueryResponseData<Course> findAllCourses(Integer page, Integer size, QueryCourseRequest queryCourseRequest) {
@@ -95,7 +95,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public UniqueQueryResponseData<Course> findCourseById(String courseId) {
-        if (withUserValidationUtil.notParticipate(courseId)) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
             ApiExceptionCast.forbidden();
         }
 
@@ -121,7 +121,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public UniqueQueryResponseData<Course> requestLiveCourse(String courseId) {
-        if (withUserValidationUtil.notCourseOwner(courseId)) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
 
@@ -256,7 +256,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public BasicResponseData updateCourse(String courseId, ModifyCourseRequest modifyCourseRequest) {
-        if (withUserValidationUtil.notCourseOwner(courseId)) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
 
@@ -313,7 +313,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public BasicResponseData closeCourse(String courseId) {
-        if (withUserValidationUtil.notCourseOwner(courseId)) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
 

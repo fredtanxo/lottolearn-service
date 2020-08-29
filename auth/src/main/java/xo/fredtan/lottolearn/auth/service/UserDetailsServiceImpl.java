@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import xo.fredtan.lottolearn.api.user.constant.UserAccountType;
+import xo.fredtan.lottolearn.api.user.constants.UserAccountType;
 import xo.fredtan.lottolearn.api.user.service.UserAccountService;
 import xo.fredtan.lottolearn.auth.domain.JwtUser;
 import xo.fredtan.lottolearn.domain.user.response.UserOfAccount;

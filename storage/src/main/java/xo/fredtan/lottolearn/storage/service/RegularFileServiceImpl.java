@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import xo.fredtan.lottolearn.api.course.service.ChapterResourceService;
 import xo.fredtan.lottolearn.api.course.service.ResourceLibraryService;
-import xo.fredtan.lottolearn.api.storage.constant.FileCode;
+import xo.fredtan.lottolearn.api.storage.constants.FileCode;
 import xo.fredtan.lottolearn.api.storage.service.RegularFileService;
 import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;

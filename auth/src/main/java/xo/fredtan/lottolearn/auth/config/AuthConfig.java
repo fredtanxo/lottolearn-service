@@ -13,9 +13,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import xo.fredtan.lottolearn.api.auth.constant.AuthConstants;
 import xo.fredtan.lottolearn.auth.filter.JwtAuthenticationFilter;
 import xo.fredtan.lottolearn.auth.service.UserDetailsServiceImpl;
+import xo.fredtan.lottolearn.common.constant.LotToLearnConstants;
 
 @EnableWebSecurity
 public class AuthConfig extends WebSecurityConfigurerAdapter {
@@ -47,7 +47,9 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
      * 登录失败跳转回首页
      */
     private AuthenticationFailureHandler thirdPartyAuthenticationFailureHandler() {
-        return (request, response, exception) -> response.sendRedirect(AuthConstants.LOTTOLEARN_HOME_PAGE + "?failure=true");
+        return (request, response, exception) -> response.sendRedirect(
+                "%s?failure=true".formatted(LotToLearnConstants.LOGIN_PAGE)
+        );
     }
 
     @Override

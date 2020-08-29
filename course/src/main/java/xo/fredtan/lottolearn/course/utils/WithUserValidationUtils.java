@@ -1,4 +1,4 @@
-package xo.fredtan.lottolearn.course.util;
+package xo.fredtan.lottolearn.course.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class WithUserValidationUtil {
+public class WithUserValidationUtils {
     private final UserCourseRepository userCourseRepository;
 
     /**
@@ -20,7 +20,7 @@ public class WithUserValidationUtil {
      * @param courseId 课程ID
      */
     public boolean notCourseOwner(String courseId) {
-        return !WithUserValidationUtil.validateWithUser((_userId, _courseId) -> {
+        return !WithUserValidationUtils.validateWithUser((_userId, _courseId) -> {
             UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(_userId, _courseId);
             if (Objects.isNull(userCourse)) {
                 return false;
@@ -34,7 +34,7 @@ public class WithUserValidationUtil {
      * @param courseId 课程ID
      */
     public boolean notParticipate(String courseId) {
-        return WithUserValidationUtil.validateWithUser((_userId, _courseId) -> {
+        return WithUserValidationUtils.validateWithUser((_userId, _courseId) -> {
             UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(_userId, _courseId);
             return Objects.isNull(userCourse);
         }, courseId);

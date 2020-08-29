@@ -1,4 +1,4 @@
-package xo.fredtan.lottolearn.api.storage.constant;
+package xo.fredtan.lottolearn.api.storage.constants;
 
 import xo.fredtan.lottolearn.common.model.response.ResultCode;
 

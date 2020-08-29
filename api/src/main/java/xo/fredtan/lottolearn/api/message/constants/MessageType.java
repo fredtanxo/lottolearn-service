@@ -1,4 +1,4 @@
-package xo.fredtan.lottolearn.api.message.constant;
+package xo.fredtan.lottolearn.api.message.constants;
 
 public enum MessageType {
     CHAT("CHAT"),
