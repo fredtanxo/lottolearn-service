@@ -5,6 +5,8 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.Course;
+import xo.fredtan.lottolearn.domain.course.Sign;
+import xo.fredtan.lottolearn.domain.course.SignRecord;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
 import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
@@ -33,6 +35,10 @@ public interface CourseService {
     BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, String courseId, Long timeout);
 
     BasicResponseData handleLiveCourseSign(@RequestBody CourseSignRequest courseSignRequest);
+
+    QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, String courseId);
+
+    QueryResponseData<SignRecord> findCourseSignRecord(String signId);
 
     UniqueQueryResponseData<UserCourse> findUserCourse(String userId, String courseId);
 

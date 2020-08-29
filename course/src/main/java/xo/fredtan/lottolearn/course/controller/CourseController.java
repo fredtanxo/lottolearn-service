@@ -13,6 +13,8 @@ import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Course;
+import xo.fredtan.lottolearn.domain.course.Sign;
+import xo.fredtan.lottolearn.domain.course.SignRecord;
 import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
@@ -86,6 +88,22 @@ public class CourseController implements CourseControllerApi {
     @PostMapping("/live/student/sign")
     public BasicResponseData handleLiveCourseSign(@RequestBody CourseSignRequest courseSignRequest) {
         return courseService.handleLiveCourseSign(courseSignRequest);
+    }
+
+    @Override
+    @GetMapping("/sign/{courseId}")
+    @ValidatePagination
+    public QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, @PathVariable String courseId) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        return courseService.findCourseSigns(page, size, courseId);
+    }
+
+    @Override
+    @GetMapping("/sign/{signId}/records")
+    public QueryResponseData<SignRecord> findCourseSignRecord(String signId) {
+        return courseService.findCourseSignRecord(signId);
     }
 
     @Override

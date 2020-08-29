@@ -6,6 +6,8 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.Course;
+import xo.fredtan.lottolearn.domain.course.Sign;
+import xo.fredtan.lottolearn.domain.course.SignRecord;
 import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
@@ -36,6 +38,12 @@ public interface CourseControllerApi {
 
     @ApiOperation("处理课程直播签到")
     BasicResponseData handleLiveCourseSign(CourseSignRequest courseSignRequest);
+
+    @ApiOperation("查询课程签到记录")
+    QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, String courseId);
+
+    @ApiOperation("查询课程签到记录详细信息")
+    QueryResponseData<SignRecord> findCourseSignRecord(String signId);
 
     @ApiOperation("增加课程")
     AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest);

@@ -29,6 +29,7 @@ import xo.fredtan.lottolearn.course.config.RabbitMqConfig;
 import xo.fredtan.lottolearn.course.dao.*;
 import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.Sign;
+import xo.fredtan.lottolearn.domain.course.SignRecord;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
 import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
 import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
@@ -52,6 +53,7 @@ public class CourseServiceImpl implements CourseService {
     private final UserCourseRepository userCourseRepository;
     private final UserCourseMapper userCourseMapper;
     private final SignRepository signRepository;
+    private final SignRecordRepository signRecordRepository;
 
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisTemplate<String, ChatMessage> chatMessageRedisTemplate;
@@ -175,6 +177,23 @@ public class CourseServiceImpl implements CourseService {
                 RabbitMqConfig.EXCHANGE_COURSE_SIGN, RabbitMqConfig.ROUTING_KEY_COURSE_SIGN, courseSignRequest);
 
         return success ? BasicResponseData.ok() : BasicResponseData.invalid();
+    }
+
+    @Override
+    public QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, String courseId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Sign> courseSigns = signRepository.findByCourseIdOrderBySignDateDesc(pageRequest, courseId);
+        QueryResult<Sign> queryResult = new QueryResult<>(courseSigns.getTotalElements(), courseSigns.getContent());
+
+        return QueryResponseData.ok(queryResult);
+    }
+
+    @Override
+    public QueryResponseData<SignRecord> findCourseSignRecord(String signId) {
+        List<SignRecord> signRecords = signRecordRepository.findBySignIdOrderBySignTimeDesc(signId);
+        QueryResult<SignRecord> queryResult = new QueryResult<>((long) signRecords.size(), signRecords);
+
+        return QueryResponseData.ok(queryResult);
     }
 
     @Override
