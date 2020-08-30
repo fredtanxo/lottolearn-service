@@ -13,7 +13,7 @@ public interface ChapterResourceMapper {
             "from chapter_resource cr " +
             "left join resource_library rl " +
             "on (cr.resource_id = rl.id) " +
-            "where cr.chapter_id = #{chapterId} and rl.type = #{type} " +
+            "where cr.chapter_id = #{chapterId} and rl.type = #{type} and cr.status = 1 " +
             "order by rl.upload_date desc")
     List<ResourceLibrary> selectChapterResource(@Param("chapterId") String chapterId, @Param("type") Integer type);
 }

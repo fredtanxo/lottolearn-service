@@ -22,10 +22,18 @@ public class ResourceLibraryController implements ResourceLibraryControllerApi {
     @Override
     @GetMapping("/course/{courseId}")
     public QueryResponseData<ResourceLibrary> findResourceItemsByCourseId(@PathVariable String courseId) {
-        if (withUserValidationUtils.notParticipate(courseId)) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
         return resourceLibraryService.findResourceItemsByCourseId(courseId);
+    }
+
+    @GetMapping("/media/course/{courseId}")
+    public QueryResponseData<ResourceLibrary> findMediaResourcesByCourseId(@PathVariable String courseId) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        return resourceLibraryService.findMediaResourcesByCourseId(courseId);
     }
 
     @Override

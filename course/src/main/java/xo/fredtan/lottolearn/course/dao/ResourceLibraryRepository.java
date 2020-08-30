@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ResourceLibraryRepository extends JpaRepository<ResourceLibrary, String> {
     List<ResourceLibrary> findByCourseIdOrderByUploadDateDesc(String courseId);
+
+    List<ResourceLibrary> findByCourseIdAndTypeOrderByUploadDateDesc(String courseId, Integer type);
 }

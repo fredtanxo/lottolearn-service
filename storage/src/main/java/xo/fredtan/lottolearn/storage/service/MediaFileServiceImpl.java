@@ -23,7 +23,7 @@ import java.util.Map;
  * 媒体文件上传
  *
  * 文件保存路径：{basePath}/course/{courseId}/media/{filename}
- * 文件访问路径：https://media.lottolearn.com/course/{courseId}/chapter/{chapterId}/{chapterMediaId}
+ * 文件访问路径：https://media.lottolearn.com/course/{courseId}/{chapterMediaId}
  */
 @Slf4j
 @Service
@@ -46,7 +46,7 @@ public class MediaFileServiceImpl extends AbstractTusUploadService implements Me
 
     @Override
     protected String getBasePath(String courseId) {
-        return String.format("%s/course/%s/media", basePath, courseId);
+        return String.format("%s/course/%s", basePath, courseId);
     }
 
     @Override

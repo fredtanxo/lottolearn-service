@@ -11,5 +11,9 @@ public interface ChapterResourceService {
 
     QueryResponseData<ResourceLibrary> findFilesByChapterId(String chapterId);
 
-    BasicResponseData uploadChapterFile(ChapterResource chapterResource);
+    void uploadChapterFile(ChapterResource chapterResource);
+
+    BasicResponseData linkChapterMediaResource(String chapterId, String resourceId);
+
+    BasicResponseData unlinkChapterResource(String chapterId, String resourceId);
 }

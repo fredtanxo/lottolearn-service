@@ -2,12 +2,10 @@ package xo.fredtan.lottolearn.course.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import xo.fredtan.lottolearn.api.course.controller.ChapterResourceControllerApi;
 import xo.fredtan.lottolearn.api.course.service.ChapterResourceService;
+import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.ResourceLibrary;
@@ -28,5 +26,11 @@ public class ChapterResourceController implements ChapterResourceControllerApi {
     @GetMapping("/file/chapter/{chapterId}")
     public QueryResponseData<ResourceLibrary> findFilesByChapterId(@PathVariable String chapterId) {
         return chapterResourceService.findFilesByChapterId(chapterId);
+    }
+
+    @Override
+    @PutMapping("/link/chapter/{chapterId}/resource/{resourceId}")
+    public BasicResponseData linkChapterMediaResource(@PathVariable String chapterId, @PathVariable String resourceId) {
+        return chapterResourceService.linkChapterMediaResource(chapterId, resourceId);
     }
 }

@@ -18,4 +18,5 @@ public class ChapterResource implements Serializable {
     private String chapterId;
     @Column(name = "resource_id")
     private String resourceId;
+    private Boolean status;
 }

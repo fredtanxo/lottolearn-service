@@ -16,6 +16,7 @@ import xo.fredtan.lottolearn.domain.course.ResourceLibrary;
 import xo.fredtan.lottolearn.domain.storage.constant.FileUploadType;
 
 import java.util.List;
+import java.util.Objects;
 
 @DubboService(version = "0.0.1")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -41,8 +42,40 @@ public class ChapterResourceServiceImpl implements ChapterResourceService {
 
     @Override
     @Transactional
-    public BasicResponseData uploadChapterFile(ChapterResource chapterResource) {
+    public void uploadChapterFile(ChapterResource chapterResource) {
         chapterResourceRepository.save(chapterResource);
+    }
+
+    @Override
+    @Transactional
+    public BasicResponseData linkChapterMediaResource(String chapterId, String resourceId) {
+        // 清除已有的选择
+        UniqueQueryResponseData<ResourceLibrary> query = this.findMediaByChapterId(chapterId);
+        ResourceLibrary item = query.getPayload();
+        if (Objects.nonNull(item)) {
+            if (item.getId().equals(resourceId)) { // 重复选同一个媒体
+                return BasicResponseData.ok();
+            }
+            ChapterResource linkItem = chapterResourceRepository.findByChapterIdAndResourceId(chapterId, item.getId());
+            linkItem.setStatus(false);
+            chapterResourceRepository.save(linkItem);
+        }
+        ChapterResource chapterResource = new ChapterResource();
+        chapterResource.setChapterId(chapterId);
+        chapterResource.setResourceId(resourceId);
+        chapterResource.setStatus(true);
+        chapterResourceRepository.save(chapterResource);
+        return BasicResponseData.ok();
+    }
+
+    @Override
+    @Transactional
+    public BasicResponseData unlinkChapterResource(String chapterId, String resourceId) {
+        ChapterResource item = chapterResourceRepository.findByChapterIdAndResourceId(chapterId, resourceId);
+        if (Objects.nonNull(item)) {
+            item.setStatus(false);
+            chapterResourceRepository.save(item);
+        }
         return BasicResponseData.ok();
     }
 }
