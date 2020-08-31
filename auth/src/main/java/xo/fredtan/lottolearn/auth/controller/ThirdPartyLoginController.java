@@ -36,6 +36,6 @@ public class ThirdPartyLoginController implements ThirdPartyControllerApi {
 
         response.addCookie(cookie);
 
-        return "redirect:%s".formatted(LotToLearnConstants.HOME_PAGE);
+        return String.format("redirect:%s", LotToLearnConstants.HOME_PAGE);
     }
 }

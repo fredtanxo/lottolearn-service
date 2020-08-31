@@ -48,7 +48,7 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
      */
     private AuthenticationFailureHandler thirdPartyAuthenticationFailureHandler() {
         return (request, response, exception) -> response.sendRedirect(
-                "%s?failure=true".formatted(LotToLearnConstants.LOGIN_PAGE)
+                String.format("%s?failure=true", LotToLearnConstants.LOGIN_PAGE)
         );
     }
 
