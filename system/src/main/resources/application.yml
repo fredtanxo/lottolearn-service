@@ -1,5 +1,37 @@
 spring:
   application:
     name: lottolearn-system
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql:///lottolearn_system?characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    druid:
+      initial-size: 1
+      max-active: 20
+      min-idle: 1
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      async-init: true
+      pool-prepared-statements: true
+      max-open-prepared-statements: 20
+  rabbitmq:
+    host: localhost
+    port: 5672
+    virtual-host: /
 server:
   port: 51212
+dubbo:
+  scan:
+    base-packages:
+      - xo.fredtan.lottolearn.api
+      - xo.fredtan.lottolearn.system.service
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: nacos://127.0.0.1:8848
