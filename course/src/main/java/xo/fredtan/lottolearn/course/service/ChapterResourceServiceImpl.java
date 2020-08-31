@@ -60,6 +60,15 @@ public class ChapterResourceServiceImpl implements ChapterResourceService {
             linkItem.setStatus(false);
             chapterResourceRepository.save(linkItem);
         }
+
+        ChapterResource itemPre = chapterResourceRepository.findByChapterIdAndResourceId(chapterId, resourceId);
+        if (Objects.nonNull(itemPre)) { // 之前选过
+            itemPre.setStatus(true);
+            chapterResourceRepository.save(itemPre);
+            return BasicResponseData.ok();
+        }
+
+        // 第一次选
         ChapterResource chapterResource = new ChapterResource();
         chapterResource.setChapterId(chapterId);
         chapterResource.setResourceId(resourceId);
