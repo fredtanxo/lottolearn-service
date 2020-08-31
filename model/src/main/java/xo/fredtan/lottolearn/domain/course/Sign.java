@@ -1,5 +1,6 @@
 package xo.fredtan.lottolearn.domain.course;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -18,5 +19,6 @@ public class Sign implements Serializable {
     @Column(name = "course_id")
     private String courseId;
     private Long timeout;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date signDate;
 }

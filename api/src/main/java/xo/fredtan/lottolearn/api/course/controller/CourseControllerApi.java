@@ -43,7 +43,7 @@ public interface CourseControllerApi {
     QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, String courseId);
 
     @ApiOperation("查询课程签到记录详细信息")
-    QueryResponseData<SignRecord> findCourseSignRecord(String signId);
+    QueryResponseData<SignRecord> findCourseSignRecord(String signId, String courseId);
 
     @ApiOperation("增加课程")
     AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest);

@@ -91,9 +91,9 @@ public class CourseController implements CourseControllerApi {
     }
 
     @Override
-    @GetMapping("/sign/{courseId}")
+    @GetMapping("/sign")
     @ValidatePagination
-    public QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, @PathVariable String courseId) {
+    public QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, String courseId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
@@ -102,7 +102,10 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @GetMapping("/sign/{signId}/records")
-    public QueryResponseData<SignRecord> findCourseSignRecord(String signId) {
+    public QueryResponseData<SignRecord> findCourseSignRecord(@PathVariable String signId, String courseId) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
         return courseService.findCourseSignRecord(signId);
     }
 
