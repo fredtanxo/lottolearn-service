@@ -1,7 +1,6 @@
 package xo.fredtan.lottolearn.storage.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -58,10 +56,11 @@ public class ChapterFileServiceImpl extends AbstractTusUploadService implements 
                     ApiExceptionCast.cast(FileCode.FILE_NOT_FOUND);
                 }
 
-                try (InputStream inputStream = new FileInputStream(file)) {
-                    response.setHeader("content-disposition",
+                try (FileInputStream inputStream = new FileInputStream(file)) {
+                    response.setHeader("Content-Length", String.valueOf(file.length()));
+                    response.setHeader("Content-Disposition",
                             "attachment;filename=" + URLEncoder.encode(resourceItem.getName(), StandardCharsets.UTF_8));
-                    IOUtils.copy(inputStream, outputStream);
+                    inputStream.transferTo(outputStream);
                 }
             } catch (IOException e) {
                 log.error("下载章节文件错误：[章节ID：{}，资源ID：{}]", chapterId, resourceId);
@@ -115,6 +114,7 @@ public class ChapterFileServiceImpl extends AbstractTusUploadService implements 
         ChapterResource chapterResource = new ChapterResource();
         chapterResource.setChapterId(chapterId);
         chapterResource.setResourceId(resourceId);
+        chapterResource.setStatus(true);
         chapterResourceService.uploadChapterFile(chapterResource);
 
         ResourceLibrary resourceItem = getTemp().get();
