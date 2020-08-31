@@ -3,7 +3,7 @@ spring:
     name: lottolearn-course
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql:///lottolearn_course?characterEncoding=UTF-8
+    url: jdbc:mysql:///lottolearn_course?characterEncoding=UTF-8&serverTimezone=UTC
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     druid:

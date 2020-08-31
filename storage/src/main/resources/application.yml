@@ -8,6 +8,12 @@ spring:
     host: localhost
     port: 5672
     virtual-host: /
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://lottolearn.com
+          jwk-set-uri: http://localhost:51200/.well-known/jwks.json
 server:
   port: 51206
 dubbo:
