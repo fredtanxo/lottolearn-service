@@ -16,8 +16,8 @@ public interface TermControllerApi {
     BasicResponseData addTerm(ModifyTermRequest modifyTermRequest);
 
     @ApiOperation("修改学期")
-    BasicResponseData updateTerm(String termId, ModifyTermRequest modifyTermRequest);
+    BasicResponseData updateTerm(Long termId, ModifyTermRequest modifyTermRequest);
 
     @ApiOperation("删除学期")
-    BasicResponseData closeTerm(String termId);
+    BasicResponseData closeTerm(Long termId);
 }

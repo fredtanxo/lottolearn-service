@@ -10,11 +10,11 @@ import xo.fredtan.lottolearn.domain.user.response.RoleWithMenuIds;
 public interface RoleService {
     QueryResponseData<Role> findAllRoles(Integer page, Integer size);
 
-    UniqueQueryResponseData<RoleWithMenuIds> findRoleById(String roleId);
+    UniqueQueryResponseData<RoleWithMenuIds> findRoleById(Long roleId);
 
     BasicResponseData addRole(ModifyRoleRequest modifyRoleRequest);
 
-    BasicResponseData updateRole(String roleId, ModifyRoleRequest modifyRoleRequest);
+    BasicResponseData updateRole(Long roleId, ModifyRoleRequest modifyRoleRequest);
 
-    BasicResponseData closeRole(String roleId);
+    BasicResponseData closeRole(Long roleId);
 }

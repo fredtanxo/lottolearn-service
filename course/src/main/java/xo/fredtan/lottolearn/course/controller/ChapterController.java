@@ -27,7 +27,7 @@ public class ChapterController implements ChapterControllerApi {
     @ValidatePagination
     public QueryResponseData<Chapter> findChaptersByCourseId(Integer page,
                                                              Integer size,
-                                                             @PathVariable String courseId) {
+                                                             @PathVariable Long courseId) {
         if (withUserValidationUtils.notParticipate(courseId)) {
             ApiExceptionCast.cast(CourseCode.NOT_JOIN_COURSE);
         }
@@ -36,7 +36,7 @@ public class ChapterController implements ChapterControllerApi {
 
     @Override
     @PostMapping("/course/{courseId}")
-    public BasicResponseData addChapter(@PathVariable String courseId,
+    public BasicResponseData addChapter(@PathVariable Long courseId,
                                         @RequestBody ModifyChapterRequest modifyChapterRequest) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
@@ -46,8 +46,8 @@ public class ChapterController implements ChapterControllerApi {
 
     @Override
     @PutMapping("/course/{courseId}/{chapterId}")
-    public BasicResponseData updateChapter(@PathVariable String courseId,
-                                           @PathVariable String chapterId,
+    public BasicResponseData updateChapter(@PathVariable Long courseId,
+                                           @PathVariable Long chapterId,
                                            @RequestBody ModifyChapterRequest modifyChapterRequest) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
@@ -57,7 +57,7 @@ public class ChapterController implements ChapterControllerApi {
 
     @Override
     @DeleteMapping("/id/{courseId}/{chapterId}")
-    public BasicResponseData deleteChapter(@PathVariable String courseId, @PathVariable String chapterId) {
+    public BasicResponseData deleteChapter(@PathVariable Long courseId, @PathVariable Long chapterId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }

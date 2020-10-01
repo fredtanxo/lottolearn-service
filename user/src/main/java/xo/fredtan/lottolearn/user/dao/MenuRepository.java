@@ -5,6 +5,6 @@ import xo.fredtan.lottolearn.domain.user.Menu;
 
 import java.util.List;
 
-public interface MenuRepository extends JpaRepository<Menu, String> {
+public interface MenuRepository extends JpaRepository<Menu, Long> {
     List<Menu> findByType(Boolean type);
 }

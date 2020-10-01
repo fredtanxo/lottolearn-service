@@ -5,5 +5,5 @@ import xo.fredtan.lottolearn.domain.user.response.RoleWithMenuIds;
 
 @Mapper
 public interface PermissionMapper {
-    RoleWithMenuIds selectRoleWithMenu(String roleId);
+    RoleWithMenuIds selectRoleWithMenu(Long roleId);
 }

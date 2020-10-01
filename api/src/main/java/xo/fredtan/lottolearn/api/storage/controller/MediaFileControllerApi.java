@@ -12,11 +12,11 @@ public interface MediaFileControllerApi {
     void createMediaFile(HttpServletRequest request, HttpServletResponse response);
 
     @ApiOperation("查询媒体文件上传进度")
-    void checkMediaFile(String resourceId, HttpServletResponse response);
+    void checkMediaFile(Long resourceId, HttpServletResponse response);
 
     @ApiOperation("上传媒体文件")
-    void uploadMediaFile(String resourceId, HttpServletRequest request, HttpServletResponse response);
+    void uploadMediaFile(Long resourceId, HttpServletRequest request, HttpServletResponse response);
 
     @ApiOperation("取消上传媒体文件")
-    void deleteMediaFile(String resourceId, HttpServletRequest request, HttpServletResponse response);
+    void deleteMediaFile(Long resourceId, HttpServletRequest request, HttpServletResponse response);
 }

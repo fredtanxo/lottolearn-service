@@ -2,7 +2,6 @@ package xo.fredtan.lottolearn.domain.course;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 import xo.fredtan.lottolearn.domain.audit.AbstractEntity;
 
 import javax.persistence.*;
@@ -14,11 +13,10 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "term")
-@GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
 public class Term extends AbstractEntity implements Serializable {
     @Id
-    @GeneratedValue(generator = "uuid")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @NotBlank(message = "必须提供学期名称")
     private String name;
     @NotNull(message = "必须提供学期开始时间")

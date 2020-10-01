@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UniqueQueryResponseData<UserWithRoleIds> findUserById(String userId) {
+    public UniqueQueryResponseData<UserWithRoleIds> findUserById(Long userId) {
         return userRepository.findById(userId).map(user -> {
             UserWithRoleIds userWithRoleIds = new UserWithRoleIds();
             BeanUtils.copyProperties(user, userWithRoleIds);
@@ -66,14 +66,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UniqueQueryResponseData<UserWithRoleIds> findUserByIdWithRoleIds(String userId) {
+    public UniqueQueryResponseData<UserWithRoleIds> findUserByIdWithRoleIds(Long userId) {
         UserWithRoleIds userWithRolesIds = userRoleMapper.selectUserWithRole(userId);
         return UniqueQueryResponseData.ok(userWithRolesIds);
     }
 
     @Override
     public UniqueQueryResponseData<User> findCurrentUser() {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         return userRepository.findById(userId)
                 .map(UniqueQueryResponseData::ok)
                 .orElseGet(() -> UniqueQueryResponseData.ok(null));
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public BasicResponseData updateUser(String userId, ModifyUserRequest modifyUserRequest) {
+    public BasicResponseData updateUser(Long userId, ModifyUserRequest modifyUserRequest) {
         userRepository.findById(userId).ifPresent(user -> {
             BeanUtils.copyProperties(modifyUserRequest, user);
             user.setId(userId);
@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService {
         return BasicResponseData.ok();
     }
 
-    private void updateRoles(String userId, List<String> roleIds) {
+    private void updateRoles(Long userId, List<Long> roleIds) {
         if (Objects.isNull(roleIds))
             return;
         userRoleRepository.deleteByUserId(userId);
@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public BasicResponseData closeUser(String userId) {
+    public BasicResponseData closeUser(Long userId) {
         userRepository.findById(userId).ifPresent(user -> {
             user.setStatus(false);
             userRepository.save(user);

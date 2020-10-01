@@ -21,33 +21,33 @@ public interface CourseService {
 
     UniqueQueryResponseData<Course> findCourseByLive(String liveId);
 
-    UniqueQueryResponseData<Course> findCourseById(String courseId);
+    UniqueQueryResponseData<Course> findCourseById(Long courseId);
 
     QueryResponseData<Course> findUserCourses(Integer page,
                                               Integer size,
-                                              String userId,
+                                              Long userId,
                                               QueryUserCourseRequest queryUserCourseRequest);
 
-    UniqueQueryResponseData<Course> requestLiveCourse(String courseId);
+    UniqueQueryResponseData<Course> requestLiveCourse(Long courseId);
 
-    BasicResponseData requestLiveCourseEnd(String courseId);
+    BasicResponseData requestLiveCourseEnd(Long courseId);
 
-    BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, String courseId, Long timeout);
+    BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, Long courseId, Long timeout);
 
     BasicResponseData handleLiveCourseSign(@RequestBody CourseSignRequest courseSignRequest);
 
-    QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, String courseId);
+    QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, Long courseId);
 
-    QueryResponseData<SignRecord> findCourseSignRecord(String signId);
+    QueryResponseData<SignRecord> findCourseSignRecord(Long signId);
 
-    UniqueQueryResponseData<UserCourse> findUserCourse(String userId, String courseId);
+    UniqueQueryResponseData<UserCourse> findUserCourse(Long userId, Long courseId);
 
     AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest);
 
-    BasicResponseData updateCourse(String courseId, ModifyCourseRequest modifyCourseRequest);
+    BasicResponseData updateCourse(Long courseId, ModifyCourseRequest modifyCourseRequest);
 
     JoinCourseResult joinCourse(String invitationCode);
 
-    BasicResponseData closeCourse(String courseId);
+    BasicResponseData closeCourse(Long courseId);
 
 }

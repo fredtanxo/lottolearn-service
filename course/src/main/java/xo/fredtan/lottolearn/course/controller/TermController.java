@@ -30,13 +30,13 @@ public class TermController implements TermControllerApi {
 
     @Override
     @PutMapping("/id/{termId}")
-    public BasicResponseData updateTerm(@PathVariable String termId, ModifyTermRequest modifyTermRequest) {
+    public BasicResponseData updateTerm(@PathVariable Long termId, ModifyTermRequest modifyTermRequest) {
         return termService.updateTerm(termId, modifyTermRequest);
     }
 
     @Override
     @DeleteMapping("/id/{termId}")
-    public BasicResponseData closeTerm(@PathVariable String termId) {
+    public BasicResponseData closeTerm(@PathVariable Long termId) {
         return termService.closeTerm(termId);
     }
 }

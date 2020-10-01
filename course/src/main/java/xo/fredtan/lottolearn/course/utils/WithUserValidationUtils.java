@@ -19,7 +19,7 @@ public class WithUserValidationUtils {
      * 校验用户是否为该课程的创建者（老师）
      * @param courseId 课程ID
      */
-    public boolean notCourseOwner(String courseId) {
+    public boolean notCourseOwner(Long courseId) {
         return !WithUserValidationUtils.validateWithUser((_userId, _courseId) -> {
             UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(_userId, _courseId);
             if (Objects.isNull(userCourse)) {
@@ -33,7 +33,7 @@ public class WithUserValidationUtils {
      * 校验用户是否已加入该课程
      * @param courseId 课程ID
      */
-    public boolean notParticipate(String courseId) {
+    public boolean notParticipate(Long courseId) {
         return WithUserValidationUtils.validateWithUser((_userId, _courseId) -> {
             UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(_userId, _courseId);
             return Objects.isNull(userCourse);
@@ -46,8 +46,8 @@ public class WithUserValidationUtils {
      * @param arg 行为的第二个参数
      * @return 执行结果
      */
-    private static <T> boolean validateWithUser(BiFunction<String, T, Boolean> action, T arg) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+    private static <T> boolean validateWithUser(BiFunction<Long, T, Boolean> action, T arg) {
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         return action.apply(userId, arg);
     }
 }

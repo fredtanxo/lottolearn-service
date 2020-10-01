@@ -77,7 +77,7 @@ public class MessageInboundChannelInterceptor implements ChannelInterceptor {
                     if (Objects.isNull(user)) {
                         throw new MessagingException("未登录");
                     }
-                    String userId = user.getName();
+                    Long userId = Long.valueOf(user.getName());
                     UserCourse userCourse = messageService.findUserCourseLive(userId, roomId);
                     if (Objects.isNull(userCourse)) {
                         throw new MessagingException("课程未开始或没有加入课程");

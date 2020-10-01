@@ -8,5 +8,5 @@ import java.util.List;
 
 @Data
 public class ModifyUserRequest extends User implements RequestData {
-    private List<String> roleIds;
+    private List<Long> roleIds;
 }

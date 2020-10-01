@@ -15,7 +15,7 @@ public class MessageServiceImpl implements MessageService {
     @DubboReference(version = "0.0.1")
     private CourseService courseService;
 
-    public UserCourse findUserCourseLive(String userId, String roomId) {
+    public UserCourse findUserCourseLive(Long userId, String roomId) {
         UniqueQueryResponseData<Course> courseByLiveResponse = courseService.findCourseByLive(roomId);
         Course course = courseByLiveResponse.getPayload();
         if (Objects.isNull(course)) {

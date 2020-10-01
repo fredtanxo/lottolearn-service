@@ -9,8 +9,8 @@ import xo.fredtan.lottolearn.domain.course.ResourceLibrary;
 @Api("课程媒体资源库")
 public interface ResourceLibraryControllerApi {
     @ApiOperation("根据课程ID查找所有资源")
-    QueryResponseData<ResourceLibrary> findResourceItemsByCourseId(String courseId);
+    QueryResponseData<ResourceLibrary> findResourceItemsByCourseId(Long courseId);
 
     @ApiOperation("删除媒体资源")
-    BasicResponseData deleteResourceItemByCourseId(String courseId, String resourceId);
+    BasicResponseData deleteResourceItemByCourseId(Long courseId, Long resourceId);
 }

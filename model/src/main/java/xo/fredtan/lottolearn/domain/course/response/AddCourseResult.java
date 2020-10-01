@@ -7,9 +7,9 @@ import xo.fredtan.lottolearn.common.model.response.ResultCode;
 @Data
 public class AddCourseResult extends BasicResponseData {
     private String invitationCode;
-    private String courseId;
+    private Long courseId;
 
-    public AddCourseResult(ResultCode resultCode, String invitationCode, String courseId) {
+    public AddCourseResult(ResultCode resultCode, String invitationCode, Long courseId) {
         super(resultCode);
         this.invitationCode = invitationCode;
         this.courseId = courseId;

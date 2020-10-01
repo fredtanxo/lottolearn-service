@@ -17,7 +17,7 @@ public class PermissionServiceImpl implements PermissionService {
     private final MenuMapper menuMapper;
 
     @Override
-    public UniqueQueryResponseData<PermissionCodeSet> findUserPermissionCodes(String userId) {
+    public UniqueQueryResponseData<PermissionCodeSet> findUserPermissionCodes(Long userId) {
         List<String> permissions = menuMapper.selectUserPermissions(userId);
         return UniqueQueryResponseData.ok(new PermissionCodeSet(new HashSet<>(permissions)));
     }

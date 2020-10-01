@@ -46,7 +46,7 @@ public class TermServiceImpl implements TermService {
 
     @Override
     @Transactional
-    public BasicResponseData updateTerm(String termId, ModifyTermRequest modifyTermRequest) {
+    public BasicResponseData updateTerm(Long termId, ModifyTermRequest modifyTermRequest) {
         termRepository.findById(termId).ifPresent(term -> {
             BeanUtils.copyProperties(modifyTermRequest, term);
             term.setId(termId);
@@ -57,7 +57,7 @@ public class TermServiceImpl implements TermService {
 
     @Override
     @Transactional
-    public BasicResponseData closeTerm(String termId) {
+    public BasicResponseData closeTerm(Long termId) {
         termRepository.findById(termId).ifPresent(term -> {
             term.setStatus(false);
             termRepository.save(term);

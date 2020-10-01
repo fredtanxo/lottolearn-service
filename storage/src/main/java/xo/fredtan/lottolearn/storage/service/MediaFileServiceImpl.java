@@ -38,26 +38,26 @@ public class MediaFileServiceImpl extends AbstractTusUploadService implements Me
     private String basePath;
 
     @Override
-    protected ResourceLibrary getResourceItem(String resourceId) {
+    protected ResourceLibrary getResourceItem(Long resourceId) {
         ResourceLibrary item = resourceLibraryService.findResourceItemById(resourceId);
         getTemp().set(item);
         return item;
     }
 
     @Override
-    protected String getBasePath(String courseId) {
+    protected String getBasePath(Long courseId) {
         return String.format("%s/course/%s", basePath, courseId);
     }
 
     @Override
     protected String getUploadUrl() {
         ResourceLibrary resourceItem = getTemp().get();
-        String resourceId = resourceItem.getId();
+        Long resourceId = resourceItem.getId();
         return String.format("https://storage.lottolearn.com/media/upload/%s", resourceId);
     }
 
     @Override
-    protected void afterFileCreation(String courseId, Long uploadLength, Map<String, String> metadata, File file) {
+    protected void afterFileCreation(Long courseId, Long uploadLength, Map<String, String> metadata, File file) {
         ResourceLibrary resourceItem = new ResourceLibrary();
         resourceItem.setCourseId(courseId);
         resourceItem.setFilename(file.getName());
@@ -75,7 +75,7 @@ public class MediaFileServiceImpl extends AbstractTusUploadService implements Me
     }
 
     @Override
-    protected void afterFileUploadComplete(String resourceId, Map<String, String> appData) {
+    protected void afterFileUploadComplete(Long resourceId, Map<String, String> appData) {
         ResourceLibrary resourceItem = getTemp().get();
         MediaProcessRequest processRequest = new MediaProcessRequest();
         processRequest.setResourceId(resourceItem.getId());
@@ -86,7 +86,7 @@ public class MediaFileServiceImpl extends AbstractTusUploadService implements Me
     }
 
     @Override
-    protected void afterFileDelete(String resourceId, Map<String, String> appData) {
+    protected void afterFileDelete(Long resourceId, Map<String, String> appData) {
 
     }
 }

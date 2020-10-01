@@ -8,5 +8,5 @@ import xo.fredtan.lottolearn.domain.user.response.PermissionCodeSet;
 @Api("用户权限")
 public interface PermissionControllerApi {
     @ApiOperation("获取用户权限代码集合")
-    UniqueQueryResponseData<PermissionCodeSet> findUserPermissionCodes(String userId);
+    UniqueQueryResponseData<PermissionCodeSet> findUserPermissionCodes(Long userId);
 }

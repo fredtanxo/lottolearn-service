@@ -10,5 +10,5 @@ public interface LogService {
 
     void saveLog(Log log);
 
-    BasicResponseData deleteLog(String logId);
+    BasicResponseData deleteLog(Long logId);
 }

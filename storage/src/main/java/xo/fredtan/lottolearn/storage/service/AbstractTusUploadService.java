@@ -36,7 +36,7 @@ public abstract class AbstractTusUploadService implements TusUploadService {
             String uuid = UUID.randomUUID().toString();
 
             Map<String, String> appData = resolveAppData(request);
-            String courseId = appData.get("courseId");
+            Long courseId = Long.valueOf(appData.get("courseId"));
             String uploadMetadata = request.getHeader("Upload-Metadata");
             Long uploadLength = Long.parseLong(request.getHeader("Upload-Length"));
 
@@ -76,7 +76,7 @@ public abstract class AbstractTusUploadService implements TusUploadService {
      * @param response HttpServletResponse
      */
     @Override
-    public void checkFile(String resourceId, HttpServletResponse response) {
+    public void checkFile(Long resourceId, HttpServletResponse response) {
         try {
             ResourceLibrary item = getResourceItem(resourceId);
             if (Objects.isNull(item)) {
@@ -100,7 +100,7 @@ public abstract class AbstractTusUploadService implements TusUploadService {
      * @param response HttpServletResponse
      */
     @Override
-    public void uploadFile(String resourceId, HttpServletRequest request, HttpServletResponse response) {
+    public void uploadFile(Long resourceId, HttpServletRequest request, HttpServletResponse response) {
         try {
             ResourceLibrary item = getResourceItem(resourceId);
             if (Objects.isNull(item)) {
@@ -135,7 +135,7 @@ public abstract class AbstractTusUploadService implements TusUploadService {
     }
 
     @Override
-    public void deleteFile(String resourceId, HttpServletRequest request, HttpServletResponse response) {
+    public void deleteFile(Long resourceId, HttpServletRequest request, HttpServletResponse response) {
         try {
             ResourceLibrary item = getResourceItem(resourceId);
             File file = new File(item.getLocalPath());
@@ -167,20 +167,20 @@ public abstract class AbstractTusUploadService implements TusUploadService {
 
 
     /** 获取资源项 */
-    protected abstract ResourceLibrary getResourceItem(String resourceId);
+    protected abstract ResourceLibrary getResourceItem(Long resourceId);
 
     /** 获取文件的父目录 */
-    protected abstract String getBasePath(String courseId);
+    protected abstract String getBasePath(Long courseId);
 
     /** 获取文件上传的路径 */
     protected abstract String getUploadUrl();
 
     /** 文件创建完毕后钩子方法 */
-    protected abstract void afterFileCreation(String courseId, Long uploadLength, Map<String, String> metadata, File file);
+    protected abstract void afterFileCreation(Long courseId, Long uploadLength, Map<String, String> metadata, File file);
 
     /** 文件上传完毕后钩子方法 */
-    protected abstract void afterFileUploadComplete(String resourceId, Map<String, String> appData);
+    protected abstract void afterFileUploadComplete(Long resourceId, Map<String, String> appData);
 
     /** 文件删除后钩子方法 */
-    protected abstract void afterFileDelete(String resourceId, Map<String, String> appData);
+    protected abstract void afterFileDelete(Long resourceId, Map<String, String> appData);
 }

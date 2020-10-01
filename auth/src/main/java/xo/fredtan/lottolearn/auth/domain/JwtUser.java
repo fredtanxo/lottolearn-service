@@ -15,7 +15,7 @@ import java.util.Objects;
 @Setter
 public class JwtUser implements UserDetails {
     @Getter
-    private String userId;
+    private Long userId;
     @Getter
     private String nickname;
     private String username;

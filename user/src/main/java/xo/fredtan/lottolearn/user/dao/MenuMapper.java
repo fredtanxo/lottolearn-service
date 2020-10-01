@@ -15,5 +15,5 @@ public interface MenuMapper {
     @Select("select m.id from user_role ur left join permission p on (ur.role_id = p.role_id) " +
             "left join menu m on (p.menu_id = m.id) " +
             "where m.`status`=1 and ur.user_id = #{userId}")
-    List<String> selectUserPermissions(@Param("userId") String userId);
+    List<String> selectUserPermissions(@Param("userId") Long userId);
 }

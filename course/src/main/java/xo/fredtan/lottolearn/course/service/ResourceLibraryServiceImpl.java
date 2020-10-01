@@ -21,14 +21,14 @@ public class ResourceLibraryServiceImpl implements ResourceLibraryService {
     private final ResourceLibraryRepository resourceLibraryRepository;
 
     @Override
-    public QueryResponseData<ResourceLibrary> findResourceItemsByCourseId(String courseId) {
+    public QueryResponseData<ResourceLibrary> findResourceItemsByCourseId(Long courseId) {
         List<ResourceLibrary> items = resourceLibraryRepository.findByCourseIdOrderByUploadDateDesc(courseId);
         QueryResult<ResourceLibrary> queryResult = new QueryResult<>((long) items.size(), items);
         return QueryResponseData.ok(queryResult);
     }
 
     @Override
-    public QueryResponseData<ResourceLibrary> findMediaResourcesByCourseId(String courseId) {
+    public QueryResponseData<ResourceLibrary> findMediaResourcesByCourseId(Long courseId) {
         List<ResourceLibrary> items =
                 resourceLibraryRepository.findByCourseIdAndTypeOrderByUploadDateDesc(courseId, FileUploadType.MEDIA.getType());
         QueryResult<ResourceLibrary> queryResult = new QueryResult<>((long) items.size(), items);
@@ -36,7 +36,7 @@ public class ResourceLibraryServiceImpl implements ResourceLibraryService {
     }
 
     @Override
-    public ResourceLibrary findResourceItemById(String resourceId) {
+    public ResourceLibrary findResourceItemById(Long resourceId) {
         return resourceLibraryRepository.findById(resourceId).orElse(null);
     }
 
@@ -48,7 +48,7 @@ public class ResourceLibraryServiceImpl implements ResourceLibraryService {
 
     @Override
     @Transactional
-    public BasicResponseData deleteResourceItemByCourseId(String courseId, String resourceId) {
+    public BasicResponseData deleteResourceItemByCourseId(Long courseId, Long resourceId) {
         resourceLibraryRepository.findById(resourceId).ifPresent(resource -> {
             if (resource.getCourseId().equals(courseId)) {
                 resource.setStatus(FileStatus.DELETED.getType());

@@ -46,7 +46,7 @@ public class ChapterFileServiceImpl extends AbstractTusUploadService implements 
     private String baseUrl;
 
     @Override
-    public void downloadChapterFile(String chapterId, String resourceId, HttpServletResponse response) {
+    public void downloadChapterFile(Long chapterId, Long resourceId, HttpServletResponse response) {
         ResourceLibrary resourceItem = resourceLibraryService.findResourceItemById(resourceId);
         if (Objects.nonNull(resourceItem)) {
             try (ServletOutputStream outputStream = response.getOutputStream()) {
@@ -72,26 +72,26 @@ public class ChapterFileServiceImpl extends AbstractTusUploadService implements 
     }
 
     @Override
-    protected ResourceLibrary getResourceItem(String resourceId) {
+    protected ResourceLibrary getResourceItem(Long resourceId) {
         ResourceLibrary item = resourceLibraryService.findResourceItemById(resourceId);
         getTemp().set(item);
         return item;
     }
 
     @Override
-    protected String getBasePath(String courseId) {
+    protected String getBasePath(Long courseId) {
         return String.format("%s/course/%s", basePath, courseId);
     }
 
     @Override
     protected String getUploadUrl() {
         ResourceLibrary resourceItem = getTemp().get();
-        String resourceId = resourceItem.getId();
+        Long resourceId = resourceItem.getId();
         return String.format("https://storage.lottolearn.com/files/upload/%s", resourceId);
     }
 
     @Override
-    protected void afterFileCreation(String courseId, Long uploadLength, Map<String, String> metadata, File file) {
+    protected void afterFileCreation(Long courseId, Long uploadLength, Map<String, String> metadata, File file) {
         ResourceLibrary resourceItem = new ResourceLibrary();
         resourceItem.setCourseId(courseId);
         resourceItem.setName(metadata.get("filename"));
@@ -109,8 +109,8 @@ public class ChapterFileServiceImpl extends AbstractTusUploadService implements 
     }
 
     @Override
-    protected void afterFileUploadComplete(String resourceId, Map<String, String> appData) {
-        String chapterId = appData.get("chapterId");
+    protected void afterFileUploadComplete(Long resourceId, Map<String, String> appData) {
+        Long chapterId = Long.valueOf(appData.get("chapterId"));
         ChapterResource chapterResource = new ChapterResource();
         chapterResource.setChapterId(chapterId);
         chapterResource.setResourceId(resourceId);
@@ -123,8 +123,8 @@ public class ChapterFileServiceImpl extends AbstractTusUploadService implements 
     }
 
     @Override
-    protected void afterFileDelete(String resourceId, Map<String, String> appData) {
+    protected void afterFileDelete(Long resourceId, Map<String, String> appData) {
         // 取消与章节的关联并删除文件
-        chapterResourceService.unlinkChapterResource(appData.get("chapterId"), resourceId);
+        chapterResourceService.unlinkChapterResource(Long.valueOf(appData.get("chapterId")), resourceId);
     }
 }

@@ -3,6 +3,6 @@ package xo.fredtan.lottolearn.course.dao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import xo.fredtan.lottolearn.domain.course.ChapterResource;
 
-public interface ChapterResourceRepository extends JpaRepository<ChapterResource, String> {
-    ChapterResource findByChapterIdAndResourceId(String chapterId, String resourceId);
+public interface ChapterResourceRepository extends JpaRepository<ChapterResource, Long> {
+    ChapterResource findByChapterIdAndResourceId(Long chapterId, Long resourceId);
 }

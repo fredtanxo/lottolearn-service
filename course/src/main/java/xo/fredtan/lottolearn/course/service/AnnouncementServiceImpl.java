@@ -26,7 +26,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
 
     @Override
-    public QueryResponseData<Announcement> findAnnouncementByCourseId(Integer page, Integer size, String courseId) {
+    public QueryResponseData<Announcement> findAnnouncementByCourseId(Integer page, Integer size, Long courseId) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Announcement> announcements = announcementRepository.findByCourseId(pageRequest, courseId);
 
@@ -36,7 +36,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
     @Override
     @Transactional
-    public BasicResponseData addAnnouncement(String courseId, ModifyAnnouncementRequest modifyAnnouncementRequest) {
+    public BasicResponseData addAnnouncement(Long courseId, ModifyAnnouncementRequest modifyAnnouncementRequest) {
         Announcement announcement = new Announcement();
         announcement.setCourseId(courseId);
         announcement.setTitle(modifyAnnouncementRequest.getTitle());
@@ -50,8 +50,8 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
     @Override
     @Transactional
-    public BasicResponseData updateAnnouncement(String courseId,
-                                                String announcementId,
+    public BasicResponseData updateAnnouncement(Long courseId,
+                                                Long announcementId,
                                                 ModifyAnnouncementRequest modifyAnnouncementRequest) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String publisher = "";
@@ -73,7 +73,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
     @Override
     @Transactional
-    public BasicResponseData deleteAnnouncement(String courseId, String announcementId) {
+    public BasicResponseData deleteAnnouncement(Long courseId, Long announcementId) {
         announcementRepository.findById(announcementId).ifPresent(announcementRepository::delete);
         return BasicResponseData.ok();
     }

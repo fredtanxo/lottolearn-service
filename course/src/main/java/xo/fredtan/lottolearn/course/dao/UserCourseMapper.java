@@ -9,6 +9,6 @@ import java.util.List;
 
 @Mapper
 public interface UserCourseMapper {
-    List<Course> selectUserCourses(@Param("userId") String userId,
+    List<Course> selectUserCourses(@Param("userId") Long userId,
                                    @Param("query") QueryUserCourseRequest queryUserCourseRequest);
 }

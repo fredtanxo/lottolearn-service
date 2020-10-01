@@ -16,7 +16,7 @@ public interface UserControllerApi {
     QueryResponseData<User> findAllUsers(Integer page, Integer size, QueryUserRequest queryUserRequest);
 
     @ApiOperation("根据用户ID查询用户信息")
-    UniqueQueryResponseData<UserWithRoleIds> findUserById(String userId, Boolean withRoles);
+    UniqueQueryResponseData<UserWithRoleIds> findUserById(Long userId, Boolean withRoles);
 
     @ApiOperation("查询当前用户")
     UniqueQueryResponseData<User> findCurrentUser();
@@ -25,8 +25,8 @@ public interface UserControllerApi {
     BasicResponseData addUser(ModifyUserRequest modifyUserRequest);
 
     @ApiOperation("更新用户")
-    BasicResponseData updateUser(String userId, ModifyUserRequest modifyUserRequest);
+    BasicResponseData updateUser(Long userId, ModifyUserRequest modifyUserRequest);
 
     @ApiOperation("关闭用户")
-    BasicResponseData closeUser(String userId);
+    BasicResponseData closeUser(Long userId);
 }

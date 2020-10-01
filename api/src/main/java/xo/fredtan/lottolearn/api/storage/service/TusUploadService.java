@@ -6,9 +6,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface TusUploadService {
     void createFile(HttpServletRequest request, HttpServletResponse response);
 
-    void checkFile(String resourceId, HttpServletResponse response);
+    void checkFile(Long resourceId, HttpServletResponse response);
 
-    void uploadFile(String resourceId, HttpServletRequest request, HttpServletResponse response);
+    void uploadFile(Long resourceId, HttpServletRequest request, HttpServletResponse response);
 
-    void deleteFile(String resourceId, HttpServletRequest request, HttpServletResponse response);
+    void deleteFile(Long resourceId, HttpServletRequest request, HttpServletResponse response);
 }

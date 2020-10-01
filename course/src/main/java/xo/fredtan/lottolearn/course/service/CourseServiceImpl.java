@@ -93,7 +93,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public UniqueQueryResponseData<Course> findCourseById(String courseId) {
+    public UniqueQueryResponseData<Course> findCourseById(Long courseId) {
         return courseRepository.findById(courseId)
                 .map(UniqueQueryResponseData::ok)
                 .orElseGet(() -> UniqueQueryResponseData.ok(null));
@@ -103,7 +103,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public QueryResponseData<Course> findUserCourses(Integer page,
                                                      Integer size,
-                                                     String userId,
+                                                     Long userId,
                                                      QueryUserCourseRequest queryUserCourseRequest) {
         PageHelper.startPage(page, size);
         List<Course> courses = userCourseMapper.selectUserCourses(userId, queryUserCourseRequest);
@@ -115,7 +115,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public UniqueQueryResponseData<Course> requestLiveCourse(String courseId) {
+    public UniqueQueryResponseData<Course> requestLiveCourse(Long courseId) {
         return courseRepository.findById(courseId).map(course -> {
             String roomId = UUID.randomUUID().toString().replace("-", "");
             course.setLive(roomId);
@@ -127,7 +127,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public BasicResponseData requestLiveCourseEnd(String courseId) {
+    public BasicResponseData requestLiveCourseEnd(Long courseId) {
         courseRepository.findById(courseId).ifPresent(course -> {
             course.setLive(null);
             courseRepository.save(course);
@@ -137,7 +137,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, String courseId, Long timeout) {
+    public BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, Long courseId, Long timeout) {
         if (timeout < 0) { // fail safe
             timeout = 15L;
         }
@@ -154,7 +154,7 @@ public class CourseServiceImpl implements CourseService {
 
         byteRedisTemplate.convertAndSend(MessageConstants.LIVE_DISTRIBUTION_CHANNEL, chatMessage);
         stringRedisTemplate.boundValueOps(CourseConstants.LIVE_SIGN_KEY_PREFIX + sign.getId())
-                .set(courseId, timeout, TimeUnit.SECONDS);
+                .set(courseId.toString(), timeout, TimeUnit.SECONDS);
 
         return BasicResponseData.ok();
     }
@@ -167,7 +167,7 @@ public class CourseServiceImpl implements CourseService {
 
         boolean success = StringUtils.hasText(courseId);
 
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         courseSignRequest.setUserId(userId);
         courseSignRequest.setId(null);
         courseSignRequest.setSignTime(new Date());
@@ -180,7 +180,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, String courseId) {
+    public QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, Long courseId) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Sign> courseSigns = signRepository.findByCourseIdOrderBySignDateDesc(pageRequest, courseId);
         QueryResult<Sign> queryResult = new QueryResult<>(courseSigns.getTotalElements(), courseSigns.getContent());
@@ -189,7 +189,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public QueryResponseData<SignRecord> findCourseSignRecord(String signId) {
+    public QueryResponseData<SignRecord> findCourseSignRecord(Long signId) {
         List<SignRecord> signRecords = signRecordRepository.findBySignIdOrderBySignTimeDesc(signId);
         QueryResult<SignRecord> queryResult = new QueryResult<>((long) signRecords.size(), signRecords);
 
@@ -197,7 +197,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public UniqueQueryResponseData<UserCourse> findUserCourse(String userId, String courseId) {
+    public UniqueQueryResponseData<UserCourse> findUserCourse(Long userId, Long courseId) {
         UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(userId, courseId);
         return UniqueQueryResponseData.ok(userCourse);
     }
@@ -205,7 +205,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         UniqueQueryResponseData<UserWithRoleIds> userPre = userService.findUserById(userId);
         UserWithRoleIds user = userPre.getPayload();
 
@@ -262,8 +262,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public BasicResponseData updateCourse(String courseId, ModifyCourseRequest modifyCourseRequest) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+    public BasicResponseData updateCourse(Long courseId, ModifyCourseRequest modifyCourseRequest) {
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         courseRepository.findById(courseId).ifPresent(course -> {
             // 确保课程ID、邀请码、教师ID、发布日期、状态一致
             modifyCourseRequest.setCode(course.getCode());
@@ -287,7 +287,7 @@ public class CourseServiceImpl implements CourseService {
             return new JoinCourseResult(CourseCode.COURSE_IS_CLOSED, null);
         }
 
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(userId, course.getId());
 
         // 此前加入过该课程
@@ -315,7 +315,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public BasicResponseData closeCourse(String courseId) {
+    public BasicResponseData closeCourse(Long courseId) {
         courseRepository.findById(courseId).ifPresent(course -> {
             course.setStatus(3);
             courseRepository.save(course);

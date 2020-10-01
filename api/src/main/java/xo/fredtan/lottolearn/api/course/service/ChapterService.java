@@ -6,11 +6,11 @@ import xo.fredtan.lottolearn.domain.course.Chapter;
 import xo.fredtan.lottolearn.domain.course.request.ModifyChapterRequest;
 
 public interface ChapterService {
-    QueryResponseData<Chapter> findChaptersByCourseId(Integer page, Integer size, String courseId);
+    QueryResponseData<Chapter> findChaptersByCourseId(Integer page, Integer size, Long courseId);
 
-    BasicResponseData addChapter(String courseId, ModifyChapterRequest modifyChapterRequest);
+    BasicResponseData addChapter(Long courseId, ModifyChapterRequest modifyChapterRequest);
 
-    BasicResponseData updateChapter(String courseId, String chapterId, ModifyChapterRequest modifyChapterRequest);
+    BasicResponseData updateChapter(Long courseId, Long chapterId, ModifyChapterRequest modifyChapterRequest);
 
-    BasicResponseData deleteChapter(String courseId, String chapterId);
+    BasicResponseData deleteChapter(Long courseId, Long chapterId);
 }

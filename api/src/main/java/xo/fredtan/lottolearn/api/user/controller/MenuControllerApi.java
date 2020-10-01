@@ -13,14 +13,14 @@ public interface MenuControllerApi {
     UniqueQueryResponseData<MenuTree> findAllMenus();
 
     @ApiOperation("根据parentId查询菜单列表")
-    UniqueQueryResponseData<MenuTree> findMenusByParentId(String parentId);
+    UniqueQueryResponseData<MenuTree> findMenusByParentId(Long parentId);
 
     @ApiOperation("增加菜单")
     BasicResponseData addMenu(ModifyMenuRequest modifyMenuRequest);
 
     @ApiOperation("更新菜单")
-    BasicResponseData updateMenu(String menuId, ModifyMenuRequest modifyMenuRequest);
+    BasicResponseData updateMenu(Long menuId, ModifyMenuRequest modifyMenuRequest);
 
     @ApiOperation("关闭菜单")
-    BasicResponseData closeMenu(String menuId);
+    BasicResponseData closeMenu(Long menuId);
 }

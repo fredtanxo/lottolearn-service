@@ -25,7 +25,7 @@ public class ChapterResourceServiceImpl implements ChapterResourceService {
     private final ChapterResourceMapper chapterResourceMapper;
 
     @Override
-    public UniqueQueryResponseData<ResourceLibrary> findMediaByChapterId(String chapterId) {
+    public UniqueQueryResponseData<ResourceLibrary> findMediaByChapterId(Long chapterId) {
         List<ResourceLibrary> mediaList =
                 chapterResourceMapper.selectChapterResource(chapterId, FileUploadType.MEDIA.getType());
         ResourceLibrary resource = mediaList.isEmpty() ? null : mediaList.get(0);
@@ -33,7 +33,7 @@ public class ChapterResourceServiceImpl implements ChapterResourceService {
     }
 
     @Override
-    public QueryResponseData<ResourceLibrary> findFilesByChapterId(String chapterId) {
+    public QueryResponseData<ResourceLibrary> findFilesByChapterId(Long chapterId) {
         List<ResourceLibrary> fileList =
                 chapterResourceMapper.selectChapterResource(chapterId, FileUploadType.REGULAR.getType());
         QueryResult<ResourceLibrary> queryResult = new QueryResult<>((long) fileList.size(), fileList);
@@ -48,7 +48,7 @@ public class ChapterResourceServiceImpl implements ChapterResourceService {
 
     @Override
     @Transactional
-    public BasicResponseData linkChapterMediaResource(String chapterId, String resourceId) {
+    public BasicResponseData linkChapterMediaResource(Long chapterId, Long resourceId) {
         // 清除已有的选择
         UniqueQueryResponseData<ResourceLibrary> query = this.findMediaByChapterId(chapterId);
         ResourceLibrary item = query.getPayload();
@@ -79,7 +79,7 @@ public class ChapterResourceServiceImpl implements ChapterResourceService {
 
     @Override
     @Transactional
-    public BasicResponseData unlinkChapterResource(String chapterId, String resourceId) {
+    public BasicResponseData unlinkChapterResource(Long chapterId, Long resourceId) {
         ChapterResource item = chapterResourceRepository.findByChapterIdAndResourceId(chapterId, resourceId);
         if (Objects.nonNull(item)) {
             item.setStatus(false);

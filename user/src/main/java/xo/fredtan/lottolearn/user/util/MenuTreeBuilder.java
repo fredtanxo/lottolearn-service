@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MenuTreeBuilder {
-    public static MenuTree build(List<MenuTree> menuTreeList, String rootId) {
+    public static MenuTree build(List<MenuTree> menuTreeList, Long rootId) {
         AtomicReference<MenuTree> root = new AtomicReference<>();
 
         Supplier<Stream<MenuTree>> menuTreeSupplier = menuTreeList::stream;

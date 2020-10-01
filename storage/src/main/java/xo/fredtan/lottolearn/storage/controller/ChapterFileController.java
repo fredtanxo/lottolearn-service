@@ -21,19 +21,19 @@ public class ChapterFileController implements ChapterFileControllerApi {
     }
 
     @RequestMapping(path = "/upload/{resourceId}", method = RequestMethod.HEAD)
-    public void checkChapterFile(@PathVariable String resourceId, HttpServletResponse response) {
+    public void checkChapterFile(@PathVariable Long resourceId, HttpServletResponse response) {
         chapterFileService.checkFile(resourceId, response);
     }
 
     @PatchMapping("/upload/{resourceId}")
-    public void uploadChapterFile(@PathVariable String resourceId,
+    public void uploadChapterFile(@PathVariable Long resourceId,
                                   HttpServletRequest request,
                                   HttpServletResponse response) {
         chapterFileService.uploadFile(resourceId, request, response);
     }
 
     @DeleteMapping("/upload/{resourceId}")
-    public void deleteChapterFile(@PathVariable String resourceId,
+    public void deleteChapterFile(@PathVariable Long resourceId,
                                   HttpServletRequest request,
                                   HttpServletResponse response) {
         chapterFileService.deleteFile(resourceId, request, response);
@@ -41,8 +41,8 @@ public class ChapterFileController implements ChapterFileControllerApi {
 
     @Override
     @GetMapping("/chapter/{chapterId}/resource/{resourceId}")
-    public void downloadChapterFile(@PathVariable String chapterId,
-                                    @PathVariable String resourceId,
+    public void downloadChapterFile(@PathVariable Long chapterId,
+                                    @PathVariable Long resourceId,
                                     HttpServletResponse response) {
         chapterFileService.downloadChapterFile(chapterId, resourceId, response);
     }

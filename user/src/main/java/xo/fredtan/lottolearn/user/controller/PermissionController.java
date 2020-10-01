@@ -19,7 +19,7 @@ public class PermissionController implements PermissionControllerApi {
 
     @Override
     @GetMapping("/user/{userId}")
-    public UniqueQueryResponseData<PermissionCodeSet> findUserPermissionCodes(@PathVariable String userId) {
+    public UniqueQueryResponseData<PermissionCodeSet> findUserPermissionCodes(@PathVariable Long userId) {
         return permissionService.findUserPermissionCodes(userId);
     }
 }

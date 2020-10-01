@@ -27,7 +27,7 @@ public class AnnouncementController implements AnnouncementControllerApi {
     @ValidatePagination
     public QueryResponseData<Announcement> findAnnouncementByCourseId(Integer page,
                                                                       Integer size,
-                                                                      @PathVariable String courseId) {
+                                                                      @PathVariable Long courseId) {
         if (withUserValidationUtils.notParticipate(courseId)) {
             ApiExceptionCast.cast(CourseCode.NOT_JOIN_COURSE);
         }
@@ -36,7 +36,7 @@ public class AnnouncementController implements AnnouncementControllerApi {
 
     @Override
     @PostMapping("/course/{courseId}")
-    public BasicResponseData addAnnouncement(@PathVariable String courseId,
+    public BasicResponseData addAnnouncement(@PathVariable Long courseId,
                                              @RequestBody ModifyAnnouncementRequest modifyAnnouncementRequest) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
@@ -46,8 +46,8 @@ public class AnnouncementController implements AnnouncementControllerApi {
 
     @Override
     @PutMapping("/course/{courseId}/{announcementId}")
-    public BasicResponseData updateAnnouncement(@PathVariable String courseId,
-                                                @PathVariable String announcementId,
+    public BasicResponseData updateAnnouncement(@PathVariable Long courseId,
+                                                @PathVariable Long announcementId,
                                                 @RequestBody ModifyAnnouncementRequest modifyAnnouncementRequest) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
@@ -57,8 +57,8 @@ public class AnnouncementController implements AnnouncementControllerApi {
 
     @Override
     @DeleteMapping("/course/{courseId}/{announcementId}")
-    public BasicResponseData deleteAnnouncement(@PathVariable String courseId,
-                                                @PathVariable String announcementId) {
+    public BasicResponseData deleteAnnouncement(@PathVariable Long courseId,
+                                                @PathVariable Long announcementId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }

@@ -15,14 +15,14 @@ public interface RoleControllerApi {
     QueryResponseData<Role> findAllRoles(Integer page, Integer size);
 
     @ApiOperation("根据角色ID查询角色信息（包含角色权限信息）")
-    UniqueQueryResponseData<RoleWithMenuIds> findRoleById(String roleId);
+    UniqueQueryResponseData<RoleWithMenuIds> findRoleById(Long roleId);
 
     @ApiOperation("增加角色")
     BasicResponseData addRole(ModifyRoleRequest modifyRoleRequest);
 
     @ApiOperation("更新角色")
-    BasicResponseData updateRole(String roleId, ModifyRoleRequest modifyRoleRequest);
+    BasicResponseData updateRole(Long roleId, ModifyRoleRequest modifyRoleRequest);
 
     @ApiOperation("关闭角色")
-    BasicResponseData closeRole(String roleId);
+    BasicResponseData closeRole(Long roleId);
 }

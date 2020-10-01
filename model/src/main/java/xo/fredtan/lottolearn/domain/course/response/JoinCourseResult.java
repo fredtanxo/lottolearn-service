@@ -8,9 +8,9 @@ import xo.fredtan.lottolearn.common.model.response.ResultCode;
 @Data
 @AllArgsConstructor
 public class JoinCourseResult extends BasicResponseData {
-    private String courseId;
+    private Long courseId;
 
-    public JoinCourseResult(ResultCode resultCode, String courseId) {
+    public JoinCourseResult(ResultCode resultCode, Long courseId) {
         super(resultCode);
         this.courseId = courseId;
     }

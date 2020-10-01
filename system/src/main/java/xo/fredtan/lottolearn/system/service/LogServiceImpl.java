@@ -58,7 +58,7 @@ public class LogServiceImpl implements LogService {
 
     @Override
     @Transactional
-    public BasicResponseData deleteLog(String logId) {
+    public BasicResponseData deleteLog(Long logId) {
         logRepository.deleteById(logId);
         return BasicResponseData.ok();
     }

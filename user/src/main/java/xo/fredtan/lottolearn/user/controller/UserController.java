@@ -31,7 +31,7 @@ public class UserController implements UserControllerApi {
 
     @Override
     @GetMapping("/id/{userId}")
-    public UniqueQueryResponseData<UserWithRoleIds> findUserById(@PathVariable String userId, Boolean withRoles) {
+    public UniqueQueryResponseData<UserWithRoleIds> findUserById(@PathVariable Long userId, Boolean withRoles) {
         if (Objects.isNull(withRoles) || !withRoles) {
             return userService.findUserById(userId);
         }
@@ -52,13 +52,13 @@ public class UserController implements UserControllerApi {
 
     @Override
     @PutMapping("/id/{userId}")
-    public BasicResponseData updateUser(@PathVariable String userId, @RequestBody ModifyUserRequest modifyUserRequest) {
+    public BasicResponseData updateUser(@PathVariable Long userId, @RequestBody ModifyUserRequest modifyUserRequest) {
         return userService.updateUser(userId, modifyUserRequest);
     }
 
     @Override
     @DeleteMapping("/id/{userId}")
-    public BasicResponseData closeUser(@PathVariable String userId) {
+    public BasicResponseData closeUser(@PathVariable Long userId) {
         return userService.closeUser(userId);
     }
 }

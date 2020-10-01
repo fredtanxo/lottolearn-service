@@ -10,14 +10,14 @@ import xo.fredtan.lottolearn.domain.course.request.ModifyChapterRequest;
 @Api("课程章节")
 public interface ChapterControllerApi {
     @ApiOperation("根据课程ID查询课程章节")
-    QueryResponseData<Chapter> findChaptersByCourseId(Integer page, Integer size, String courseId);
+    QueryResponseData<Chapter> findChaptersByCourseId(Integer page, Integer size, Long courseId);
 
     @ApiOperation("增加课程章节")
-    BasicResponseData addChapter(String courseId, ModifyChapterRequest modifyChapterRequest);
+    BasicResponseData addChapter(Long courseId, ModifyChapterRequest modifyChapterRequest);
 
     @ApiOperation("修改课程章节")
-    BasicResponseData updateChapter(String courseId, String chapterId, ModifyChapterRequest modifyChapterRequest);
+    BasicResponseData updateChapter(Long courseId, Long chapterId, ModifyChapterRequest modifyChapterRequest);
 
     @ApiOperation("删除课程章节")
-    BasicResponseData deleteChapter(String courseId, String chapterId);
+    BasicResponseData deleteChapter(Long courseId, Long chapterId);
 }

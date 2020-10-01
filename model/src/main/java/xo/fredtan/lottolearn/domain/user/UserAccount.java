@@ -1,7 +1,6 @@
 package xo.fredtan.lottolearn.domain.user;
 
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,13 +8,12 @@ import java.io.Serializable;
 @Data
 @Entity
 @Table(name = "user_account")
-@GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
 public class UserAccount implements Serializable {
     @Id
-    @GeneratedValue(generator = "uuid")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @Column(name = "user_id")
-    private String userId;
+    private Long userId;
     private String account;
     private Integer type;
     private String credential;

@@ -42,7 +42,7 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @GetMapping("/id/{courseId}")
-    public UniqueQueryResponseData<Course> findCourseById(@PathVariable String courseId) {
+    public UniqueQueryResponseData<Course> findCourseById(@PathVariable Long courseId) {
         if (withUserValidationUtils.notParticipate(courseId)) {
             ApiExceptionCast.forbidden();
         }
@@ -54,13 +54,13 @@ public class CourseController implements CourseControllerApi {
     @GetMapping("/user")
     @ValidatePagination
     public QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         return courseService.findUserCourses(page, size, userId, queryUserCourseRequest);
     }
 
     @Override
     @PostMapping("/live/{courseId}")
-    public UniqueQueryResponseData<Course> requestLiveCourse(@PathVariable String courseId) {
+    public UniqueQueryResponseData<Course> requestLiveCourse(@PathVariable Long courseId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
@@ -69,14 +69,14 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @DeleteMapping("/live/{courseId}")
-    public BasicResponseData requestLiveCourseEnd(@PathVariable String courseId) {
+    public BasicResponseData requestLiveCourseEnd(@PathVariable Long courseId) {
         return courseService.requestLiveCourseEnd(courseId);
     }
 
     @Override
     @PostMapping("/live/sign/{courseId}/{timeout}")
     public BasicResponseData requestLiveCourseSign(@RequestBody ChatMessage chatMessage,
-                                                   @PathVariable String courseId,
+                                                   @PathVariable Long courseId,
                                                    @PathVariable Long timeout) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
@@ -93,7 +93,7 @@ public class CourseController implements CourseControllerApi {
     @Override
     @GetMapping("/sign")
     @ValidatePagination
-    public QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, String courseId) {
+    public QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, Long courseId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
@@ -102,7 +102,7 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @GetMapping("/sign/{signId}/records")
-    public QueryResponseData<SignRecord> findCourseSignRecord(@PathVariable String signId, String courseId) {
+    public QueryResponseData<SignRecord> findCourseSignRecord(@PathVariable Long signId, Long courseId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
@@ -117,7 +117,7 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PutMapping("/id/{courseId}")
-    public BasicResponseData updateCourse(@PathVariable String courseId, @RequestBody ModifyCourseRequest modifyCourseRequest) {
+    public BasicResponseData updateCourse(@PathVariable Long courseId, @RequestBody ModifyCourseRequest modifyCourseRequest) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
@@ -132,7 +132,7 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @DeleteMapping("/id/{courseId}")
-    public BasicResponseData closeCourse(@PathVariable String courseId) {
+    public BasicResponseData closeCourse(@PathVariable Long courseId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }

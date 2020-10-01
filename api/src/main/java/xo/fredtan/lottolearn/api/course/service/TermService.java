@@ -10,7 +10,7 @@ public interface TermService {
 
     BasicResponseData addTerm(ModifyTermRequest modifyTermRequest);
 
-    BasicResponseData updateTerm(String termId, ModifyTermRequest modifyTermRequest);
+    BasicResponseData updateTerm(Long termId, ModifyTermRequest modifyTermRequest);
 
-    BasicResponseData closeTerm(String termId);
+    BasicResponseData closeTerm(Long termId);
 }

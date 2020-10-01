@@ -5,6 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import xo.fredtan.lottolearn.domain.course.Sign;
 
-public interface SignRepository extends JpaRepository<Sign, String> {
-    Page<Sign> findByCourseIdOrderBySignDateDesc(Pageable pageable, String courseId);
+public interface SignRepository extends JpaRepository<Sign, Long> {
+    Page<Sign> findByCourseIdOrderBySignDateDesc(Pageable pageable, Long courseId);
 }

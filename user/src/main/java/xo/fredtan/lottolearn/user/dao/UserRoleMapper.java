@@ -5,5 +5,5 @@ import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
 
 @Mapper
 public interface UserRoleMapper {
-    UserWithRoleIds selectUserWithRole(String userId);
+    UserWithRoleIds selectUserWithRole(Long userId);
 }

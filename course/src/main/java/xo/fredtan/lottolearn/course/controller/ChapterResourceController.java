@@ -18,19 +18,19 @@ public class ChapterResourceController implements ChapterResourceControllerApi {
 
     @Override
     @GetMapping("/media/chapter/{chapterId}")
-    public UniqueQueryResponseData<ResourceLibrary> findMediaByChapterId(@PathVariable String chapterId) {
+    public UniqueQueryResponseData<ResourceLibrary> findMediaByChapterId(@PathVariable Long chapterId) {
         return chapterResourceService.findMediaByChapterId(chapterId);
     }
 
     @Override
     @GetMapping("/file/chapter/{chapterId}")
-    public QueryResponseData<ResourceLibrary> findFilesByChapterId(@PathVariable String chapterId) {
+    public QueryResponseData<ResourceLibrary> findFilesByChapterId(@PathVariable Long chapterId) {
         return chapterResourceService.findFilesByChapterId(chapterId);
     }
 
     @Override
     @PutMapping("/link/chapter/{chapterId}/resource/{resourceId}")
-    public BasicResponseData linkChapterMediaResource(@PathVariable String chapterId, @PathVariable String resourceId) {
+    public BasicResponseData linkChapterMediaResource(@PathVariable Long chapterId, @PathVariable Long resourceId) {
         return chapterResourceService.linkChapterMediaResource(chapterId, resourceId);
     }
 }

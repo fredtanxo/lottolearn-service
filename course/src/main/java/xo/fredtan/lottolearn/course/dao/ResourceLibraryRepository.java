@@ -5,8 +5,8 @@ import xo.fredtan.lottolearn.domain.course.ResourceLibrary;
 
 import java.util.List;
 
-public interface ResourceLibraryRepository extends JpaRepository<ResourceLibrary, String> {
-    List<ResourceLibrary> findByCourseIdOrderByUploadDateDesc(String courseId);
+public interface ResourceLibraryRepository extends JpaRepository<ResourceLibrary, Long> {
+    List<ResourceLibrary> findByCourseIdOrderByUploadDateDesc(Long courseId);
 
-    List<ResourceLibrary> findByCourseIdAndTypeOrderByUploadDateDesc(String courseId, Integer type);
+    List<ResourceLibrary> findByCourseIdAndTypeOrderByUploadDateDesc(Long courseId, Integer type);
 }

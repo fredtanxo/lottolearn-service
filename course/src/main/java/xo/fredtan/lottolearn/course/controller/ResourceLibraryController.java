@@ -21,7 +21,7 @@ public class ResourceLibraryController implements ResourceLibraryControllerApi {
 
     @Override
     @GetMapping("/course/{courseId}")
-    public QueryResponseData<ResourceLibrary> findResourceItemsByCourseId(@PathVariable String courseId) {
+    public QueryResponseData<ResourceLibrary> findResourceItemsByCourseId(@PathVariable Long courseId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
@@ -29,7 +29,7 @@ public class ResourceLibraryController implements ResourceLibraryControllerApi {
     }
 
     @GetMapping("/media/course/{courseId}")
-    public QueryResponseData<ResourceLibrary> findMediaResourcesByCourseId(@PathVariable String courseId) {
+    public QueryResponseData<ResourceLibrary> findMediaResourcesByCourseId(@PathVariable Long courseId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
@@ -38,8 +38,8 @@ public class ResourceLibraryController implements ResourceLibraryControllerApi {
 
     @Override
     @DeleteMapping("/course/{courseId}/resource/{resourceId}")
-    public BasicResponseData deleteResourceItemByCourseId(@PathVariable String courseId,
-                                                          @PathVariable String resourceId) {
+    public BasicResponseData deleteResourceItemByCourseId(@PathVariable Long courseId,
+                                                          @PathVariable Long resourceId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }

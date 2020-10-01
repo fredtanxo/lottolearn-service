@@ -23,7 +23,7 @@ public class ChapterServiceImpl implements ChapterService {
     private final ChapterRepository chapterRepository;
 
     @Override
-    public QueryResponseData<Chapter> findChaptersByCourseId(Integer page, Integer size, String courseId) {
+    public QueryResponseData<Chapter> findChaptersByCourseId(Integer page, Integer size, Long courseId) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Chapter> chapters = chapterRepository.findByCourseIdOrderByPubDateDesc(pageRequest, courseId);
 
@@ -33,7 +33,7 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     @Transactional
-    public BasicResponseData addChapter(String courseId, ModifyChapterRequest modifyChapterRequest) {
+    public BasicResponseData addChapter(Long courseId, ModifyChapterRequest modifyChapterRequest) {
         Chapter chapter = new Chapter();
         BeanUtils.copyProperties(modifyChapterRequest, chapter);
         chapter.setId(null);
@@ -47,8 +47,8 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     @Transactional
-    public BasicResponseData updateChapter(String courseId,
-                                           String chapterId,
+    public BasicResponseData updateChapter(Long courseId,
+                                           Long chapterId,
                                            ModifyChapterRequest modifyChapterRequest) {
         chapterRepository.findById(chapterId).ifPresent(chapter -> {
             // 确保课程ID和发布时间一致
@@ -64,7 +64,7 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     @Transactional
-    public BasicResponseData deleteChapter(String courseId, String chapterId) {
+    public BasicResponseData deleteChapter(Long courseId, Long chapterId) {
         chapterRepository.findById(chapterId).ifPresent(chapter -> {
             if (chapter.getCourseId().equals(courseId)) {
                 chapterRepository.delete(chapter);

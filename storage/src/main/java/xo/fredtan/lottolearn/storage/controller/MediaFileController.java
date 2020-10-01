@@ -21,19 +21,19 @@ public class MediaFileController implements MediaFileControllerApi {
     }
 
     @RequestMapping(path = "/upload/{resourceId}", method = RequestMethod.HEAD)
-    public void checkMediaFile(@PathVariable String resourceId, HttpServletResponse response) {
+    public void checkMediaFile(@PathVariable Long resourceId, HttpServletResponse response) {
         mediaFileService.checkFile(resourceId, response);
     }
 
     @PatchMapping("/upload/{resourceId}")
-    public void uploadMediaFile(@PathVariable String resourceId,
+    public void uploadMediaFile(@PathVariable Long resourceId,
                                 HttpServletRequest request,
                                 HttpServletResponse response) {
         mediaFileService.uploadFile(resourceId, request, response);
     }
 
     @DeleteMapping("/upload/{resourceId}")
-    public void deleteMediaFile(@PathVariable String resourceId,
+    public void deleteMediaFile(@PathVariable Long resourceId,
                                 HttpServletRequest request,
                                 HttpServletResponse response) {
         mediaFileService.deleteFile(resourceId, request, response);

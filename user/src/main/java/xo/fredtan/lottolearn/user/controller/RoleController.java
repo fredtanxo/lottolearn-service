@@ -28,7 +28,7 @@ public class RoleController implements RoleControllerApi {
 
     @Override
     @GetMapping("/id/{roleId}")
-    public UniqueQueryResponseData<RoleWithMenuIds> findRoleById(@PathVariable String roleId) {
+    public UniqueQueryResponseData<RoleWithMenuIds> findRoleById(@PathVariable Long roleId) {
         return roleService.findRoleById(roleId);
     }
 
@@ -40,13 +40,13 @@ public class RoleController implements RoleControllerApi {
 
     @Override
     @PutMapping("/id/{roleId}")
-    public BasicResponseData updateRole(@PathVariable String roleId, @RequestBody ModifyRoleRequest modifyRoleRequest) {
+    public BasicResponseData updateRole(@PathVariable Long roleId, @RequestBody ModifyRoleRequest modifyRoleRequest) {
         return roleService.updateRole(roleId, modifyRoleRequest);
     }
 
     @Override
     @DeleteMapping("/id/{roleId}")
-    public BasicResponseData closeRole(@PathVariable String roleId) {
+    public BasicResponseData closeRole(@PathVariable Long roleId) {
         return roleService.closeRole(roleId);
     }
 }

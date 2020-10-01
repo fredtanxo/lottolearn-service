@@ -24,7 +24,7 @@ public class MenuController implements MenuControllerApi {
 
     @Override
     @GetMapping("/parent/{parentId}")
-    public UniqueQueryResponseData<MenuTree> findMenusByParentId(@PathVariable String parentId) {
+    public UniqueQueryResponseData<MenuTree> findMenusByParentId(@PathVariable Long parentId) {
         return menuService.findMenusByParentId(parentId);
     }
 
@@ -36,13 +36,13 @@ public class MenuController implements MenuControllerApi {
 
     @Override
     @PutMapping("/id/{menuId}")
-    public BasicResponseData updateMenu(@PathVariable String menuId, @RequestBody ModifyMenuRequest modifyMenuRequest) {
+    public BasicResponseData updateMenu(@PathVariable Long menuId, @RequestBody ModifyMenuRequest modifyMenuRequest) {
         return menuService.updateMenu(menuId, modifyMenuRequest);
     }
 
     @Override
     @DeleteMapping("/id/{menuId}")
-    public BasicResponseData closeMenu(@PathVariable String menuId) {
+    public BasicResponseData closeMenu(@PathVariable Long menuId) {
         return menuService.closeMenu(menuId);
     }
 }

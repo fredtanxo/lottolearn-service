@@ -6,7 +6,7 @@ import xo.fredtan.lottolearn.common.model.request.RequestData;
 @Data
 public class QueryCourseRequest implements RequestData {
     private String name;
-    private String termId;
+    private Long termId;
     private Boolean mode;
     private Integer status;
 }

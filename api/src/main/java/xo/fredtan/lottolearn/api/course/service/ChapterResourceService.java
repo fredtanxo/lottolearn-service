@@ -7,13 +7,13 @@ import xo.fredtan.lottolearn.domain.course.ChapterResource;
 import xo.fredtan.lottolearn.domain.course.ResourceLibrary;
 
 public interface ChapterResourceService {
-    UniqueQueryResponseData<ResourceLibrary> findMediaByChapterId(String chapterId);
+    UniqueQueryResponseData<ResourceLibrary> findMediaByChapterId(Long chapterId);
 
-    QueryResponseData<ResourceLibrary> findFilesByChapterId(String chapterId);
+    QueryResponseData<ResourceLibrary> findFilesByChapterId(Long chapterId);
 
     void uploadChapterFile(ChapterResource chapterResource);
 
-    BasicResponseData linkChapterMediaResource(String chapterId, String resourceId);
+    BasicResponseData linkChapterMediaResource(Long chapterId, Long resourceId);
 
-    BasicResponseData unlinkChapterResource(String chapterId, String resourceId);
+    BasicResponseData unlinkChapterResource(Long chapterId, Long resourceId);
 }

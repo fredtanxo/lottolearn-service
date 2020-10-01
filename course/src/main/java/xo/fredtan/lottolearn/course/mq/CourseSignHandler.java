@@ -27,8 +27,8 @@ public class CourseSignHandler {
     @Transactional
     public void handleSign(CourseSignRequest request, Message message, Channel channel) {
         try {
-            String userId = request.getUserId();
-            String signId = request.getSignId();
+            Long userId = request.getUserId();
+            Long signId = request.getSignId();
             SignRecord signRecord = signRecordRepository.findByUserIdAndSignId(userId, signId);
 
             // 用户可能由于网络延迟重复签到

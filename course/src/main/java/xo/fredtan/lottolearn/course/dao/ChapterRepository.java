@@ -5,6 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import xo.fredtan.lottolearn.domain.course.Chapter;
 
-public interface ChapterRepository extends JpaRepository<Chapter, String> {
-    Page<Chapter> findByCourseIdOrderByPubDateDesc(Pageable pageable, String courseId);
+public interface ChapterRepository extends JpaRepository<Chapter, Long> {
+    Page<Chapter> findByCourseIdOrderByPubDateDesc(Pageable pageable, Long courseId);
 }

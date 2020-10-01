@@ -2,7 +2,6 @@ package xo.fredtan.lottolearn.domain.course;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,15 +10,14 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "sign_record")
-@GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
 public class SignRecord implements Serializable {
     @Id
-    @GeneratedValue(generator = "uuid")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @Column(name = "user_id")
-    private String userId;
+    private Long userId;
     @Column(name = "sign_id")
-    private String signId;
+    private Long signId;
     @Column(name = "user_nickname")
     private String userNickname;
     @Column(name = "sign_time")

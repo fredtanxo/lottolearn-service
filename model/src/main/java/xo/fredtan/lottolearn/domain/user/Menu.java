@@ -1,7 +1,6 @@
 package xo.fredtan.lottolearn.domain.user;
 
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 import xo.fredtan.lottolearn.domain.audit.AbstractEntity;
 
 import javax.persistence.*;
@@ -11,13 +10,12 @@ import java.io.Serializable;
 @Data
 @Entity
 @Table(name = "menu")
-@GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
 public class Menu extends AbstractEntity implements Serializable {
     @Id
-    @GeneratedValue(generator = "uuid")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @Column(name = "parent_id")
-    private String parentId;
+    private Long parentId;
     @NotNull(message = "必须提供菜单名称")
     private String name;
     private Boolean type;

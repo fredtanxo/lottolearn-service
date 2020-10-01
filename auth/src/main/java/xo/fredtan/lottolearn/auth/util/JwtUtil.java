@@ -32,14 +32,14 @@ public class JwtUtil {
      */
     public static String issueRSAToken(RSAKey rsaKey,
                                        String issuer,
-                                       String subject,
+                                       Long subject,
                                        Map<String, ?> claims,
                                        Long expirationOffset) {
         Date now = new Date();
         try {
             JWSSigner signer = new RSASSASigner(rsaKey);
             JWTClaimsSet.Builder claimsSetBuilder = new JWTClaimsSet.Builder()
-                    .subject(subject)
+                    .subject(String.valueOf(subject))
                     .issuer(issuer)
                     .issueTime(now)
                     .expirationTime(new Date(now.getTime() + expirationOffset));

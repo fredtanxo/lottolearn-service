@@ -25,11 +25,11 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public UniqueQueryResponseData<MenuTree> findAllMenus() {
-        return findMenusByParentId("0");
+        return findMenusByParentId(0L);
     }
 
     @Override
-    public UniqueQueryResponseData<MenuTree> findMenusByParentId(String parentId) {
+    public UniqueQueryResponseData<MenuTree> findMenusByParentId(Long parentId) {
         List<MenuTree> menuList = menuMapper.selectMenus();
         MenuTree menuTree = MenuTreeBuilder.build(menuList, parentId);
         return UniqueQueryResponseData.ok(menuTree);
@@ -48,7 +48,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional
-    public BasicResponseData updateMenu(String menuId, ModifyMenuRequest modifyMenuRequest) {
+    public BasicResponseData updateMenu(Long menuId, ModifyMenuRequest modifyMenuRequest) {
         menuRepository.findById(menuId).ifPresent(menu -> {
             BeanUtils.copyProperties(modifyMenuRequest, menu);
             menu.setId(menuId);
@@ -59,7 +59,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional
-    public BasicResponseData closeMenu(String menuId) {
+    public BasicResponseData closeMenu(Long menuId) {
         menuRepository.findById(menuId).ifPresent(menu -> {
             menu.setStatus(false);
             menuRepository.save(menu);

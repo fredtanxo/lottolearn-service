@@ -15,5 +15,5 @@ public interface ChapterResourceMapper {
             "on (cr.resource_id = rl.id) " +
             "where cr.chapter_id = #{chapterId} and rl.type = #{type} and cr.status = 1 " +
             "order by rl.upload_date desc")
-    List<ResourceLibrary> selectChapterResource(@Param("chapterId") String chapterId, @Param("type") Integer type);
+    List<ResourceLibrary> selectChapterResource(@Param("chapterId") Long chapterId, @Param("type") Integer type);
 }

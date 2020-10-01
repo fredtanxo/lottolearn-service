@@ -22,38 +22,38 @@ public interface CourseControllerApi {
     QueryResponseData<Course> findAllCourses(Integer page, Integer size, QueryCourseRequest queryCourseRequest);
 
     @ApiOperation("根据ID查询课程")
-    UniqueQueryResponseData<Course> findCourseById(String courseId);
+    UniqueQueryResponseData<Course> findCourseById(Long courseId);
 
     @ApiOperation("查询用户课程")
     QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest);
 
     @ApiOperation("请求课程直播")
-    UniqueQueryResponseData<Course> requestLiveCourse(String courseId);
+    UniqueQueryResponseData<Course> requestLiveCourse(Long courseId);
 
     @ApiOperation("结束课程直播")
-    BasicResponseData requestLiveCourseEnd(String courseId);
+    BasicResponseData requestLiveCourseEnd(Long courseId);
 
     @ApiOperation("请求课程直播签到")
-    BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, String courseId, Long timeout);
+    BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, Long courseId, Long timeout);
 
     @ApiOperation("处理课程直播签到")
     BasicResponseData handleLiveCourseSign(CourseSignRequest courseSignRequest);
 
     @ApiOperation("查询课程签到记录")
-    QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, String courseId);
+    QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, Long courseId);
 
     @ApiOperation("查询课程签到记录详细信息")
-    QueryResponseData<SignRecord> findCourseSignRecord(String signId, String courseId);
+    QueryResponseData<SignRecord> findCourseSignRecord(Long signId, Long courseId);
 
     @ApiOperation("增加课程")
     AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest);
 
     @ApiOperation("修改课程")
-    BasicResponseData updateCourse(String courseId, ModifyCourseRequest modifyCourseRequest);
+    BasicResponseData updateCourse(Long courseId, ModifyCourseRequest modifyCourseRequest);
 
     @ApiOperation("凭课程邀请码加入课程")
     JoinCourseResult joinCourse(String invitationCode);
 
     @ApiOperation("关闭课程")
-    BasicResponseData closeCourse(String courseId);
+    BasicResponseData closeCourse(Long courseId);
 }

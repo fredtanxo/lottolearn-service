@@ -40,7 +40,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public UniqueQueryResponseData<RoleWithMenuIds> findRoleById(String roleId) {
+    public UniqueQueryResponseData<RoleWithMenuIds> findRoleById(Long roleId) {
         RoleWithMenuIds roleWithMenuIds = permissionMapper.selectRoleWithMenu(roleId);
 
         return UniqueQueryResponseData.ok(roleWithMenuIds);
@@ -65,7 +65,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public BasicResponseData updateRole(String roleId, ModifyRoleRequest modifyRoleRequest) {
+    public BasicResponseData updateRole(Long roleId, ModifyRoleRequest modifyRoleRequest) {
         roleRepository.findById(roleId).ifPresent(role -> {
             BeanUtils.copyProperties(modifyRoleRequest, role);
             role.setId(roleId);
@@ -75,7 +75,7 @@ public class RoleServiceImpl implements RoleService {
         return BasicResponseData.ok();
     }
 
-    private void updateMenus(String roleId, List<String> menuIds) {
+    private void updateMenus(Long roleId, List<Long> menuIds) {
         if (Objects.isNull(menuIds))
             return;
         permissionRepository.deleteByRoleId(roleId);
@@ -89,7 +89,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public BasicResponseData closeRole(String roleId) {
+    public BasicResponseData closeRole(Long roleId) {
         roleRepository.findById(roleId).ifPresent(role -> {
             role.setStatus(false);
             roleRepository.save(role);

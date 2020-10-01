@@ -11,15 +11,15 @@ import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
 public interface UserService {
     QueryResponseData<User> findAllUsers(Integer page, Integer size, QueryUserRequest queryUserRequest);
 
-    UniqueQueryResponseData<UserWithRoleIds> findUserById(String userId);
+    UniqueQueryResponseData<UserWithRoleIds> findUserById(Long userId);
 
-    UniqueQueryResponseData<UserWithRoleIds> findUserByIdWithRoleIds(String userId);
+    UniqueQueryResponseData<UserWithRoleIds> findUserByIdWithRoleIds(Long userId);
 
     UniqueQueryResponseData<User> findCurrentUser();
 
     BasicResponseData addUser(ModifyUserRequest modifyUserRequest);
 
-    BasicResponseData updateUser(String userId, ModifyUserRequest modifyUserRequest);
+    BasicResponseData updateUser(Long userId, ModifyUserRequest modifyUserRequest);
 
-    BasicResponseData closeUser(String userId);
+    BasicResponseData closeUser(Long userId);
 }
