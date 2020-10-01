@@ -1,19 +1,19 @@
 package xo.fredtan.lottolearn.course.config;
 
-import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import xo.fredtan.lottolearn.domain.message.ChatMessage;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
 @Configuration
 public class RedisTemplateConfig {
     @Bean
-    public RedisTemplate<String, ChatMessage> redisMessageTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, ChatMessage> template = new RedisTemplate<>();
+    public RedisTemplate<String, byte[]> redisMessageTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, byte[]> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
-        template.setDefaultSerializer(new FastJsonRedisSerializer<>(ChatMessage.class));
+        template.setKeySerializer(RedisSerializer.string());
+        template.setValueSerializer(RedisSerializer.byteArray());
         return template;
     }
 }

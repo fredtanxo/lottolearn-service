@@ -56,7 +56,7 @@ public class CourseServiceImpl implements CourseService {
     private final SignRecordRepository signRecordRepository;
 
     private final RedisTemplate<String, String> stringRedisTemplate;
-    private final RedisTemplate<String, ChatMessage> chatMessageRedisTemplate;
+    private final RedisTemplate<String, byte[]> byteRedisTemplate;
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -152,7 +152,7 @@ public class CourseServiceImpl implements CourseService {
         String content = JSON.toJSONString(Map.of("timeout", timeout, "signId", sign.getId()));
         chatMessage.setContent(content);
 
-        chatMessageRedisTemplate.convertAndSend(MessageConstants.LIVE_DISTRIBUTION_CHANNEL, chatMessage);
+        byteRedisTemplate.convertAndSend(MessageConstants.LIVE_DISTRIBUTION_CHANNEL, chatMessage);
         stringRedisTemplate.boundValueOps(CourseConstants.LIVE_SIGN_KEY_PREFIX + sign.getId())
                 .set(courseId, timeout, TimeUnit.SECONDS);
 

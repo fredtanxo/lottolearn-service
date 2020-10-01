@@ -57,5 +57,14 @@
             <artifactId>tomcat-embed-core</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-runtime</artifactId>
+        </dependency>
     </dependencies>
 </project>
