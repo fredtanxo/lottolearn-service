@@ -3,18 +3,29 @@
 <mapper namespace="xo.fredtan.lottolearn.course.dao.UserCourseMapper">
     <select id="selectUserCourses" resultType="xo.fredtan.lottolearn.domain.course.Course">
         select
-               c.*
+               c.id,
+               c.name,
+               c.visibility,
+               c.description,
+               c.teacher_id,
+               t.name as term_name,
+               c.credit,
+               c.pub_date,
+               c.status
         from
              user_course uc
                  left join course c
-                     on (uc.course_id = c.id)
+                     on uc.course_id = c.id
+                 left join term t
+                     on c.term_id = t.id
         where
-              uc.user_id = #{userId}
-          and c.status = #{query.status}
-          <if test="query.teacher != null">
-                and uc.is_teacher = #{query.teacher}
-          </if>
+                uc.user_id = #{userId}
+            and
+                c.status = #{query.status}
+        <if test="query.teacher != null">
+            and uc.is_teacher = #{query.teacher}
+        </if>
         order by
-                 uc.enroll_date desc
+            uc.enroll_date desc
     </select>
 </mapper>

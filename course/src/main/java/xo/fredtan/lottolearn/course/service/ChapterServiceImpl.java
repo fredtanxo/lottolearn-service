@@ -5,12 +5,14 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.course.constants.ChapterConstants;
 import xo.fredtan.lottolearn.api.course.service.ChapterService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
+import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
 import xo.fredtan.lottolearn.common.util.RedisCacheUtils;
 import xo.fredtan.lottolearn.course.dao.ChapterRepository;
 import xo.fredtan.lottolearn.domain.course.Chapter;
@@ -57,6 +59,17 @@ public class ChapterServiceImpl implements ChapterService {
                     chapters.stream().map(c -> c.getId().toString()).collect(Collectors.toList()),
                     stringRedisTemplate
             );
+
+            // 一门课被访问，其所有章节曝光的概率将增大，缓存所有章节会是一个比较好的做法
+            ValueOperations<String, byte[]> ops = byteRedisTemplate.opsForValue();
+            chapters.forEach(chapter -> {
+                String k = ChapterConstants.CHAPTER_CACHE_PREFIX + chapter.getId();
+                ops.set(
+                        k,
+                        ProtostuffSerializeUtils.serialize(chapter),
+                        ChapterConstants.CHAPTER_CACHE_EXPIRATION.plusDays(random.nextInt(3))
+                );
+            });
             List<Chapter> result = chapters.subList(start, Math.min(end + 1, chapters.size()));
             queryResult = new QueryResult<>((long) chapters.size(), result);
         }

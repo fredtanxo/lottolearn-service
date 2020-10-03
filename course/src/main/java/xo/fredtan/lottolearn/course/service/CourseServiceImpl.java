@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -54,9 +55,11 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final TermRepository termRepository;
     private final UserCourseRepository userCourseRepository;
-    private final UserCourseMapper userCourseMapper;
     private final SignRepository signRepository;
     private final SignRecordRepository signRecordRepository;
+
+    private final CourseMapper courseMapper;
+    private final UserCourseMapper userCourseMapper;
 
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisTemplate<String, byte[]> byteRedisTemplate;
@@ -105,7 +108,7 @@ public class CourseServiceImpl implements CourseService {
         if (Objects.nonNull(data) && data.length > 0) {
             course = ProtostuffSerializeUtils.deserialize(data, Course.class);
         } else {
-            course = courseRepository.findById(courseId).orElse(null);
+            course = findCourseWithDetailsById(courseId);
             if (Objects.nonNull(course)) {
                 ops.set(
                         ProtostuffSerializeUtils.serialize(course),
@@ -114,6 +117,18 @@ public class CourseServiceImpl implements CourseService {
             }
         }
         return UniqueQueryResponseData.ok(course);
+    }
+
+    private Course findCourseWithDetailsById(Long courseId) {
+        Course course = courseMapper.selectCourseById(courseId);
+        if (Objects.nonNull(course)) {
+            UniqueQueryResponseData<User> data = userService.findUserById(course.getTeacherId());
+            User user = data.getPayload();
+            if (Objects.nonNull(user)) {
+                course.setTeacherName(user.getNickname());
+            }
+        }
+        return course;
     }
 
     @Override
@@ -142,7 +157,7 @@ public class CourseServiceImpl implements CourseService {
                         CourseConstants.COURSE_CACHE_EXPIRATION.plusDays(random.nextInt(3)),
                         Course.class,
                         byteRedisTemplate,
-                        id -> courseRepository.findById(id).orElse(null)
+                        this::findCourseWithDetailsById
                 );
             }
             queryResult = new QueryResult<>(count, list);
@@ -154,7 +169,23 @@ public class CourseServiceImpl implements CourseService {
                     courses.stream().map(c -> c.getId().toString()).collect(Collectors.toList()),
                     stringRedisTemplate
             );
+
+            // 打开首页，不可能所有课程都有用，因此只缓存第一页
             List<Course> result = courses.subList(start, Math.min(end + 1, courses.size()));
+            ValueOperations<String, byte[]> ops = byteRedisTemplate.opsForValue();
+            result.forEach(course -> {
+                UniqueQueryResponseData<User> data = userService.findUserById(course.getTeacherId());
+                User user = data.getPayload();
+                if (Objects.nonNull(user)) {
+                    course.setTeacherName(user.getNickname());
+                }
+                String k = CourseConstants.COURSE_CACHE_PREFIX + course.getId();
+                ops.set(
+                        k,
+                        ProtostuffSerializeUtils.serialize(course),
+                        CourseConstants.COURSE_CACHE_EXPIRATION.plusDays(3)
+                );
+            });
             queryResult = new QueryResult<>((long) courses.size(), result);
         }
 
