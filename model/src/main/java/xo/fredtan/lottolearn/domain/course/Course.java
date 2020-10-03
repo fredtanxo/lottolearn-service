@@ -18,7 +18,7 @@ public class Course implements Serializable {
     private Long id;
     @NotBlank(message = "必须提供课程名称")
     private String name;
-    private String cover;
+    private Boolean visibility;
     private String description;
     private String code;
     private String live;
@@ -33,4 +33,9 @@ public class Course implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date pubDate;
     private Integer status;
+
+    @Transient
+    private String teacherName;
+    @Transient
+    private String termName;
 }
