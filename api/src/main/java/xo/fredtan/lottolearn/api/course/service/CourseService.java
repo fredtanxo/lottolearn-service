@@ -28,7 +28,7 @@ public interface CourseService {
                                               Long userId,
                                               QueryUserCourseRequest queryUserCourseRequest);
 
-    UniqueQueryResponseData<Course> requestLiveCourse(Long courseId);
+    BasicResponseData requestLiveCourse(Long courseId);
 
     BasicResponseData requestLiveCourseEnd(Long courseId);
 

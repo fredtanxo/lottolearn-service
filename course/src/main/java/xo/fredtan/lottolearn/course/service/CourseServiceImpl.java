@@ -1,8 +1,6 @@
 package xo.fredtan.lottolearn.course.service;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -14,6 +12,8 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.BoundHashOperations;
+import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +23,12 @@ import xo.fredtan.lottolearn.api.course.service.CourseService;
 import xo.fredtan.lottolearn.api.message.constants.MessageConstants;
 import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
-import xo.fredtan.lottolearn.common.exception.ApiInvocationException;
-import xo.fredtan.lottolearn.common.model.response.*;
+import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
+import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
+import xo.fredtan.lottolearn.common.model.response.QueryResult;
+import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
+import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
+import xo.fredtan.lottolearn.common.util.RedisCacheUtils;
 import xo.fredtan.lottolearn.course.config.RabbitMqConfig;
 import xo.fredtan.lottolearn.course.dao.*;
 import xo.fredtan.lottolearn.domain.course.Course;
@@ -43,6 +47,7 @@ import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @DubboService(version = "0.0.1")
@@ -59,6 +64,8 @@ public class CourseServiceImpl implements CourseService {
     private final RedisTemplate<String, byte[]> byteRedisTemplate;
 
     private final RabbitTemplate rabbitTemplate;
+
+    private static final Random random = new Random();
 
     @DubboReference(version = "0.0.1")
     private UserService userService;
@@ -94,44 +101,82 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public UniqueQueryResponseData<Course> findCourseById(Long courseId) {
-        return courseRepository.findById(courseId)
-                .map(UniqueQueryResponseData::ok)
-                .orElseGet(() -> UniqueQueryResponseData.ok(null));
+        BoundValueOperations<String, byte[]> ops = byteRedisTemplate.boundValueOps(CourseConstants.COURSE_CACHE_PREFIX + courseId);
+        byte[] data = ops.get();
+        Course course;
+        if (Objects.nonNull(data) && data.length > 0) {
+            course = ProtostuffSerializeUtils.deserialize(data, Course.class);
+        } else {
+            course = courseRepository.findById(courseId).orElse(null);
+            if (Objects.nonNull(course)) {
+                ops.set(
+                        ProtostuffSerializeUtils.serialize(course),
+                        CourseConstants.COURSE_CACHE_EXPIRATION.plusDays(random.nextInt(5))
+                );
+            }
+        }
+        return UniqueQueryResponseData.ok(course);
     }
-
 
     @Override
     public QueryResponseData<Course> findUserCourses(Integer page,
                                                      Integer size,
                                                      Long userId,
                                                      QueryUserCourseRequest queryUserCourseRequest) {
-        PageHelper.startPage(page, size);
-        List<Course> courses = userCourseMapper.selectUserCourses(userId, queryUserCourseRequest);
-        PageInfo<Course> coursePageInfo = new PageInfo<>(courses);
+        String key = String.format(
+                "%s%s:%s:%s",
+                CourseConstants.USER_COURSE_CACHE_PREFIX,
+                userId,
+                queryUserCourseRequest.getTeacher(),
+                queryUserCourseRequest.getStatus()
+        );
+        Long count = stringRedisTemplate.opsForZSet().zCard(key);
+        int start = page * size;
+        int end = start + size - 1;
+        QueryResult<Course> queryResult;
+        if (Objects.nonNull(count) && count > 0) {
+            Set<String> courseIds = stringRedisTemplate.opsForZSet().rangeByScore(key, start, end);
+            List<Course> list = null;
+            if (Objects.nonNull(courseIds)) {
+                list = RedisCacheUtils.batchGet(
+                        List.copyOf(courseIds),
+                        CourseConstants.COURSE_CACHE_PREFIX,
+                        CourseConstants.COURSE_CACHE_EXPIRATION.plusDays(random.nextInt(3)),
+                        Course.class,
+                        byteRedisTemplate,
+                        id -> courseRepository.findById(id).orElse(null)
+                );
+            }
+            queryResult = new QueryResult<>(count, list);
+        } else {
+            List<Course> courses = userCourseMapper.selectUserCourses(userId, queryUserCourseRequest);
+            RedisCacheUtils.batchSet(
+                    key,
+                    CourseConstants.USER_COURSE_CACHE_EXPIRATION.plusDays(random.nextInt(3)),
+                    courses.stream().map(c -> c.getId().toString()).collect(Collectors.toList()),
+                    stringRedisTemplate
+            );
+            List<Course> result = courses.subList(start, Math.min(end + 1, courses.size()));
+            queryResult = new QueryResult<>((long) courses.size(), result);
+        }
 
-        QueryResult<Course> queryResult = new QueryResult<>(coursePageInfo.getTotal(), coursePageInfo.getList());
         return QueryResponseData.ok(queryResult);
     }
 
     @Override
-    @Transactional
-    public UniqueQueryResponseData<Course> requestLiveCourse(Long courseId) {
-        return courseRepository.findById(courseId).map(course -> {
-            String roomId = UUID.randomUUID().toString().replace("-", "");
-            course.setLive(roomId);
-            Course savedCourse = courseRepository.save(course);
-
-            return UniqueQueryResponseData.ok(savedCourse);
-        }).orElseThrow(() -> new ApiInvocationException(CommonCode.INVALID_PARAM));
+    public BasicResponseData requestLiveCourse(Long courseId) {
+        Optional<Course> optional = courseRepository.findById(courseId);
+        if (optional.isEmpty()) {
+            return BasicResponseData.invalid();
+        }
+        BoundHashOperations<String, Object, Object> ops = stringRedisTemplate.boundHashOps(CourseConstants.COURSE_LIVE_KEY);
+        ops.putIfAbsent(courseId, optional.get().getLive());
+        return BasicResponseData.ok();
     }
 
     @Override
-    @Transactional
     public BasicResponseData requestLiveCourseEnd(Long courseId) {
-        courseRepository.findById(courseId).ifPresent(course -> {
-            course.setLive(null);
-            courseRepository.save(course);
-        });
+        stringRedisTemplate.boundHashOps(CourseConstants.COURSE_LIVE_KEY).delete(courseId);
         return BasicResponseData.ok();
     }
 
@@ -216,7 +261,11 @@ public class CourseServiceImpl implements CourseService {
         Course course = new Course();
         BeanUtils.copyProperties(modifyCourseRequest, course);
         course.setId(null);
+        course.setTeacherId(userId);
         course.setPubDate(new Date());
+
+        UUID uuid = UUID.randomUUID();
+        course.setLive(uuid.toString());
 
         // 根据学期判断课程是否应该开始
         if (Objects.isNull(course.getStatus()) || course.getStatus() <= 0) {
@@ -249,13 +298,26 @@ public class CourseServiceImpl implements CourseService {
                 savedCourse.getStatus(),
                 System.nanoTime(),
                 Thread.currentThread(),
-                UUID.randomUUID()
+                uuid
         );
         codePre &= Integer.MAX_VALUE;
         String code = Integer.toString(codePre, 36);
         course.setCode(code);
 
         savedCourse = courseRepository.save(course);
+
+        UserCourse userCourse = new UserCourse();
+        userCourse.setUserId(userId);
+        userCourse.setCourseId(course.getId());
+        userCourse.setIsTeacher(true);
+        userCourse.setEnrollDate(new Date());
+        userCourse.setStatus(true);
+
+        userCourseRepository.save(userCourse);
+
+        // 清除缓存
+//        clearUserCoursesCache(userId);
+        RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + userId + "*", stringRedisTemplate);
 
         return new AddCourseResult(CourseCode.ADD_SUCCESS, savedCourse.getCode(), savedCourse.getId());
     }
@@ -310,6 +372,11 @@ public class CourseServiceImpl implements CourseService {
         userCourse.setStatus(true);
 
         userCourseRepository.save(userCourse);
+
+        // 清除缓存
+//        clearUserCoursesCache(userId);
+        RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + userId + "*", stringRedisTemplate);
+
         return new JoinCourseResult(CourseCode.JOIN_SUCCESS, course.getId());
     }
 

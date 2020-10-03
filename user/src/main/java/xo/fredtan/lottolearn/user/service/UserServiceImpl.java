@@ -8,13 +8,17 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.BoundValueOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import xo.fredtan.lottolearn.api.user.constants.UserConstants;
 import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
+import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
 import xo.fredtan.lottolearn.domain.user.User;
 import xo.fredtan.lottolearn.domain.user.UserRole;
 import xo.fredtan.lottolearn.domain.user.request.ModifyUserRequest;
@@ -26,6 +30,7 @@ import xo.fredtan.lottolearn.user.dao.UserRoleRepository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 @DubboService(version = "0.0.1")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -33,6 +38,10 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final UserRoleMapper userRoleMapper;
+
+    private final RedisTemplate<String, byte[]> byteRedisTemplate;
+
+    private static final Random random = new Random();
 
     @Override
     public QueryResponseData<User> findAllUsers(Integer page, Integer size, QueryUserRequest queryUserRequest) {
@@ -74,9 +83,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public UniqueQueryResponseData<User> findCurrentUser() {
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-        return userRepository.findById(userId)
-                .map(UniqueQueryResponseData::ok)
-                .orElseGet(() -> UniqueQueryResponseData.ok(null));
+
+        BoundValueOperations<String, byte[]> ops = byteRedisTemplate.boundValueOps(UserConstants.USER_CACHE_PREFIX + userId);
+        byte[] bytes = ops.get();
+        User user;
+        if (Objects.nonNull(bytes)) {
+            user = ProtostuffSerializeUtils.deserialize(bytes, User.class);
+        } else {
+            user = userRepository.findById(userId).orElse(null);
+            if (Objects.nonNull(user)) {
+                ops.set(
+                        ProtostuffSerializeUtils.serialize(user),
+                        UserConstants.USER_CACHE_EXPIRATION.plusDays(random.nextInt(3))
+                );
+            }
+        }
+
+        return UniqueQueryResponseData.ok(user);
     }
 
     @Override

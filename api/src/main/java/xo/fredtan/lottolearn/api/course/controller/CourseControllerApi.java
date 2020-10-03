@@ -28,7 +28,7 @@ public interface CourseControllerApi {
     QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest);
 
     @ApiOperation("请求课程直播")
-    UniqueQueryResponseData<Course> requestLiveCourse(Long courseId);
+    BasicResponseData requestLiveCourse(Long courseId);
 
     @ApiOperation("结束课程直播")
     BasicResponseData requestLiveCourseEnd(Long courseId);

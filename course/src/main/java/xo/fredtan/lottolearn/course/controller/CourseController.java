@@ -60,7 +60,7 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PostMapping("/live/{courseId}")
-    public UniqueQueryResponseData<Course> requestLiveCourse(@PathVariable Long courseId) {
+    public BasicResponseData requestLiveCourse(@PathVariable Long courseId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
