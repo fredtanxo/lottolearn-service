@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.course.config.RabbitMqConfig;
 import xo.fredtan.lottolearn.course.dao.SignRecordRepository;
 import xo.fredtan.lottolearn.domain.course.SignRecord;
-import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -25,7 +24,7 @@ public class CourseSignHandler {
 
     @RabbitListener(queues = RabbitMqConfig.QUEUE_COURSE_SIGN, ackMode = "MANUAL")
     @Transactional
-    public void handleSign(CourseSignRequest request, Message message, Channel channel) {
+    public void handleSign(SignRecord request, Message message, Channel channel) {
         try {
             Long userId = request.getUserId();
             Long signId = request.getSignId();

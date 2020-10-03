@@ -6,9 +6,7 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.user.User;
-import xo.fredtan.lottolearn.domain.user.request.ModifyUserRequest;
 import xo.fredtan.lottolearn.domain.user.request.QueryUserRequest;
-import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
 
 @Api("用户管理")
 public interface UserControllerApi {
@@ -16,16 +14,16 @@ public interface UserControllerApi {
     QueryResponseData<User> findAllUsers(Integer page, Integer size, QueryUserRequest queryUserRequest);
 
     @ApiOperation("根据用户ID查询用户信息")
-    UniqueQueryResponseData<UserWithRoleIds> findUserById(Long userId, Boolean withRoles);
+    UniqueQueryResponseData<User> findUserById(Long userId, Boolean withRoles);
 
     @ApiOperation("查询当前用户")
     UniqueQueryResponseData<User> findCurrentUser();
 
     @ApiOperation("增加用户")
-    BasicResponseData addUser(ModifyUserRequest modifyUserRequest);
+    BasicResponseData addUser(User user);
 
     @ApiOperation("更新用户")
-    BasicResponseData updateUser(Long userId, ModifyUserRequest modifyUserRequest);
+    BasicResponseData updateUser(Long userId, User user);
 
     @ApiOperation("关闭用户")
     BasicResponseData closeUser(Long userId);

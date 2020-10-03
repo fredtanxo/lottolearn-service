@@ -21,9 +21,7 @@ import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
 import xo.fredtan.lottolearn.domain.user.User;
 import xo.fredtan.lottolearn.domain.user.UserRole;
-import xo.fredtan.lottolearn.domain.user.request.ModifyUserRequest;
 import xo.fredtan.lottolearn.domain.user.request.QueryUserRequest;
-import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
 import xo.fredtan.lottolearn.user.dao.UserRepository;
 import xo.fredtan.lottolearn.user.dao.UserRoleMapper;
 import xo.fredtan.lottolearn.user.dao.UserRoleRepository;
@@ -66,24 +64,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UniqueQueryResponseData<UserWithRoleIds> findUserById(Long userId) {
-        return userRepository.findById(userId).map(user -> {
-            UserWithRoleIds userWithRoleIds = new UserWithRoleIds();
-            BeanUtils.copyProperties(user, userWithRoleIds);
-            return UniqueQueryResponseData.ok(userWithRoleIds);
-        }).orElseGet(() -> UniqueQueryResponseData.ok(null));
+    public UniqueQueryResponseData<User> findUserById(Long userId) {
+        User user = findCachedUserById(userId);
+        return UniqueQueryResponseData.ok(user);
     }
 
     @Override
-    public UniqueQueryResponseData<UserWithRoleIds> findUserByIdWithRoleIds(Long userId) {
-        UserWithRoleIds userWithRolesIds = userRoleMapper.selectUserWithRole(userId);
+    public UniqueQueryResponseData<User> findUserByIdWithRoleIds(Long userId) {
+        User userWithRolesIds = userRoleMapper.selectUserWithRole(userId);
         return UniqueQueryResponseData.ok(userWithRolesIds);
     }
 
     @Override
     public UniqueQueryResponseData<User> findCurrentUser() {
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = findCachedUserById(userId);
+        return UniqueQueryResponseData.ok(user);
+    }
 
+    private User findCachedUserById(Long userId) {
         BoundValueOperations<String, byte[]> ops = byteRedisTemplate.boundValueOps(UserConstants.USER_CACHE_PREFIX + userId);
         byte[] bytes = ops.get();
         User user;
@@ -98,19 +97,15 @@ public class UserServiceImpl implements UserService {
                 );
             }
         }
-
-        return UniqueQueryResponseData.ok(user);
+        return user;
     }
 
     @Override
     @Transactional
-    public BasicResponseData addUser(ModifyUserRequest modifyUserRequest) {
-        User user = new User();
-        BeanUtils.copyProperties(modifyUserRequest, user);
+    public BasicResponseData addUser(User user) {
         user.setId(null);
         User save = userRepository.save(user);
-
-        modifyUserRequest.getRoleIds().forEach(roleId -> {
+        user.getRoleIds().forEach(roleId -> {
             UserRole userRole = new UserRole();
             userRole.setUserId(save.getId());
             userRole.setRoleId(roleId);
@@ -121,19 +116,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public BasicResponseData updateUser(Long userId, ModifyUserRequest modifyUserRequest) {
-        userRepository.findById(userId).ifPresent(user -> {
-            BeanUtils.copyProperties(modifyUserRequest, user);
-            user.setId(userId);
-            userRepository.save(user);
-            updateRoles(userId, modifyUserRequest.getRoleIds());
+    public BasicResponseData updateUser(Long userId, User user) {
+        userRepository.findById(userId).ifPresent(u -> {
+            BeanUtils.copyProperties(user, u);
+            u.setId(userId);
+            userRepository.save(u);
+            updateRoles(userId, user.getRoleIds());
         });
         return BasicResponseData.ok();
     }
 
     private void updateRoles(Long userId, List<Long> roleIds) {
-        if (Objects.isNull(roleIds))
+        if (Objects.isNull(roleIds)) {
             return;
+        }
         userRoleRepository.deleteByUserId(userId);
         roleIds.forEach(roleId -> {
             UserRole userRole = new UserRole();

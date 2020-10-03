@@ -14,7 +14,6 @@ import xo.fredtan.lottolearn.common.model.response.QueryResult;
 import xo.fredtan.lottolearn.common.util.RedisCacheUtils;
 import xo.fredtan.lottolearn.course.dao.ChapterRepository;
 import xo.fredtan.lottolearn.domain.course.Chapter;
-import xo.fredtan.lottolearn.domain.course.request.ModifyChapterRequest;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,11 +66,9 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     @Transactional
-    public BasicResponseData addChapter(Long courseId, ModifyChapterRequest modifyChapterRequest) {
+    public BasicResponseData addChapter(Long courseId, Chapter chapter) {
         String key = ChapterConstants.COURSE_CHAPTER_CACHE_PREFIX + courseId;
 
-        Chapter chapter = new Chapter();
-        BeanUtils.copyProperties(modifyChapterRequest, chapter);
         chapter.setId(null);
         chapter.setCourseId(courseId);
         chapter.setPubDate(new Date());
@@ -88,14 +85,14 @@ public class ChapterServiceImpl implements ChapterService {
     @Transactional
     public BasicResponseData updateChapter(Long courseId,
                                            Long chapterId,
-                                           ModifyChapterRequest modifyChapterRequest) {
-        chapterRepository.findById(chapterId).ifPresent(chapter -> {
+                                           Chapter chapter) {
+        chapterRepository.findById(chapterId).ifPresent(c -> {
             // 确保课程ID和发布时间一致
-            modifyChapterRequest.setCourseId(chapter.getCourseId());
-            modifyChapterRequest.setPubDate(chapter.getPubDate());
-            BeanUtils.copyProperties(modifyChapterRequest, chapter);
-            chapter.setId(chapterId);
-            chapterRepository.save(chapter);
+            chapter.setCourseId(c.getCourseId());
+            chapter.setPubDate(c.getPubDate());
+            BeanUtils.copyProperties(chapter, c);
+            c.setId(chapterId);
+            chapterRepository.save(c);
         });
 
         return BasicResponseData.ok();

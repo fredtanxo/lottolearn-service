@@ -20,7 +20,6 @@ import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
 import xo.fredtan.lottolearn.common.util.RedisCacheUtils;
 import xo.fredtan.lottolearn.course.dao.AnnouncementRepository;
 import xo.fredtan.lottolearn.domain.course.Announcement;
-import xo.fredtan.lottolearn.domain.course.request.ModifyAnnouncementRequest;
 
 import java.time.Duration;
 import java.util.Date;
@@ -72,13 +71,10 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 
     @Override
     @Transactional
-    public BasicResponseData addAnnouncement(Long courseId, ModifyAnnouncementRequest modifyAnnouncementRequest) {
+    public BasicResponseData addAnnouncement(Long courseId, Announcement announcement) {
         String key = AnnouncementConstants.ANNOUNCEMENT_CACHE_PREFIX + courseId;
-        Announcement announcement = new Announcement();
+
         announcement.setCourseId(courseId);
-        announcement.setTitle(modifyAnnouncementRequest.getTitle());
-        announcement.setContent(modifyAnnouncementRequest.getContent());
-        announcement.setPublisher(modifyAnnouncementRequest.getPublisher());
         announcement.setPubDate(new Date());
 
         announcementRepository.save(announcement);
@@ -93,21 +89,21 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     @Transactional
     public BasicResponseData updateAnnouncement(Long courseId,
                                                 Long announcementId,
-                                                ModifyAnnouncementRequest modifyAnnouncementRequest) {
+                                                Announcement announcement) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String publisher = "";
         if (principal instanceof Jwt) {
             publisher = ((Jwt) principal).getClaim("nickname");
         }
         String finalPublisher = publisher;
-        announcementRepository.findById(announcementId).ifPresent(announcement -> {
+        announcementRepository.findById(announcementId).ifPresent(a -> {
             // 确保课程ID一致
-            modifyAnnouncementRequest.setCourseId(announcement.getCourseId());
-            BeanUtils.copyProperties(modifyAnnouncementRequest, announcement);
-            announcement.setPublisher(finalPublisher);
-            announcement.setPubDate(new Date());
-            announcement.setId(announcementId);
-            announcementRepository.save(announcement);
+            announcement.setCourseId(a.getCourseId());
+            BeanUtils.copyProperties(announcement, a);
+            a.setPublisher(finalPublisher);
+            a.setPubDate(new Date());
+            a.setId(announcementId);
+            announcementRepository.save(a);
         });
         return BasicResponseData.ok();
     }

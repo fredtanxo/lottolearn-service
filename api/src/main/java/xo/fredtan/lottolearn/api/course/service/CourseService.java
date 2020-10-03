@@ -8,8 +8,6 @@ import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.Sign;
 import xo.fredtan.lottolearn.domain.course.SignRecord;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
-import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
-import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
@@ -34,7 +32,7 @@ public interface CourseService {
 
     BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, Long courseId, Long timeout);
 
-    BasicResponseData handleLiveCourseSign(@RequestBody CourseSignRequest courseSignRequest);
+    BasicResponseData handleLiveCourseSign(@RequestBody SignRecord signRecord);
 
     QueryResponseData<Sign> findCourseSigns(Integer page, Integer size, Long courseId);
 
@@ -42,9 +40,9 @@ public interface CourseService {
 
     UniqueQueryResponseData<UserCourse> findUserCourse(Long userId, Long courseId);
 
-    AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest);
+    AddCourseResult addCourse(Course course);
 
-    BasicResponseData updateCourse(Long courseId, ModifyCourseRequest modifyCourseRequest);
+    BasicResponseData updateCourse(Long courseId, Course course);
 
     JoinCourseResult joinCourse(String invitationCode);
 

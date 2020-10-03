@@ -12,7 +12,6 @@ import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
 import xo.fredtan.lottolearn.course.dao.TermRepository;
 import xo.fredtan.lottolearn.domain.course.Term;
-import xo.fredtan.lottolearn.domain.course.request.ModifyTermRequest;
 
 import java.util.Date;
 import java.util.List;
@@ -31,13 +30,10 @@ public class TermServiceImpl implements TermService {
 
     @Override
     @Transactional
-    public BasicResponseData addTerm(ModifyTermRequest modifyTermRequest) {
-        if (modifyTermRequest.getTermEnd().before(new Date())) {
+    public BasicResponseData addTerm(Term term) {
+        if (term.getTermEnd().before(new Date())) {
             ApiExceptionCast.invalidParam();
         }
-
-        Term term = new Term();
-        BeanUtils.copyProperties(modifyTermRequest, term);
         term.setId(null);
         term.setStatus(true);
         termRepository.save(term);
@@ -46,11 +42,11 @@ public class TermServiceImpl implements TermService {
 
     @Override
     @Transactional
-    public BasicResponseData updateTerm(Long termId, ModifyTermRequest modifyTermRequest) {
-        termRepository.findById(termId).ifPresent(term -> {
-            BeanUtils.copyProperties(modifyTermRequest, term);
-            term.setId(termId);
-            termRepository.save(term);
+    public BasicResponseData updateTerm(Long termId, Term term) {
+        termRepository.findById(termId).ifPresent(t -> {
+            BeanUtils.copyProperties(term, t);
+            t.setId(termId);
+            termRepository.save(t);
         });
         return BasicResponseData.ok();
     }

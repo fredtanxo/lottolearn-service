@@ -35,15 +35,13 @@ import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.Sign;
 import xo.fredtan.lottolearn.domain.course.SignRecord;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
-import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
-import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.CourseCode;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
 import xo.fredtan.lottolearn.domain.message.ChatMessage;
-import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
+import xo.fredtan.lottolearn.domain.user.User;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -205,21 +203,21 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public BasicResponseData handleLiveCourseSign(CourseSignRequest courseSignRequest) {
+    public BasicResponseData handleLiveCourseSign(SignRecord signRecord) {
         String courseId = stringRedisTemplate
-                .boundValueOps(CourseConstants.LIVE_SIGN_KEY_PREFIX + courseSignRequest.getSignId())
+                .boundValueOps(CourseConstants.LIVE_SIGN_KEY_PREFIX + signRecord.getSignId())
                 .get();
 
         boolean success = StringUtils.hasText(courseId);
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-        courseSignRequest.setUserId(userId);
-        courseSignRequest.setId(null);
-        courseSignRequest.setSignTime(new Date());
-        courseSignRequest.setSuccess(success);
+        signRecord.setUserId(userId);
+        signRecord.setId(null);
+        signRecord.setSignTime(new Date());
+        signRecord.setSuccess(success);
 
         rabbitTemplate.convertAndSend(
-                RabbitMqConfig.EXCHANGE_COURSE_SIGN, RabbitMqConfig.ROUTING_KEY_COURSE_SIGN, courseSignRequest);
+                RabbitMqConfig.EXCHANGE_COURSE_SIGN, RabbitMqConfig.ROUTING_KEY_COURSE_SIGN, signRecord);
 
         return success ? BasicResponseData.ok() : BasicResponseData.invalid();
     }
@@ -249,17 +247,15 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public AddCourseResult addCourse(ModifyCourseRequest modifyCourseRequest) {
+    public AddCourseResult addCourse(Course course) {
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-        UniqueQueryResponseData<UserWithRoleIds> userPre = userService.findUserById(userId);
-        UserWithRoleIds user = userPre.getPayload();
+        UniqueQueryResponseData<User> userPre = userService.findUserById(userId);
+        User user = userPre.getPayload();
 
         if (Objects.isNull(user)) {
             ApiExceptionCast.internalError();
         }
 
-        Course course = new Course();
-        BeanUtils.copyProperties(modifyCourseRequest, course);
         course.setId(null);
         course.setTeacherId(userId);
         course.setPubDate(new Date());
@@ -289,7 +285,7 @@ public class CourseServiceImpl implements CourseService {
                 user.getDescription(),
                 savedCourse.getId(),
                 savedCourse.getName(),
-                savedCourse.getCover(),
+                savedCourse.getVisibility(),
                 savedCourse.getDescription(),
                 savedCourse.getTeacherId(),
                 savedCourse.getTermId(),
@@ -316,7 +312,6 @@ public class CourseServiceImpl implements CourseService {
         userCourseRepository.save(userCourse);
 
         // 清除缓存
-//        clearUserCoursesCache(userId);
         RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + userId + "*", stringRedisTemplate);
 
         return new AddCourseResult(CourseCode.ADD_SUCCESS, savedCourse.getCode(), savedCourse.getId());
@@ -324,17 +319,17 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public BasicResponseData updateCourse(Long courseId, ModifyCourseRequest modifyCourseRequest) {
+    public BasicResponseData updateCourse(Long courseId, Course course) {
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-        courseRepository.findById(courseId).ifPresent(course -> {
+        courseRepository.findById(courseId).ifPresent(c -> {
             // 确保课程ID、邀请码、教师ID、发布日期、状态一致
-            modifyCourseRequest.setCode(course.getCode());
-            modifyCourseRequest.setTeacherId(userId);
-            modifyCourseRequest.setPubDate(course.getPubDate());
-            modifyCourseRequest.setStatus(course.getStatus());
-            BeanUtils.copyProperties(modifyCourseRequest, course);
-            course.setId(courseId);
-            courseRepository.save(course);
+            course.setCode(c.getCode());
+            course.setTeacherId(userId);
+            course.setPubDate(c.getPubDate());
+            course.setStatus(c.getStatus());
+            BeanUtils.copyProperties(course, c);
+            c.setId(courseId);
+            courseRepository.save(c);
         });
         return BasicResponseData.ok();
     }

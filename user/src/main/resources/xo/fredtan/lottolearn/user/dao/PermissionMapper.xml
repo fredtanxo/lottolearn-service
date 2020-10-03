@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="xo.fredtan.lottolearn.user.dao.PermissionMapper">
-    <resultMap id="permissionResultMap" type="xo.fredtan.lottolearn.domain.user.response.RoleWithMenuIds">
+    <resultMap id="permissionResultMap" type="xo.fredtan.lottolearn.domain.user.Role">
         <id column="rid" property="id" />
         <result column="rname" property="name" />
         <result column="rdescription" property="description" />
@@ -10,11 +10,11 @@
         <result column="rcreated_at" property="createdAt" />
         <result column="rupdated_by" property="updatedBy" />
         <result column="rupdated_at" property="updatedAt" />
-        <collection property="menuIds" ofType="string" javaType="list">
+        <collection property="menuIds" ofType="long" javaType="list">
             <result column="mid" />
         </collection>
     </resultMap>
-    <select id="selectRoleWithMenu" parameterType="string" resultMap="permissionResultMap">
+    <select id="selectRoleWithMenu" parameterType="long" resultMap="permissionResultMap">
         select
                r.id as rid,
                r.name as rname,

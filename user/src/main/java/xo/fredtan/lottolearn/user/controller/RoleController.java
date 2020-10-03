@@ -10,8 +10,6 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.user.Role;
-import xo.fredtan.lottolearn.domain.user.request.ModifyRoleRequest;
-import xo.fredtan.lottolearn.domain.user.response.RoleWithMenuIds;
 
 @RestController
 @RequestMapping("/role")
@@ -28,20 +26,20 @@ public class RoleController implements RoleControllerApi {
 
     @Override
     @GetMapping("/id/{roleId}")
-    public UniqueQueryResponseData<RoleWithMenuIds> findRoleById(@PathVariable Long roleId) {
+    public UniqueQueryResponseData<Role> findRoleById(@PathVariable Long roleId) {
         return roleService.findRoleById(roleId);
     }
 
     @Override
     @PostMapping("/new")
-    public BasicResponseData addRole(@RequestBody ModifyRoleRequest modifyRoleRequest) {
-        return roleService.addRole(modifyRoleRequest);
+    public BasicResponseData addRole(@RequestBody Role role) {
+        return roleService.addRole(role);
     }
 
     @Override
     @PutMapping("/id/{roleId}")
-    public BasicResponseData updateRole(@PathVariable Long roleId, @RequestBody ModifyRoleRequest modifyRoleRequest) {
-        return roleService.updateRole(roleId, modifyRoleRequest);
+    public BasicResponseData updateRole(@PathVariable Long roleId, @RequestBody Role role) {
+        return roleService.updateRole(roleId, role);
     }
 
     @Override

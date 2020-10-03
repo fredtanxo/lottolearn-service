@@ -11,7 +11,6 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Chapter;
-import xo.fredtan.lottolearn.domain.course.request.ModifyChapterRequest;
 import xo.fredtan.lottolearn.domain.course.response.CourseCode;
 
 @RestController
@@ -36,23 +35,22 @@ public class ChapterController implements ChapterControllerApi {
 
     @Override
     @PostMapping("/course/{courseId}")
-    public BasicResponseData addChapter(@PathVariable Long courseId,
-                                        @RequestBody ModifyChapterRequest modifyChapterRequest) {
+    public BasicResponseData addChapter(@PathVariable Long courseId, @RequestBody Chapter chapter) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
-        return chapterService.addChapter(courseId, modifyChapterRequest);
+        return chapterService.addChapter(courseId, chapter);
     }
 
     @Override
     @PutMapping("/course/{courseId}/{chapterId}")
     public BasicResponseData updateChapter(@PathVariable Long courseId,
                                            @PathVariable Long chapterId,
-                                           @RequestBody ModifyChapterRequest modifyChapterRequest) {
+                                           @RequestBody Chapter chapter) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
-        return chapterService.updateChapter(courseId, chapterId, modifyChapterRequest);
+        return chapterService.updateChapter(courseId, chapterId, chapter);
     }
 
     @Override

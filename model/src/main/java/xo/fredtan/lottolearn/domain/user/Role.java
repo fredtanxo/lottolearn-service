@@ -6,6 +6,7 @@ import xo.fredtan.lottolearn.domain.audit.AbstractEntity;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Entity
@@ -20,4 +21,7 @@ public class Role extends AbstractEntity implements Serializable {
     private String code;
     private String description;
     private Boolean status;
+
+    @Transient
+    private List<Long> menuIds;
 }

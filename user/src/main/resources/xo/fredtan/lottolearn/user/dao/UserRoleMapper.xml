@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="xo.fredtan.lottolearn.user.dao.UserRoleMapper">
-    <resultMap id="userRoleResultMap" type="xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds">
+    <resultMap id="userRoleResultMap" type="xo.fredtan.lottolearn.domain.user.User">
         <id column="uid" property="id" />
         <result column="unickname" property="nickname" />
         <result column="ugender" property="gender" />
@@ -12,12 +12,12 @@
         <result column="ucreated_at" property="createdAt" />
         <result column="uupdated_by" property="updatedBy" />
         <result column="uupdated_at" property="updatedAt" />
-        <collection property="roleIds" ofType="string" javaType="list">
+        <collection property="roleIds" ofType="long" javaType="list">
             <result column="rid" />
         </collection>
     </resultMap>
     
-    <select id="selectUserWithRole" parameterType="string" resultMap="userRoleResultMap">
+    <select id="selectUserWithRole" parameterType="long" resultMap="userRoleResultMap">
         select
                u.id as uid,
                u.nickname as unickname,

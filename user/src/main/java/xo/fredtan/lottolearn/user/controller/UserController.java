@@ -10,9 +10,7 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.user.User;
-import xo.fredtan.lottolearn.domain.user.request.ModifyUserRequest;
 import xo.fredtan.lottolearn.domain.user.request.QueryUserRequest;
-import xo.fredtan.lottolearn.domain.user.response.UserWithRoleIds;
 
 import java.util.Objects;
 
@@ -31,7 +29,7 @@ public class UserController implements UserControllerApi {
 
     @Override
     @GetMapping("/id/{userId}")
-    public UniqueQueryResponseData<UserWithRoleIds> findUserById(@PathVariable Long userId, Boolean withRoles) {
+    public UniqueQueryResponseData<User> findUserById(@PathVariable Long userId, Boolean withRoles) {
         if (Objects.isNull(withRoles) || !withRoles) {
             return userService.findUserById(userId);
         }
@@ -46,14 +44,14 @@ public class UserController implements UserControllerApi {
 
     @Override
     @PostMapping("/new")
-    public BasicResponseData addUser(@RequestBody ModifyUserRequest modifyUserRequest) {
-        return userService.addUser(modifyUserRequest);
+    public BasicResponseData addUser(@RequestBody User user) {
+        return userService.addUser(user);
     }
 
     @Override
     @PutMapping("/id/{userId}")
-    public BasicResponseData updateUser(@PathVariable Long userId, @RequestBody ModifyUserRequest modifyUserRequest) {
-        return userService.updateUser(userId, modifyUserRequest);
+    public BasicResponseData updateUser(@PathVariable Long userId, @RequestBody User user) {
+        return userService.updateUser(userId, user);
     }
 
     @Override

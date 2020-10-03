@@ -14,8 +14,6 @@ import xo.fredtan.lottolearn.common.model.response.QueryResult;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.user.Permission;
 import xo.fredtan.lottolearn.domain.user.Role;
-import xo.fredtan.lottolearn.domain.user.request.ModifyRoleRequest;
-import xo.fredtan.lottolearn.domain.user.response.RoleWithMenuIds;
 import xo.fredtan.lottolearn.user.dao.PermissionMapper;
 import xo.fredtan.lottolearn.user.dao.PermissionRepository;
 import xo.fredtan.lottolearn.user.dao.RoleRepository;
@@ -40,37 +38,34 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public UniqueQueryResponseData<RoleWithMenuIds> findRoleById(Long roleId) {
-        RoleWithMenuIds roleWithMenuIds = permissionMapper.selectRoleWithMenu(roleId);
-
-        return UniqueQueryResponseData.ok(roleWithMenuIds);
+    public UniqueQueryResponseData<Role> findRoleById(Long roleId) {
+        Role role = permissionMapper.selectRoleWithMenu(roleId);
+        return UniqueQueryResponseData.ok(role);
     }
 
     @Override
     @Transactional
-    public BasicResponseData addRole(ModifyRoleRequest modifyRoleRequest) {
-        Role role = new Role();
-        BeanUtils.copyProperties(modifyRoleRequest, role);
+    public BasicResponseData addRole(Role role) {
         role.setId(null);
         Role save = roleRepository.save(role);
 
-        modifyRoleRequest.getMenuIds().forEach(menuId -> {
-                    Permission permission = new Permission();
-                    permission.setRoleId(save.getId());
-                    permission.setMenuId(menuId);
-                    permissionRepository.save(permission);
-                });
+        role.getMenuIds().forEach(menuId -> {
+                Permission permission = new Permission();
+                permission.setRoleId(save.getId());
+                permission.setMenuId(menuId);
+                permissionRepository.save(permission);
+        });
         return BasicResponseData.ok();
     }
 
     @Override
     @Transactional
-    public BasicResponseData updateRole(Long roleId, ModifyRoleRequest modifyRoleRequest) {
-        roleRepository.findById(roleId).ifPresent(role -> {
-            BeanUtils.copyProperties(modifyRoleRequest, role);
-            role.setId(roleId);
-            roleRepository.save(role);
-            updateMenus(roleId, modifyRoleRequest.getMenuIds());
+    public BasicResponseData updateRole(Long roleId, Role role) {
+        roleRepository.findById(roleId).ifPresent(r -> {
+            BeanUtils.copyProperties(role, role);
+            r.setId(roleId);
+            roleRepository.save(r);
+            updateMenus(roleId, role.getMenuIds());
         });
         return BasicResponseData.ok();
     }

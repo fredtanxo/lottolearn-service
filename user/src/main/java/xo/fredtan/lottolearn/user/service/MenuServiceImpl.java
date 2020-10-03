@@ -9,7 +9,6 @@ import xo.fredtan.lottolearn.api.user.service.MenuService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.user.Menu;
-import xo.fredtan.lottolearn.domain.user.request.ModifyMenuRequest;
 import xo.fredtan.lottolearn.domain.user.response.MenuTree;
 import xo.fredtan.lottolearn.user.dao.MenuMapper;
 import xo.fredtan.lottolearn.user.dao.MenuRepository;
@@ -37,22 +36,19 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional
-    public BasicResponseData addMenu(ModifyMenuRequest modifyMenuRequest) {
-        Menu menu = new Menu();
-        BeanUtils.copyProperties(modifyMenuRequest, menu);
+    public BasicResponseData addMenu(Menu menu) {
         menu.setId(null);
-
         menuRepository.save(menu);
         return BasicResponseData.ok();
     }
 
     @Override
     @Transactional
-    public BasicResponseData updateMenu(Long menuId, ModifyMenuRequest modifyMenuRequest) {
-        menuRepository.findById(menuId).ifPresent(menu -> {
-            BeanUtils.copyProperties(modifyMenuRequest, menu);
-            menu.setId(menuId);
-            menuRepository.save(menu);
+    public BasicResponseData updateMenu(Long menuId, Menu menu) {
+        menuRepository.findById(menuId).ifPresent(m -> {
+            BeanUtils.copyProperties(menu, m);
+            m.setId(menuId);
+            menuRepository.save(m);
         });
         return BasicResponseData.ok();
     }

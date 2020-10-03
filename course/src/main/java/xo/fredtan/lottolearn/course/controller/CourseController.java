@@ -15,8 +15,6 @@ import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.Sign;
 import xo.fredtan.lottolearn.domain.course.SignRecord;
-import xo.fredtan.lottolearn.domain.course.request.CourseSignRequest;
-import xo.fredtan.lottolearn.domain.course.request.ModifyCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
@@ -86,8 +84,8 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PostMapping("/live/student/sign")
-    public BasicResponseData handleLiveCourseSign(@RequestBody CourseSignRequest courseSignRequest) {
-        return courseService.handleLiveCourseSign(courseSignRequest);
+    public BasicResponseData handleLiveCourseSign(@RequestBody SignRecord signRecord) {
+        return courseService.handleLiveCourseSign(signRecord);
     }
 
     @Override
@@ -111,17 +109,17 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PostMapping("/new")
-    public AddCourseResult addCourse(@Valid @RequestBody ModifyCourseRequest modifyCourseRequest) {
-        return courseService.addCourse(modifyCourseRequest);
+    public AddCourseResult addCourse(@Valid @RequestBody Course course) {
+        return courseService.addCourse(course);
     }
 
     @Override
     @PutMapping("/id/{courseId}")
-    public BasicResponseData updateCourse(@PathVariable Long courseId, @RequestBody ModifyCourseRequest modifyCourseRequest) {
+    public BasicResponseData updateCourse(@PathVariable Long courseId, @RequestBody Course course) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
-        return courseService.updateCourse(courseId, modifyCourseRequest);
+        return courseService.updateCourse(courseId, course);
     }
 
     @Override

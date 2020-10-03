@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.domain.course.Chapter;
-import xo.fredtan.lottolearn.domain.course.request.ModifyChapterRequest;
 
 @Api("课程章节")
 public interface ChapterControllerApi {
@@ -13,10 +12,10 @@ public interface ChapterControllerApi {
     QueryResponseData<Chapter> findChaptersByCourseId(Integer page, Integer size, Long courseId);
 
     @ApiOperation("增加课程章节")
-    BasicResponseData addChapter(Long courseId, ModifyChapterRequest modifyChapterRequest);
+    BasicResponseData addChapter(Long courseId, Chapter chapter);
 
     @ApiOperation("修改课程章节")
-    BasicResponseData updateChapter(Long courseId, Long chapterId, ModifyChapterRequest modifyChapterRequest);
+    BasicResponseData updateChapter(Long courseId, Long chapterId, Chapter chapter);
 
     @ApiOperation("删除课程章节")
     BasicResponseData deleteChapter(Long courseId, Long chapterId);

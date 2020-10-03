@@ -8,7 +8,6 @@ import xo.fredtan.lottolearn.api.course.service.TermService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.domain.course.Term;
-import xo.fredtan.lottolearn.domain.course.request.ModifyTermRequest;
 
 @RestController
 @RequestMapping("/term")
@@ -24,14 +23,14 @@ public class TermController implements TermControllerApi {
 
     @Override
     @PostMapping("/new")
-    public BasicResponseData addTerm(@RequestBody ModifyTermRequest modifyTermRequest) {
-        return termService.addTerm(modifyTermRequest);
+    public BasicResponseData addTerm(@RequestBody Term term) {
+        return termService.addTerm(term);
     }
 
     @Override
     @PutMapping("/id/{termId}")
-    public BasicResponseData updateTerm(@PathVariable Long termId, ModifyTermRequest modifyTermRequest) {
-        return termService.updateTerm(termId, modifyTermRequest);
+    public BasicResponseData updateTerm(@PathVariable Long termId, Term term) {
+        return termService.updateTerm(termId, term);
     }
 
     @Override

@@ -7,7 +7,7 @@ import xo.fredtan.lottolearn.api.user.controller.MenuControllerApi;
 import xo.fredtan.lottolearn.api.user.service.MenuService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
-import xo.fredtan.lottolearn.domain.user.request.ModifyMenuRequest;
+import xo.fredtan.lottolearn.domain.user.Menu;
 import xo.fredtan.lottolearn.domain.user.response.MenuTree;
 
 @RestController
@@ -30,14 +30,14 @@ public class MenuController implements MenuControllerApi {
 
     @Override
     @PostMapping("/new")
-    public BasicResponseData addMenu(@RequestBody ModifyMenuRequest modifyMenuRequest) {
-        return menuService.addMenu(modifyMenuRequest);
+    public BasicResponseData addMenu(@RequestBody Menu menu) {
+        return menuService.addMenu(menu);
     }
 
     @Override
     @PutMapping("/id/{menuId}")
-    public BasicResponseData updateMenu(@PathVariable Long menuId, @RequestBody ModifyMenuRequest modifyMenuRequest) {
-        return menuService.updateMenu(menuId, modifyMenuRequest);
+    public BasicResponseData updateMenu(@PathVariable Long menuId, @RequestBody Menu menu) {
+        return menuService.updateMenu(menuId, menu);
     }
 
     @Override

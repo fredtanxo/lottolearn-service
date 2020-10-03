@@ -11,7 +11,6 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Announcement;
-import xo.fredtan.lottolearn.domain.course.request.ModifyAnnouncementRequest;
 import xo.fredtan.lottolearn.domain.course.response.CourseCode;
 
 @RestController
@@ -36,23 +35,22 @@ public class AnnouncementController implements AnnouncementControllerApi {
 
     @Override
     @PostMapping("/course/{courseId}")
-    public BasicResponseData addAnnouncement(@PathVariable Long courseId,
-                                             @RequestBody ModifyAnnouncementRequest modifyAnnouncementRequest) {
+    public BasicResponseData addAnnouncement(@PathVariable Long courseId, @RequestBody Announcement announcement) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
-        return announcementService.addAnnouncement(courseId, modifyAnnouncementRequest);
+        return announcementService.addAnnouncement(courseId, announcement);
     }
 
     @Override
     @PutMapping("/course/{courseId}/{announcementId}")
     public BasicResponseData updateAnnouncement(@PathVariable Long courseId,
                                                 @PathVariable Long announcementId,
-                                                @RequestBody ModifyAnnouncementRequest modifyAnnouncementRequest) {
+                                                @RequestBody Announcement announcement) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
-        return announcementService.updateAnnouncement(courseId, announcementId, modifyAnnouncementRequest);
+        return announcementService.updateAnnouncement(courseId, announcementId, announcement);
     }
 
     @Override
