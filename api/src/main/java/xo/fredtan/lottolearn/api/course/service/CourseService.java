@@ -28,6 +28,8 @@ public interface CourseService {
 
     BasicResponseData requestLiveCourse(Long courseId);
 
+    UniqueQueryResponseData<String> queryLiveCourse(Long courseId);
+
     BasicResponseData requestLiveCourseEnd(Long courseId);
 
     BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, Long courseId, Long timeout);
@@ -47,5 +49,4 @@ public interface CourseService {
     JoinCourseResult joinCourse(String invitationCode);
 
     BasicResponseData closeCourse(Long courseId);
-
 }

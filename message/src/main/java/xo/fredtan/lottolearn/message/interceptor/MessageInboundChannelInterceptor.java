@@ -111,8 +111,8 @@ public class MessageInboundChannelInterceptor implements ChannelInterceptor {
 
     private void userSubscribeEvent(StompHeaderAccessor accessor, Boolean flag) {
         String roomId = accessor.getSubscriptionId();
-        String courseId = (String) accessor.getHeader(MessageConstants.COURSE_ID);
-        if (StringUtils.isEmpty(courseId) || StringUtils.isEmpty(roomId)) {
+        Object courseId = accessor.getHeader(MessageConstants.COURSE_ID);
+        if (Objects.isNull(courseId) || StringUtils.isEmpty(roomId)) {
             return;
         }
         Principal principal = accessor.getUser();
@@ -122,7 +122,7 @@ public class MessageInboundChannelInterceptor implements ChannelInterceptor {
         String userId = principal.getName();
 
         BoundSetOperations<String, String> ops =
-                redisTemplate.boundSetOps(CourseConstants.LIVE_KEY_PREFIX + courseId + ":" + roomId);
+                redisTemplate.boundSetOps(CourseConstants.COURSE_LIVE_PREFIX + roomId);
         if (flag) {
             ops.add(userId);
         } else {

@@ -28,6 +28,9 @@ public interface CourseControllerApi {
     @ApiOperation("请求课程直播")
     BasicResponseData requestLiveCourse(Long courseId);
 
+    @ApiOperation("检查课程直播状态")
+    UniqueQueryResponseData<String> queryLiveCourse(Long courseId);
+
     @ApiOperation("结束课程直播")
     BasicResponseData requestLiveCourseEnd(Long courseId);
 

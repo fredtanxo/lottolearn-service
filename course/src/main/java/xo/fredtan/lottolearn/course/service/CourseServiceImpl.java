@@ -199,8 +199,15 @@ public class CourseServiceImpl implements CourseService {
             return BasicResponseData.invalid();
         }
         BoundHashOperations<String, Object, Object> ops = stringRedisTemplate.boundHashOps(CourseConstants.COURSE_LIVE_KEY);
-        ops.putIfAbsent(courseId, optional.get().getLive());
+        ops.putIfAbsent(courseId.toString(), optional.get().getLive());
         return BasicResponseData.ok();
+    }
+
+    @Override
+    public UniqueQueryResponseData<String> queryLiveCourse(Long courseId) {
+        BoundHashOperations<String, Object, Object> ops = stringRedisTemplate.boundHashOps(CourseConstants.COURSE_LIVE_KEY);
+        String s = (String) ops.get(courseId.toString());
+        return UniqueQueryResponseData.ok(StringUtils.hasText(s) ? s : null);
     }
 
     @Override

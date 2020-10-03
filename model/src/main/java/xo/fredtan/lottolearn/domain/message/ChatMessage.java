@@ -7,7 +7,7 @@ import java.io.Serializable;
 @Data
 public class ChatMessage implements Serializable {
     private String type;
-    private String userId;
+    private Long userId;
     private String nickname;
     private String avatar;
     private String content;

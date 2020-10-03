@@ -66,6 +66,15 @@ public class CourseController implements CourseControllerApi {
     }
 
     @Override
+    @GetMapping("/live/{courseId}")
+    public UniqueQueryResponseData<String> queryLiveCourse(@PathVariable Long courseId) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        return courseService.queryLiveCourse(courseId);
+    }
+
+    @Override
     @DeleteMapping("/live/{courseId}")
     public BasicResponseData requestLiveCourseEnd(@PathVariable Long courseId) {
         return courseService.requestLiveCourseEnd(courseId);
