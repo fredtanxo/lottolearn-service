@@ -47,13 +47,13 @@ public class AnnouncementServiceImpl implements AnnouncementService {
             byte[] data = ops.get();
             if (Objects.nonNull(data) && data.length > 0) {
                 Announcement announcement = ProtostuffSerializeUtils.deserialize(data, Announcement.class);
-                QueryResult<Announcement> queryResult = new QueryResult<>(-1L, List.of(announcement));
+                QueryResult<Announcement> queryResult = new QueryResult<>(Long.valueOf(count), List.of(announcement));
                 return QueryResponseData.ok(queryResult);
             }
         }
 
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Announcement> announcements = announcementRepository.findByCourseId(pageRequest, courseId);
+        Page<Announcement> announcements = announcementRepository.findByCourseIdOrderByPubDateDesc(pageRequest, courseId);
 
         List<Announcement> content = announcements.getContent();
         QueryResult<Announcement> queryResult = new QueryResult<>(announcements.getTotalElements(), content);
