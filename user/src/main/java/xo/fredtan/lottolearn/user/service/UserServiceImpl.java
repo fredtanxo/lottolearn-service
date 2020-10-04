@@ -2,7 +2,6 @@ package xo.fredtan.lottolearn.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -12,6 +11,7 @@ import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import xo.fredtan.lottolearn.api.user.constants.UserConstants;
 import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
@@ -19,6 +19,7 @@ import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
+import xo.fredtan.lottolearn.common.util.RedisCacheUtils;
 import xo.fredtan.lottolearn.domain.user.User;
 import xo.fredtan.lottolearn.domain.user.UserRole;
 import xo.fredtan.lottolearn.domain.user.request.QueryUserRequest;
@@ -118,11 +119,19 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public BasicResponseData updateUser(Long userId, User user) {
         userRepository.findById(userId).ifPresent(u -> {
-            BeanUtils.copyProperties(user, u);
-            u.setId(userId);
+            if (StringUtils.hasText(user.getNickname())) {
+                u.setNickname(user.getNickname());
+            }
+            u.setAvatar(user.getAvatar());
+            u.setGender(user.getGender());
+            u.setDescription(user.getDescription());
             userRepository.save(u);
             updateRoles(userId, user.getRoleIds());
         });
+
+        // 清除缓存
+        RedisCacheUtils.clearCache(UserConstants.USER_CACHE_PREFIX + userId, byteRedisTemplate);
+
         return BasicResponseData.ok();
     }
 
