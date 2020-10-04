@@ -212,7 +212,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public BasicResponseData requestLiveCourseEnd(Long courseId) {
-        stringRedisTemplate.boundHashOps(CourseConstants.COURSE_LIVE_KEY).delete(courseId);
+        stringRedisTemplate.boundHashOps(CourseConstants.COURSE_LIVE_KEY).delete(courseId.toString());
         return BasicResponseData.ok();
     }
 
@@ -233,7 +233,7 @@ public class CourseServiceImpl implements CourseService {
         String content = JSON.toJSONString(Map.of("timeout", timeout, "signId", sign.getId()));
         chatMessage.setContent(content);
 
-        byteRedisTemplate.convertAndSend(MessageConstants.LIVE_DISTRIBUTION_CHANNEL, chatMessage);
+        byteRedisTemplate.convertAndSend(MessageConstants.LIVE_DISTRIBUTION_CHANNEL, ProtostuffSerializeUtils.serialize(chatMessage));
         stringRedisTemplate.boundValueOps(CourseConstants.LIVE_SIGN_KEY_PREFIX + sign.getId())
                 .set(courseId.toString(), timeout, TimeUnit.SECONDS);
 
