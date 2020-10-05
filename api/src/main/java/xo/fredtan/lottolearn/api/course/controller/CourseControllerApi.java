@@ -62,6 +62,9 @@ public interface CourseControllerApi {
     @ApiOperation("凭课程邀请码加入课程")
     JoinCourseResult joinCourse(String invitationCode);
 
+    @ApiOperation("退出课程")
+    BasicResponseData quitCourse(Long courseId);
+
     @ApiOperation("关闭课程")
     BasicResponseData closeCourse(Long courseId);
 }

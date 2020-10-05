@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
 
 public interface UserCourseRepository extends JpaRepository<UserCourse, Long> {
-    UserCourse findByUserIdAndCourseId(Long userId, Long courseId);
+    UserCourse findByUserIdAndCourseId(Long userId, Long id);
+
+    UserCourse findByUserIdAndCourseIdAndStatus(Long userId, Long courseId, Boolean status);
+
     Page<UserCourse> findAllByCourseIdAndStatusOrderByEnrollDateDesc(Pageable pageable, Long courseId, Boolean status);
 }

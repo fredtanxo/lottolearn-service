@@ -19,7 +19,7 @@
                  left join term t
                      on c.term_id = t.id
         where
-                uc.user_id = #{userId}
+                uc.user_id = #{userId} and uc.status = 1
             and
                 c.status = #{query.status}
         <if test="query.teacher != null">

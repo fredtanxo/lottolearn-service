@@ -309,7 +309,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public UniqueQueryResponseData<UserCourse> findUserCourse(Long userId, Long courseId) {
-        UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(userId, courseId);
+        UserCourse userCourse = userCourseRepository.findByUserIdAndCourseIdAndStatus(userId, courseId, true);
         return UniqueQueryResponseData.ok(userCourse);
     }
 
@@ -437,10 +437,25 @@ public class CourseServiceImpl implements CourseService {
         userCourseRepository.save(userCourse);
 
         // 清除缓存
-//        clearUserCoursesCache(userId);
         RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + userId + "*", stringRedisTemplate);
 
         return new JoinCourseResult(CourseCode.JOIN_SUCCESS, course.getId());
+    }
+
+    @Override
+    @Transactional
+    public BasicResponseData quitCourse(Long courseId) {
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        UserCourse userCourse = userCourseRepository.findByUserIdAndCourseIdAndStatus(userId, courseId, true);
+        if (Objects.nonNull(userCourse)) {
+            userCourse.setStatus(false);
+            userCourseRepository.save(userCourse);
+        }
+
+        // 清除缓存
+        RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + userId + "*", stringRedisTemplate);
+
+        return BasicResponseData.ok();
     }
 
     @Override

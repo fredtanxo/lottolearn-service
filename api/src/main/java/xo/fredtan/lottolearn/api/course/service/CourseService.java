@@ -52,5 +52,7 @@ public interface CourseService {
 
     JoinCourseResult joinCourse(String invitationCode);
 
+    BasicResponseData quitCourse(Long courseId);
+
     BasicResponseData closeCourse(Long courseId);
 }

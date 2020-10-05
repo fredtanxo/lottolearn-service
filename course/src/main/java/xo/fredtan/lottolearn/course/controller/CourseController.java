@@ -157,6 +157,15 @@ public class CourseController implements CourseControllerApi {
     }
 
     @Override
+    @DeleteMapping("/user/id/{courseId}")
+    public BasicResponseData quitCourse(@PathVariable Long courseId) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        return courseService.quitCourse(courseId);
+    }
+
+    @Override
     @DeleteMapping("/id/{courseId}")
     public BasicResponseData closeCourse(@PathVariable Long courseId) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {

@@ -21,7 +21,7 @@ public class WithUserValidationUtils {
      */
     public boolean notCourseOwner(Long courseId) {
         return !WithUserValidationUtils.validateWithUser((_userId, _courseId) -> {
-            UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(_userId, _courseId);
+            UserCourse userCourse = userCourseRepository.findByUserIdAndCourseIdAndStatus(_userId, _courseId, true);
             if (Objects.isNull(userCourse)) {
                 return false;
             }
@@ -35,7 +35,7 @@ public class WithUserValidationUtils {
      */
     public boolean notParticipate(Long courseId) {
         return WithUserValidationUtils.validateWithUser((_userId, _courseId) -> {
-            UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(_userId, _courseId);
+            UserCourse userCourse = userCourseRepository.findByUserIdAndCourseIdAndStatus(_userId, _courseId, true);
             return Objects.isNull(userCourse);
         }, courseId);
     }
