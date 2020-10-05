@@ -126,8 +126,9 @@ public class CourseServiceImpl implements CourseService {
         if (Objects.nonNull(course)) {
             dbCourse = courseRepository.findById(courseId).orElse(null);
             assert dbCourse != null;
-            course.setCode(dbCourse.getCode());
-            course.setLive(dbCourse.getLive());
+            dbCourse.setTeacherName(course.getTeacherName());
+            dbCourse.setTermName(course.getTermName());
+            BeanUtils.copyProperties(dbCourse, course);
         }
         return UniqueQueryResponseData.ok(course);
     }
@@ -399,6 +400,10 @@ public class CourseServiceImpl implements CourseService {
             c.setId(courseId);
             courseRepository.save(c);
         });
+
+        // 清除缓存
+        RedisCacheUtils.clearCache(CourseConstants.COURSE_CACHE_PREFIX + courseId, byteRedisTemplate);
+
         return BasicResponseData.ok();
     }
 
