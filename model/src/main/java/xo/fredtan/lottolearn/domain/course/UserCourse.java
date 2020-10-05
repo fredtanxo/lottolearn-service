@@ -24,4 +24,9 @@ public class UserCourse implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date enrollDate;
     private Boolean status;
+
+    @Transient
+    private String userNickname;
+    @Transient
+    private String userAvatar;
 }

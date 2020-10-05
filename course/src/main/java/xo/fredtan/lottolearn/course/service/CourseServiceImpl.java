@@ -132,6 +132,23 @@ public class CourseServiceImpl implements CourseService {
         return UniqueQueryResponseData.ok(course);
     }
 
+    @Override
+    public QueryResponseData<UserCourse> findCourseMembers(Integer page, Integer size, Long courseId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<UserCourse> pg = userCourseRepository.findAllByCourseIdAndStatusOrderByEnrollDateDesc(pageRequest, courseId, true);
+        List<UserCourse> all = pg.getContent();
+        List<Long> userIds = all.stream().map(UserCourse::getUserId).collect(Collectors.toList());
+        List<User> users = userService.batchFindUserById(userIds);
+        for (int i = 0; i < all.size(); i++) {
+            UserCourse userCourse = all.get(i);
+            User user = users.get(i);
+            userCourse.setUserNickname(user.getNickname());
+            userCourse.setUserAvatar(user.getAvatar());
+        }
+        QueryResult<UserCourse> queryResult = new QueryResult<>(pg.getTotalElements(), all);
+        return QueryResponseData.ok(queryResult);
+    }
+
     private Course findCourseWithDetailsById(Long courseId) {
         Course course = courseMapper.selectCourseById(courseId);
         if (Objects.nonNull(course)) {

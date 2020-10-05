@@ -6,10 +6,14 @@ import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.user.User;
 import xo.fredtan.lottolearn.domain.user.request.QueryUserRequest;
 
+import java.util.List;
+
 public interface UserService {
     QueryResponseData<User> findAllUsers(Integer page, Integer size, QueryUserRequest queryUserRequest);
 
     UniqueQueryResponseData<User> findUserById(Long userId);
+
+    List<User> batchFindUserById(List<Long> userIds);
 
     UniqueQueryResponseData<User> findUserByIdWithRoleIds(Long userId);
 

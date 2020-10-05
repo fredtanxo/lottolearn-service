@@ -15,6 +15,7 @@ import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.Sign;
 import xo.fredtan.lottolearn.domain.course.SignRecord;
+import xo.fredtan.lottolearn.domain.course.UserCourse;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
@@ -54,6 +55,16 @@ public class CourseController implements CourseControllerApi {
             ApiExceptionCast.forbidden();
         }
         return courseService.findFullCourseById(courseId);
+    }
+
+    @Override
+    @GetMapping("/members/id/{courseId}")
+    @ValidatePagination
+    public QueryResponseData<UserCourse> findCourseMembers(Integer page, Integer size, @PathVariable Long courseId) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        return courseService.findCourseMembers(page, size, courseId);
     }
 
     @Override

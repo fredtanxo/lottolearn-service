@@ -23,6 +23,8 @@ public interface CourseService {
 
     UniqueQueryResponseData<Course> findFullCourseById(Long courseId);
 
+    QueryResponseData<UserCourse> findCourseMembers(Integer page, Integer size, Long courseId);
+
     QueryResponseData<Course> findUserCourses(Integer page,
                                               Integer size,
                                               Long userId,

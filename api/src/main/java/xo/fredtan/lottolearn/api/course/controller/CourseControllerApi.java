@@ -8,6 +8,7 @@ import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.Sign;
 import xo.fredtan.lottolearn.domain.course.SignRecord;
+import xo.fredtan.lottolearn.domain.course.UserCourse;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
@@ -24,6 +25,9 @@ public interface CourseControllerApi {
 
     @ApiOperation("根据课程ID查询完整课程信息")
     UniqueQueryResponseData<Course> findFullCourseById(Long courseId);
+
+    @ApiOperation("查询课程成员")
+    QueryResponseData<UserCourse> findCourseMembers(Integer page, Integer size, Long courseId);
 
     @ApiOperation("查询用户课程")
     QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest);

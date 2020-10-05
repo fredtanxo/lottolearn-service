@@ -27,9 +27,8 @@ import xo.fredtan.lottolearn.user.dao.UserRepository;
 import xo.fredtan.lottolearn.user.dao.UserRoleMapper;
 import xo.fredtan.lottolearn.user.dao.UserRoleRepository;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @DubboService(version = "0.0.1")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -68,6 +67,14 @@ public class UserServiceImpl implements UserService {
     public UniqueQueryResponseData<User> findUserById(Long userId) {
         User user = findCachedUserById(userId);
         return UniqueQueryResponseData.ok(user);
+    }
+
+    @Override
+    public List<User> batchFindUserById(List<Long> userIds) {
+        List<User> users = userRepository.findAllById(userIds);
+        Map<Long, User> map = new HashMap<>(userIds.size());
+        users.forEach(user -> map.put(user.getId(), user));
+        return userIds.stream().map(map::get).collect(Collectors.toList());
     }
 
     @Override
