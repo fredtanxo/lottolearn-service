@@ -47,6 +47,14 @@ public class CourseController implements CourseControllerApi {
         return courseService.findCourseById(courseId);
     }
 
+    @Override
+    @GetMapping("/full/id/{courseId}")
+    public UniqueQueryResponseData<Course> findFullCourseById(@PathVariable Long courseId) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        return courseService.findFullCourseById(courseId);
+    }
 
     @Override
     @GetMapping("/user")

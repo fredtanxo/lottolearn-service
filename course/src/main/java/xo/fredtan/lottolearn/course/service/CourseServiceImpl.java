@@ -119,6 +119,19 @@ public class CourseServiceImpl implements CourseService {
         return UniqueQueryResponseData.ok(course);
     }
 
+    @Override
+    public UniqueQueryResponseData<Course> findFullCourseById(Long courseId) {
+        Course course = findCourseById(courseId).getPayload();
+        Course dbCourse;
+        if (Objects.nonNull(course)) {
+            dbCourse = courseRepository.findById(courseId).orElse(null);
+            assert dbCourse != null;
+            course.setCode(dbCourse.getCode());
+            course.setLive(dbCourse.getLive());
+        }
+        return UniqueQueryResponseData.ok(course);
+    }
+
     private Course findCourseWithDetailsById(Long courseId) {
         Course course = courseMapper.selectCourseById(courseId);
         if (Objects.nonNull(course)) {

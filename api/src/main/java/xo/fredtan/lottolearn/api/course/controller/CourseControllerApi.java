@@ -22,6 +22,9 @@ public interface CourseControllerApi {
     @ApiOperation("根据ID查询课程")
     UniqueQueryResponseData<Course> findCourseById(Long courseId);
 
+    @ApiOperation("根据课程ID查询完整课程信息")
+    UniqueQueryResponseData<Course> findFullCourseById(Long courseId);
+
     @ApiOperation("查询用户课程")
     QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest);
 
