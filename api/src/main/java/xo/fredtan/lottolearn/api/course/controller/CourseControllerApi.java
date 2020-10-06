@@ -15,6 +15,8 @@ import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
 import xo.fredtan.lottolearn.domain.message.ChatMessage;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Api("课程相关")
 public interface CourseControllerApi {
     @ApiOperation("查询所有课程")
@@ -52,6 +54,9 @@ public interface CourseControllerApi {
 
     @ApiOperation("查询课程签到记录详细信息")
     QueryResponseData<SignRecord> findCourseSignRecord(Long signId, Long courseId);
+
+    @ApiOperation("下载课程签到记录详细信息")
+    void downloadCourseSignRecord(Long signId, Long courseId, HttpServletResponse response);
 
     @ApiOperation("增加课程")
     AddCourseResult addCourse(Course course);

@@ -37,6 +37,7 @@
         <fastjson.version>1.2.73</fastjson.version>
         <swagger.version>3.0.0</swagger.version>
         <protostuff.version>1.7.2</protostuff.version>
+        <poi.version>4.1.2</poi.version>
     </properties>
 
     <dependencyManagement>
@@ -90,6 +91,11 @@
                 <groupId>io.protostuff</groupId>
                 <artifactId>protostuff-runtime</artifactId>
                 <version>${protostuff.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

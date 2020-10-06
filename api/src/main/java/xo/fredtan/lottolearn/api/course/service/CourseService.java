@@ -14,6 +14,8 @@ import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
 import xo.fredtan.lottolearn.domain.message.ChatMessage;
 
+import javax.servlet.http.HttpServletResponse;
+
 public interface CourseService {
     QueryResponseData<Course> findAllCourses(Integer page, Integer size, QueryCourseRequest queryCourseRequest);
 
@@ -44,6 +46,8 @@ public interface CourseService {
 
     QueryResponseData<SignRecord> findCourseSignRecord(Long signId);
 
+    void downloadCourseSignRecord(Long signId, HttpServletResponse response);
+
     UniqueQueryResponseData<UserCourse> findUserCourse(Long userId, Long courseId);
 
     AddCourseResult addCourse(Course course);
@@ -55,4 +59,5 @@ public interface CourseService {
     BasicResponseData quitCourse(Long courseId);
 
     BasicResponseData closeCourse(Long courseId);
+
 }

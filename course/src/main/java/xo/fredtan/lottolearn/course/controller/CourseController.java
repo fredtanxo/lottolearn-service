@@ -22,6 +22,7 @@ import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
 import xo.fredtan.lottolearn.domain.message.ChatMessage;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
@@ -133,6 +134,15 @@ public class CourseController implements CourseControllerApi {
             ApiExceptionCast.forbidden();
         }
         return courseService.findCourseSignRecord(signId);
+    }
+
+    @Override
+    @GetMapping("/sign/{signId}/download")
+    public void downloadCourseSignRecord(@PathVariable Long signId, Long courseId, HttpServletResponse response) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        courseService.downloadCourseSignRecord(signId, response);
     }
 
     @Override

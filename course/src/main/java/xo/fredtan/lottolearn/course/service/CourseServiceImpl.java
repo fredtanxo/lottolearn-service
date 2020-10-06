@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
 import xo.fredtan.lottolearn.common.util.RedisCacheUtils;
 import xo.fredtan.lottolearn.course.config.RabbitMqConfig;
 import xo.fredtan.lottolearn.course.dao.*;
+import xo.fredtan.lottolearn.course.utils.ExcelUtils;
 import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.Sign;
 import xo.fredtan.lottolearn.domain.course.SignRecord;
@@ -44,6 +46,11 @@ import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
 import xo.fredtan.lottolearn.domain.message.ChatMessage;
 import xo.fredtan.lottolearn.domain.user.User;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -306,6 +313,28 @@ public class CourseServiceImpl implements CourseService {
         QueryResult<SignRecord> queryResult = new QueryResult<>((long) signRecords.size(), signRecords);
 
         return QueryResponseData.ok(queryResult);
+    }
+
+    @Override
+    public void downloadCourseSignRecord(Long signId, HttpServletResponse response) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<SignRecord> list = signRecordRepository.findBySignIdOrderBySignTimeDesc(signId);
+        String[] headers = {"用户ID", "用户名", "签到时间", "签到状态"};
+        String[][] content = new String[list.size()][headers.length];
+        int i = 0;
+        for (SignRecord signRecord : list) {
+            content[i][0] = signRecord.getUserId().toString();
+            content[i][1] = signRecord.getUserNickname();
+            content[i][2] = dateFormat.format(signRecord.getSignTime());
+            content[i][3] = signRecord.getSuccess() ? "成功" : "失败";
+        }
+        HSSFWorkbook workbook = ExcelUtils.generateBasicExcelFile("签到记录", headers, content);
+        try (ServletOutputStream outputStream = response.getOutputStream()) {
+            response.setHeader("Content-Disposition", "attachment;filename=SignRecords.xls");
+            workbook.write(outputStream);
+        } catch (IOException e) {
+            ApiExceptionCast.internalError();
+        }
     }
 
     @Override
