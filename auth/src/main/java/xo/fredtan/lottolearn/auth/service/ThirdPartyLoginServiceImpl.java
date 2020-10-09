@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import xo.fredtan.lottolearn.api.auth.constants.AuthConstants;
+import xo.fredtan.lottolearn.api.auth.service.ThirdPartyLoginService;
 import xo.fredtan.lottolearn.api.user.constants.UserAccountType;
 import xo.fredtan.lottolearn.api.user.service.UserAccountService;
 import xo.fredtan.lottolearn.auth.util.JwtUtil;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class ThirdPartyLoginServiceImpl {
+public class ThirdPartyLoginServiceImpl implements ThirdPartyLoginService {
     private final RSAKey rsaKey;
 
     @DubboReference(version = "0.0.1")
@@ -66,6 +67,17 @@ public class ThirdPartyLoginServiceImpl {
         );
     }
 
+    private UserOfAccount populateUserOfAccount(UserOfAccount userOfAccount, OAuth2AuthorizedClient client, UserAccountType type) {
+        UserAccount userAccount = new UserAccount();
+        userAccount.setAccount(client.getPrincipalName());
+        userAccount.setType(type.getType());
+        userAccount.setCredential(null);
+        userAccount.setStatus(true);
+
+        userOfAccount.setUserAccount(userAccount);
+        return userOfAccount;
+    }
+
     private UserOfAccount createUserOfAccountOfGitHub(OAuth2AuthorizedClient authorizedClient, OAuth2User oAuth2User) {
         UserOfAccount userOfAccount = new UserOfAccount();
 
@@ -78,19 +90,19 @@ public class ThirdPartyLoginServiceImpl {
         userOfAccount.setDescription(oAuth2User.getAttribute("bio"));
         userOfAccount.setStatus(true);
 
-        UserAccount userAccount = new UserAccount();
-        userAccount.setAccount(authorizedClient.getPrincipalName());
-        userAccount.setType(UserAccountType.GITHUB.getType());
-        userAccount.setCredential(null);
-        userAccount.setStatus(true);
-
-        userOfAccount.setUserAccount(userAccount);
-
-        return userOfAccount;
+        return populateUserOfAccount(userOfAccount, authorizedClient, UserAccountType.GITHUB);
     }
 
     private UserOfAccount createUserOfAccountOfWeibo(OAuth2AuthorizedClient authorizedClient, OAuth2User oAuth2User) {
-        return null;
+        UserOfAccount userOfAccount = new UserOfAccount();
+
+        userOfAccount.setNickname(oAuth2User.getAttribute("name"));
+        userOfAccount.setAvatar(oAuth2User.getAttribute("avatar_hd"));
+        userOfAccount.setGender("m".equals(oAuth2User.getAttribute("gender")));
+        userOfAccount.setDescription(oAuth2User.getAttribute("description"));
+        userOfAccount.setStatus(true);
+
+        return populateUserOfAccount(userOfAccount, authorizedClient, UserAccountType.WEIBO);
     }
 
     private List<String> parseAuthorities(List<Role> roleList, List<Menu> menuList) {
