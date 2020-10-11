@@ -8,11 +8,11 @@ spring:
           github:
             client-id: ${GITHUB_CLIENT_ID}
             client-secret: ${GITHUB_CLIENT_SECRET}
-            redirect-uri: https://api.lottolearn.com/login/oauth2/code/{registrationId}
+            redirect-uri: https://auth.lottolearn.com/login/oauth2/code/{registrationId}
           weibo:
             client-id: ${WEIBO_APP_KEY}
             client-secret: ${WEIBO_APP_SECRET}
-            redirect-uri: https://api.lottolearn.com/login/oauth2/code/{registrationId}
+            redirect-uri: https://auth.lottolearn.com/login/oauth2/code/{registrationId}
             authorization-grant-type: authorization_code
         provider:
           weibo:

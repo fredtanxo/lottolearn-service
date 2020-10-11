@@ -1,24 +1,24 @@
 # http跳转https
 server {
-    listen 80;
-    server_name lottolearn.com www.lottolearn.com;
-    return 301 https://lottolearn.com$request_uri;
+    listen          80;
+    server_name     lottolearn.com www.lottolearn.com;
+    return 301      https://lottolearn.com$request_uri;
 }
 
 server {
-    listen 80;
-    server_name system.lottolearn.com;
-    return 301 https://system.lottolearn.com$request_uri;
+    listen          80;
+    server_name     system.lottolearn.com;
+    return 301      https://system.lottolearn.com$request_uri;
 }
 
 
 # www二级域名跳转
 server {
-    listen 443 ssl;
-    server_name www.lottolearn.com;
+    listen                  443 ssl;
+    server_name             www.lottolearn.com;
 
-    ssl_certificate lottolearn.com+4.pem;
-    ssl_certificate_key lottolearn.com+4-key.pem;
+    ssl_certificate         lottolearn.com+4.pem;
+    ssl_certificate_key     lottolearn.com+4-key.pem;
 
     return 301 https://lottolearn.com$request_uri;
 }
@@ -33,28 +33,51 @@ server {
     listen 443 ssl;
     server_name lottolearn.com;
 
-    ssl_certificate lottolearn.com+4.pem;
-    ssl_certificate_key lottolearn.com+4-key.pem;
+    ssl_certificate         lottolearn.com+4.pem;
+    ssl_certificate_key     lottolearn.com+4-key.pem;
 
     location / {
-        proxy_pass http://index-server-pool;
+        proxy_pass          http://index-server-pool;
     }
 }
 
 
 # CORS允许列表
 map $http_origin $origin_list {
-    default	https://lottolearn.com;
-    "~https://lottolearn.com" https://lottolearn.com;
-    "~https://system.lottolearn.com"	https://system.lottolearn.com;
+    default                             https://lottolearn.com;
+    "~https://lottolearn.com"           https://lottolearn.com;
+    "~https://system.lottolearn.com"    https://system.lottolearn.com;
 }
 
 
-# API
+# auth模块
 upstream auth-server-pool {
     server 127.0.0.1:51200;
 }
 
+server {
+    listen                  443 ssl;
+    server_name             auth.lottolearn.com;
+
+    ssl_certificate         lottolearn.com+4.pem;
+    ssl_certificate_key     lottolearn.com+4-key.pem;
+
+    location / {
+        proxy_pass          http://auth-server-pool;
+        proxy_set_header    Host                                $host;
+        proxy_set_header    X-Forwarded-For                     $proxy_add_x_forwarded_for;
+        add_header          Access-Control-Allow-Origin         $origin_list                                                    always;
+        add_header          Access-Control-Max-Age              1800                                                            always;
+        add_header          Access-Control-Allow-Credentials    true                                                            always;
+        add_header          Access-Control-Allow-Methods        "GET, POST, DELETE"                                             always;
+        add_header          Access-Control-Allow-Headers        "Accept, Authorization, Content-Type, Origin, X-Request-With"   always;
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+    }
+}
+
+# API
 upstream user-server-pool {
     server 127.0.0.1:51215;
 }
@@ -64,35 +87,19 @@ upstream course-server-pool {
 }
 
 server {
-    listen  443 ssl;
-    server_name  api.lottolearn.com;
+    listen                  443 ssl;
+    server_name             api.lottolearn.com;
 
-    ssl_certificate lottolearn.com+4.pem;
-    ssl_certificate_key lottolearn.com+4-key.pem;
-
-    # auth模块
-    location ~ ^(/auth|/login|/oauth2|/third\-party) {
-        proxy_pass http://auth-server-pool;
-        add_header Access-Control-Allow-Origin $origin_list always;
-        add_header Access-Control-Max-Age 1800 always;
-        add_header Access-Control-Allow-Methods "GET, POST, DELETE" always;
-        add_header Access-Control-Allow-Credentials true always;
-        add_header Access-Control-Allow-Headers "X-Request-With, Content-Type, Origin, Authorization, Accept" always;
-        add_header Access-Control-Expose-Headers "Authorization" always;
-        if ($request_method = 'OPTIONS') {
-            return 204;
-        }
-    }
+    ssl_certificate         lottolearn.com+4.pem;
+    ssl_certificate_key     lottolearn.com+4-key.pem;
 
     # user模块
-    location ~ ^(/user|/role|/menu) {
-        proxy_pass http://user-server-pool;
-        add_header Access-Control-Allow-Origin $origin_list always;
-        add_header Access-Control-Max-Age 1800 always;
-        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE" always;
-        add_header Access-Control-Allow-Credentials true always;
-        add_header Access-Control-Allow-Headers "X-Request-With, Content-Type, Origin, Authorization, Accept" always;
-        add_header Access-Control-Expose-Headers "Authorization" always;
+    location ~ ^(/user|/account|/role|/menu) {
+        proxy_pass      http://user-server-pool;
+        add_header      Access-Control-Allow-Origin         $origin_list                                                    always;
+        add_header      Access-Control-Max-Age              1800                                                            always;
+        add_header      Access-Control-Allow-Methods        "GET, POST, PUT, DELETE"                                        always;
+        add_header      Access-Control-Allow-Headers        "Accept, Authorization, Content-Type, Origin, X-Request-With"   always;
         if ($request_method = 'OPTIONS') {
             return 204;
         }
@@ -100,12 +107,11 @@ server {
 
     # course模块
     location / {
-        proxy_pass http://course-server-pool;
-        add_header Access-Control-Allow-Origin $origin_list always;
-        add_header Access-Control-Max-Age 1800 always;
-        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE" always;
-        add_header Access-Control-Allow-Credentials true always;
-        add_header Access-Control-Allow-Headers "X-Request-With, Content-Type, Origin, Authorization, Accept" always;
+        proxy_pass      http://course-server-pool;
+        add_header      Access-Control-Allow-origin_list    $origin_list                                                    always;
+        add_header      Access-Control-Max-Age              1800                                                            always;
+        add_header      Access-Control-Allow-Methods        "GET, POST, PUT, DELETE"                                        always;
+        add_header      Access-Control-Allow-Headers        "Accept, Authorization, Content-Type, Origin, X-Request-With"   always;
         if ($request_method = 'OPTIONS') {
             return 204;
         }
@@ -125,44 +131,43 @@ upstream mediasoup-server-pool {
 }
 
 server {
-    listen 443 ssl;
-    server_name live.lottolearn.com;
+    listen                  443 ssl;
+    server_name             live.lottolearn.com;
 
-    ssl_certificate lottolearn.com+4.pem;
-    ssl_certificate_key lottolearn.com+4-key.pem;
+    ssl_certificate         lottolearn.com+4.pem;
+    ssl_certificate_key     lottolearn.com+4-key.pem;
 
     location /chat/ {
-        proxy_pass http://chat-server-pool/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "Upgrade";
+        proxy_pass          http://chat-server-pool/;
+        proxy_http_version  1.1;
+        proxy_set_header    Upgrade                     $http_upgrade;
+        proxy_set_header    Connection                  "Upgrade";
     }
 
     location /stream {
-        proxy_pass https://mediasoup-server-pool/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "Upgrade";
+        proxy_pass          https://mediasoup-server-pool/;
+        proxy_http_version  1.1;
+        proxy_set_header    Upgrade                     $http_upgrade;
+        proxy_set_header    Connection                  "Upgrade";
     }
 }
 
 
 # 视频点播站点
 server {
-    listen 443 ssl;
-    server_name media.lottolearn.com;
+    listen                  443 ssl;
+    server_name             media.lottolearn.com;
 
-    ssl_certificate lottolearn.com+4.pem;
-    ssl_certificate_key lottolearn.com+4-key.pem;
+    ssl_certificate         lottolearn.com+4.pem;
+    ssl_certificate_key     lottolearn.com+4-key.pem;
 
     location / {
-        alias /Users/fred/lottolearn/media/;
-        add_header Access-Control-Expose-Headers "Content-Length" always;
-        add_header Access-Control-Allow-Origin $http_origin always;
-        add_header Access-Control-Max-Age 1000 always;
-        add_header Access-Control-Allow-Methods "HEAD, OPTIONS, GET" always;
-        add_header Access-Control-Allow-Credentials true always;
-        add_header Access-control-Allow-Headers "X-Request-With, Content-Type, Origin, Authorization, Accept, Range" always;
+        alias               /Users/fred/lottolearn/media/;
+        add_header          Access-Control-Expose-Headers   "Content-Length"                                                        always;
+        add_header          Access-Control-Allow-Origin     $http_origin                                                            always;
+        add_header          Access-Control-Max-Age          1000                                                                    always;
+        add_header          Access-Control-Allow-Methods    "HEAD, OPTIONS, GET"                                                    always;
+        add_header          Access-control-Allow-Headers    "Accept, Authorization, Content-Type, Origin, Range, X-Request-With"    always;
         if ($request_method = 'OPTIONS') {
             return 200;
         }
@@ -176,30 +181,29 @@ upstream storage-server-pool {
 }
 
 server {
-    listen 443 ssl;
-    server_name storage.lottolearn.com;
+    listen                  443 ssl;
+    server_name             storage.lottolearn.com;
 
-    ssl_certificate lottolearn.com+4.pem;
-    ssl_certificate_key lottolearn.com+4-key.pem;
+    ssl_certificate         lottolearn.com+4.pem;
+    ssl_certificate_key     lottolearn.com+4-key.pem;
 
-    client_max_body_size 4g;
+    client_max_body_size    4g;
     # 关闭nginx缓存，否则无法实现断点续传
     proxy_request_buffering off;
 
     location / {
-        proxy_pass http://storage-server-pool;
-        add_header Access-Control-Allow-Origin $origin_list always;
-        add_header Access-Control-Max-Age 1000 always;
-        add_header Access-Control-Allow-Methods "GET, POST, PATCH, DELETE" always;
-        add_header Access-Control-Allow-Credentials true always;
-        add_header Access-control-Allow-Headers * always;
+        proxy_pass          http://storage-server-pool;
+        add_header          Access-Control-Allow-Origin     $origin_list                    always;
+        add_header          Access-Control-Max-Age          1000                            always;
+        add_header          Access-Control-Allow-Methods    "GET, POST, PATCH, DELETE"      always;
+        add_header          Access-control-Allow-Headers    *                               always;
 
         # Tus协议相关headers
-        add_header Tus-Version "1.0.0" always;
-        add_header Tus-Resumable "1.0.0" always;
-        add_header Access-Control-Expose-Headers "Content-Length, Location, Upload-Length, Upload-Offset, Tus-Resumable, Tus-Version, Tus-Max-Size, Tus-Extension" always;
-        add_header Tus-Max-Size 20000000000;
-        add_header Tus-Extension "creation,creation-with-upload,termination,concatenation,creation-defer-length";
+        add_header          Tus-Version                     "1.0.0"                         always;
+        add_header          Tus-Resumable                   "1.0.0"                         always;
+        add_header          Access-Control-Expose-Headers   "Content-Length, Location, Tus-Extension, Tus-Max-Size, Tus-Resumable, Tus-Version, Upload-Length, Upload-Offset" always;
+        add_header          Tus-Extension                   "creation,creation-with-upload,termination,concatenation,creation-defer-length";
+        add_header          Tus-Max-Size                    20000000000;
         if ($request_method = 'OPTIONS') {
             return 204;
         }
@@ -213,13 +217,13 @@ upstream system-management-server-pool {
 }
 
 server {
-    listen  443 ssl;
-    server_name system.lottolearn.com;
+    listen                  443 ssl;
+    server_name             system.lottolearn.com;
 
-    ssl_certificate lottolearn.com+4.pem;
-    ssl_certificate_key lottolearn.com+4-key.pem;
+    ssl_certificate         lottolearn.com+4.pem;
+    ssl_certificate_key     lottolearn.com+4-key.pem;
 
     location / {
-        proxy_pass http://system-management-server-pool;
+        proxy_pass          http://system-management-server-pool;
     }
 }
