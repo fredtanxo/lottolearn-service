@@ -1,14 +1,8 @@
 # http跳转https
 server {
     listen          80;
-    server_name     lottolearn.com www.lottolearn.com;
-    return 301      https://lottolearn.com$request_uri;
-}
-
-server {
-    listen          80;
-    server_name     system.lottolearn.com;
-    return 301      https://system.lottolearn.com$request_uri;
+    server_name     *.lottolearn.com;
+    return 301 https://$host$request_uri;
 }
 
 
@@ -30,8 +24,8 @@ upstream index-server-pool {
 }
 
 server {
-    listen 443 ssl;
-    server_name lottolearn.com;
+    listen                  443 ssl;
+    server_name             lottolearn.com;
 
     ssl_certificate         lottolearn.com+4.pem;
     ssl_certificate_key     lottolearn.com+4-key.pem;
@@ -108,7 +102,7 @@ server {
     # course模块
     location / {
         proxy_pass      http://course-server-pool;
-        add_header      Access-Control-Allow-origin_list    $origin_list                                                    always;
+        add_header      Access-Control-Allow-Origin         $origin_list                                                    always;
         add_header      Access-Control-Max-Age              1800                                                            always;
         add_header      Access-Control-Allow-Methods        "GET, POST, PUT, DELETE"                                        always;
         add_header      Access-Control-Allow-Headers        "Accept, Authorization, Content-Type, Origin, X-Request-With"   always;
