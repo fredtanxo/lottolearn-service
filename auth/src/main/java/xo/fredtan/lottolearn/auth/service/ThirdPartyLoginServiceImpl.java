@@ -1,9 +1,6 @@
 package xo.fredtan.lottolearn.auth.service;
 
-import com.nimbusds.jose.jwk.RSAKey;
-import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -12,9 +9,11 @@ import xo.fredtan.lottolearn.api.auth.constants.AuthConstants;
 import xo.fredtan.lottolearn.api.auth.service.ThirdPartyLoginService;
 import xo.fredtan.lottolearn.api.user.constants.UserAccountType;
 import xo.fredtan.lottolearn.api.user.service.UserAccountService;
-import xo.fredtan.lottolearn.auth.util.JwtUtil;
+import xo.fredtan.lottolearn.auth.util.JwkUtils;
+import xo.fredtan.lottolearn.auth.util.JwtUtils;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.CommonCode;
+import xo.fredtan.lottolearn.domain.auth.JwtPair;
 import xo.fredtan.lottolearn.domain.user.Menu;
 import xo.fredtan.lottolearn.domain.user.Role;
 import xo.fredtan.lottolearn.domain.user.UserAccount;
@@ -27,14 +26,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ThirdPartyLoginServiceImpl implements ThirdPartyLoginService {
-    private final RSAKey rsaKey;
-
     @DubboReference(version = "0.0.1")
     private UserAccountService userAccountService;
 
-    public String findOrCreateUserToken(OAuth2AuthorizedClient authorizedClient, OAuth2User oAuth2User) {
+    public JwtPair findOrCreateUserToken(OAuth2AuthorizedClient authorizedClient, OAuth2User oAuth2User) {
         String registrationId = authorizedClient.getClientRegistration().getRegistrationId();
         UserAccountType type = UserAccountType.valueOf(registrationId.toUpperCase());
         String account = authorizedClient.getPrincipalName();
@@ -58,12 +54,13 @@ public class ThirdPartyLoginServiceImpl implements ThirdPartyLoginService {
         Map<String, String> claims = Map.of(AuthConstants.TOKEN_CLAIM_KEY, String.join(" ", authorities),
                 "nickname", userOfAccount.getNickname());
 
-        return JwtUtil.issueRSAToken(
-                rsaKey,
+        return JwtUtils.issueRSATokenPair(
+                JwkUtils.getPrivateRsaKey(),
                 AuthConstants.ISSUER,
-                userOfAccount.getId(),
+                userOfAccount.getId().toString(),
                 claims,
-                AuthConstants.EXPIRATION_OFFSET
+                AuthConstants.ACCESS_TOKEN_EXPIRATION_OFFSET,
+                AuthConstants.REFRESH_TOKEN_EXPIRATION_OFFSET
         );
     }
 

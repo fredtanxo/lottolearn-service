@@ -1,6 +1,5 @@
 package xo.fredtan.lottolearn.auth.config;
 
-import com.nimbusds.jose.jwk.RSAKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -19,14 +18,18 @@ import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorH
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.web.client.RestTemplate;
+import xo.fredtan.lottolearn.api.auth.constants.AuthConstants;
 import xo.fredtan.lottolearn.auth.converter.OAuth2AccessTokenResponseConverter;
 import xo.fredtan.lottolearn.auth.converter.OAuth2UserInfoRequestConverter;
 import xo.fredtan.lottolearn.auth.filter.JwtAuthenticationFilter;
+import xo.fredtan.lottolearn.auth.filter.JwtLogoutFilter;
+import xo.fredtan.lottolearn.auth.filter.JwtRefreshFilter;
 import xo.fredtan.lottolearn.auth.service.UserDetailsServiceImpl;
 import xo.fredtan.lottolearn.common.constant.LotToLearnConstants;
 
@@ -35,12 +38,10 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class AuthConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsServiceImpl userDetailsService;
-    private final RSAKey rsaKey;
 
     @Autowired
-    public AuthConfig(UserDetailsServiceImpl userDetailsService, RSAKey rsaKey) {
+    public AuthConfig(UserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
-        this.rsaKey = rsaKey;
     }
 
     @Bean
@@ -80,9 +81,9 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeRequests(authorizeRequests ->
                 authorizeRequests
-                    .antMatchers(HttpMethod.POST, "/auth/login", "/auth/refresh").permitAll()
-                    .antMatchers(HttpMethod.DELETE, "/auth/logout").permitAll()
-                    .antMatchers(HttpMethod.GET, "/.well-known/jwks.json").permitAll()
+                    .antMatchers(HttpMethod.POST, AuthConstants.LOGIN_URL, AuthConstants.REFRESH_URL).permitAll()
+                    .antMatchers(HttpMethod.DELETE, AuthConstants.LOGOUT_URL).permitAll()
+                    .antMatchers(HttpMethod.GET, AuthConstants.JWK_SET_URL).permitAll()
                     .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 ->
@@ -98,7 +99,9 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
                             .userService(userInfoService())
                     )
             )
-            .addFilter(new JwtAuthenticationFilter(authenticationManager(), rsaKey))
+            .addFilterAfter(new JwtLogoutFilter(authenticationManager()), OAuth2LoginAuthenticationFilter.class)
+            .addFilterAfter(new JwtRefreshFilter(authenticationManager()), JwtLogoutFilter.class)
+            .addFilterAfter(new JwtAuthenticationFilter(authenticationManager()), JwtRefreshFilter.class)
             .sessionManagement(sessionManagement ->
                 sessionManagement
                     .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 第三方登录跳转需要Session保持Authentication

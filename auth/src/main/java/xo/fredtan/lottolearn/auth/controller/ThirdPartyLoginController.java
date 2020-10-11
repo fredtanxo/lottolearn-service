@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import xo.fredtan.lottolearn.api.auth.constants.AuthConstants;
 import xo.fredtan.lottolearn.api.auth.controller.ThirdPartyControllerApi;
 import xo.fredtan.lottolearn.auth.service.ThirdPartyLoginServiceImpl;
+import xo.fredtan.lottolearn.auth.util.TokenResponseUtils;
 import xo.fredtan.lottolearn.common.constant.LotToLearnConstants;
+import xo.fredtan.lottolearn.domain.auth.JwtPair;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -28,13 +30,14 @@ public class ThirdPartyLoginController implements ThirdPartyControllerApi {
     public String thirdPartyLogin(HttpServletResponse response,
                                   @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
                                   @AuthenticationPrincipal OAuth2User oAuth2User) {
-        String jwt = thirdPartyLoginService.findOrCreateUserToken(authorizedClient, oAuth2User);
+        JwtPair jwtPair = thirdPartyLoginService.findOrCreateUserToken(authorizedClient, oAuth2User);
 
-        Cookie cookie = new Cookie(AuthConstants.TOKEN_COOKIE_KEY, jwt);
+        Cookie cookie = new Cookie(AuthConstants.ACCESS_TOKEN_KEY, jwtPair.getAccessToken().getToken());
         cookie.setPath(AuthConstants.TOKEN_COOKIE_PATH);
-        cookie.setDomain(AuthConstants.TOKEN_COOKIE_DOMAIN);
-
+        cookie.setDomain(AuthConstants.ACCESS_TOKEN_COOKIE_DOMAIN);
         response.addCookie(cookie);
+
+        TokenResponseUtils.setRefreshToken(response, jwtPair.getRefreshToken().getToken());
 
         return String.format("redirect:%s", LotToLearnConstants.HOME_PAGE);
     }

@@ -31,3 +31,6 @@ dubbo:
     port: -1
   registry:
     address: nacos://127.0.0.1:8848
+lottolearn:
+  auth:
+    key-store-dir: ${KEY_STORE_DIR:/tmp/lottolearn/keys}

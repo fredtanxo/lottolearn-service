@@ -1,16 +1,20 @@
 package xo.fredtan.lottolearn.auth.filter;
 
 import com.alibaba.fastjson.JSON;
-import com.nimbusds.jose.jwk.RSAKey;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StringUtils;
 import xo.fredtan.lottolearn.api.auth.constants.AuthConstants;
+import xo.fredtan.lottolearn.api.user.constants.RoleConstants;
 import xo.fredtan.lottolearn.auth.domain.JwtUser;
-import xo.fredtan.lottolearn.auth.util.JwtUtil;
+import xo.fredtan.lottolearn.auth.util.JwkUtils;
+import xo.fredtan.lottolearn.auth.util.JwtUtils;
+import xo.fredtan.lottolearn.auth.util.TokenResponseUtils;
+import xo.fredtan.lottolearn.domain.auth.JwtPair;
 import xo.fredtan.lottolearn.domain.auth.request.FormLoginRequest;
 
 import javax.servlet.FilterChain;
@@ -23,12 +27,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * 用户名密码登录的Filter
+ */
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final RSAKey rsaKey;
-
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, RSAKey rsaKey) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         super.setAuthenticationManager(authenticationManager);
-        this.rsaKey = rsaKey;
         super.setFilterProcessesUrl(AuthConstants.LOGIN_URL);
     }
 
@@ -43,6 +47,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
         try {
+            String origin = request.getHeader("origin");
+            if (StringUtils.hasText(origin) && !AuthConstants.ORIGIN_LIST.contains(origin)) {
+                return null;
+            }
             FormLoginRequest formLoginRequest = JSON.parseObject(
                     request.getInputStream(), StandardCharsets.UTF_8, FormLoginRequest.class);
             if (Objects.isNull(formLoginRequest)) {
@@ -52,8 +60,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                     formLoginRequest.getUsername(), formLoginRequest.getPassword());
             setDetails(request, authenticationToken);
             return this.getAuthenticationManager().authenticate(authenticationToken);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
         }
         return null;
     }
@@ -76,20 +83,31 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
+        String origin = request.getHeader("origin");
+
+
+        if (AuthConstants.SYSTEM_MANAGEMENT_ORIGIN.equals(origin)) {
+            if (authorities.stream().noneMatch(RoleConstants.SYSTEM_ROLES::contains)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+        }
+
         Map<String, String> claims = Map.of(
                 AuthConstants.TOKEN_CLAIM_KEY, String.join(" ", authorities),
                 "nickname", principal.getNickname()
         );
 
-        String jwt = JwtUtil.issueRSAToken(
-                rsaKey,
+        JwtPair jwtPair = JwtUtils.issueRSATokenPair(
+                JwkUtils.getPrivateRsaKey(),
                 AuthConstants.ISSUER,
-                principal.getUserId(),
+                principal.getUserId().toString(),
                 claims,
-                AuthConstants.EXPIRATION_OFFSET
+                AuthConstants.ACCESS_TOKEN_EXPIRATION_OFFSET,
+                AuthConstants.REFRESH_TOKEN_EXPIRATION_OFFSET
         );
 
-        response.setHeader(AuthConstants.TOKEN_RESPONSE_HEADER, AuthConstants.TOKEN_RESPONSE_PREFIX + jwt);
+        TokenResponseUtils.respondJwtPair(response, jwtPair);
     }
 
     /**

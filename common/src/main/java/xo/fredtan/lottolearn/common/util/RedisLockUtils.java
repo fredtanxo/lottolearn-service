@@ -1,4 +1,4 @@
-package xo.fredtan.lottolearn.auth.util;
+package xo.fredtan.lottolearn.common.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.ReturnType;
@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 @Slf4j
-public class RedisLockUtil {
+public class RedisLockUtils {
     private static final String UNLOCK_LUA;
 
     static {
@@ -53,7 +53,7 @@ public class RedisLockUtil {
                 try {
                     action.accept(arg);
                 } finally {
-                    RedisLockUtil.unlock(template, lockKey, lockIdentifier);
+                    RedisLockUtils.unlock(template, lockKey, lockIdentifier);
                 }
                 break;
             }
