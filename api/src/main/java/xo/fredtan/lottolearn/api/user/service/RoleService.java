@@ -8,6 +8,8 @@ import xo.fredtan.lottolearn.domain.user.Role;
 public interface RoleService {
     QueryResponseData<Role> findAllRoles(Integer page, Integer size);
 
+    QueryResponseData<Role> findCurrentUserRoles();
+
     UniqueQueryResponseData<Role> findRoleById(Long roleId);
 
     BasicResponseData addRole(Role role);

@@ -17,7 +17,7 @@
         </collection>
     </resultMap>
     
-    <select id="selectUserWithRole" parameterType="long" resultMap="userRoleResultMap">
+    <select id="selectUserWithRoleIds" parameterType="long" resultMap="userRoleResultMap">
         select
                u.id as uid,
                u.nickname as unickname,

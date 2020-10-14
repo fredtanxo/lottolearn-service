@@ -6,6 +6,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.user.service.RoleService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
@@ -17,6 +18,7 @@ import xo.fredtan.lottolearn.domain.user.Role;
 import xo.fredtan.lottolearn.user.dao.PermissionMapper;
 import xo.fredtan.lottolearn.user.dao.PermissionRepository;
 import xo.fredtan.lottolearn.user.dao.RoleRepository;
+import xo.fredtan.lottolearn.user.dao.UserRoleMapper;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +29,7 @@ public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
     private final PermissionMapper permissionMapper;
+    private final UserRoleMapper userRoleMapper;
 
     @Override
     public QueryResponseData<Role> findAllRoles(Integer page, Integer size) {
@@ -35,6 +38,14 @@ public class RoleServiceImpl implements RoleService {
 
         QueryResult<Role> roleQueryResult = new QueryResult<>(roles.getTotalElements(), roles.getContent());
         return QueryResponseData.ok(roleQueryResult);
+    }
+
+    @Override
+    public QueryResponseData<Role> findCurrentUserRoles() {
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        List<Role> roles = userRoleMapper.selectUserRoles(userId);
+        QueryResult<Role> queryResult = new QueryResult<>((long) roles.size(), roles);
+        return QueryResponseData.ok(queryResult);
     }
 
     @Override

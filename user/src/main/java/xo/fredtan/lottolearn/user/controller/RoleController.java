@@ -25,6 +25,12 @@ public class RoleController implements RoleControllerApi {
     }
 
     @Override
+    @GetMapping("/current")
+    public QueryResponseData<Role> findCurrentUserRoles() {
+        return roleService.findCurrentUserRoles();
+    }
+
+    @Override
     @GetMapping("/id/{roleId}")
     public UniqueQueryResponseData<Role> findRoleById(@PathVariable Long roleId) {
         return roleService.findRoleById(roleId);

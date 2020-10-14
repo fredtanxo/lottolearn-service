@@ -12,6 +12,9 @@ public interface RoleControllerApi {
     @ApiOperation("查询所有角色")
     QueryResponseData<Role> findAllRoles(Integer page, Integer size);
 
+    @ApiOperation("查询当前用户角色")
+    QueryResponseData<Role> findCurrentUserRoles();
+
     @ApiOperation("根据角色ID查询角色信息（包含角色权限信息）")
     UniqueQueryResponseData<Role> findRoleById(Long roleId);
 

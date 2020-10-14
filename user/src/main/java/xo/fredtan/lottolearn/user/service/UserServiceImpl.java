@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UniqueQueryResponseData<User> findUserByIdWithRoleIds(Long userId) {
-        User userWithRolesIds = userRoleMapper.selectUserWithRole(userId);
+        User userWithRolesIds = userRoleMapper.selectUserWithRoleIds(userId);
         return UniqueQueryResponseData.ok(userWithRolesIds);
     }
 
