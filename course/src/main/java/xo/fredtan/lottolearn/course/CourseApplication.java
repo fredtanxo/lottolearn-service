@@ -1,16 +1,10 @@
 package xo.fredtan.lottolearn.course;
 
-import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
+import xo.fredtan.lottolearn.common.annotation.LotToLearnApplication;
 
-@EnableDubbo
-@EntityScan("xo.fredtan.lottolearn.domain")
-@ComponentScan(basePackages = {"xo.fredtan.lottolearn.common"})
-@ComponentScan(basePackages = {"xo.fredtan.lottolearn.api"})
-@ComponentScan(basePackages = {"xo.fredtan.lottolearn.course"})
+@LotToLearnApplication
 @SpringBootApplication
 public class CourseApplication {
     public static void main(String[] args) {
