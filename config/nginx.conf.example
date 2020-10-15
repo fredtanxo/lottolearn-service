@@ -1,10 +1,9 @@
 # http跳转https
 server {
     listen          80;
-    server_name     *.lottolearn.com;
+    server_name     ~(?<!registry\.)lottolearn\.com$;
     return 301 https://$host$request_uri;
 }
-
 
 # www二级域名跳转
 server {
@@ -15,6 +14,21 @@ server {
     ssl_certificate_key     lottolearn.com+4-key.pem;
 
     return 301 https://lottolearn.com$request_uri;
+}
+
+
+# Nacos注册中心
+upstream registry-server-pool {
+    server 127.0.0.1:8848;
+}
+
+server {
+    listen          80;
+    server_name     registry.lottolearn.com;
+
+    location / {
+        proxy_pass  http://registry-server-pool;
+    }
 }
 
 

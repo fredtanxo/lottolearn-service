@@ -1,9 +1,9 @@
 package xo.fredtan.lottolearn.course.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.course.service.TermService;
 import xo.fredtan.lottolearn.common.exception.ApiExceptionCast;
@@ -16,7 +16,7 @@ import xo.fredtan.lottolearn.domain.course.Term;
 import java.util.Date;
 import java.util.List;
 
-@DubboService(version = "0.0.1")
+@Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TermServiceImpl implements TermService {
     private final TermRepository termRepository;

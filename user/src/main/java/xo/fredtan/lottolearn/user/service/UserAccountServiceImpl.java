@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import xo.fredtan.lottolearn.api.user.constants.RoleConstants;
@@ -30,7 +31,8 @@ import xo.fredtan.lottolearn.user.dao.*;
 import java.util.List;
 import java.util.Objects;
 
-@DubboService(version = "0.0.1")
+@Service
+@DubboService
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserAccountServiceImpl implements UserAccountService {
     private final UserAccountMapper userAccountMapper;

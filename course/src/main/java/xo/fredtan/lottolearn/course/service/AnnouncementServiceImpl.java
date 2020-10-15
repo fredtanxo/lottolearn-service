@@ -1,7 +1,6 @@
 package xo.fredtan.lottolearn.course.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +9,7 @@ import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.course.constants.AnnouncementConstants;
 import xo.fredtan.lottolearn.api.course.service.AnnouncementService;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-@DubboService(version = "0.0.1")
+@Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AnnouncementServiceImpl implements AnnouncementService {
     private final AnnouncementRepository announcementRepository;

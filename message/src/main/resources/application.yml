@@ -10,8 +10,12 @@ spring:
 server:
   port: 51218
 dubbo:
+  provider:
+    version: 1.0.0
+  consumer:
+    version: 1.0.0
   protocol:
     name: dubbo
     port: -1
   registry:
-    address: nacos://127.0.0.1:8848
+    address: nacos://registry.lottolearn.com:80

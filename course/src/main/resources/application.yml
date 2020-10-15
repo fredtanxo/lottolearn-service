@@ -36,19 +36,16 @@ spring:
           jwk-set-uri: http://localhost:51200/.well-known/jwks.json
 server:
   port: 51203
-logging:
-  level:
-    root: warn
 dubbo:
-  scan:
-    base-packages:
-      - xo.fredtan.lottolearn.api
-      - xo.fredtan.lottolearn.course.service
+  provider:
+    version: 1.0.0
+  consumer:
+    version: 1.0.0
   protocol:
     name: dubbo
     port: -1
   registry:
-    address: nacos://127.0.0.1:8848
+    address: nacos://registry.lottolearn.com:80
 mybatis:
   configuration:
     map-underscore-to-camel-case: true

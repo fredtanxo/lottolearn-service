@@ -12,7 +12,7 @@ import xo.fredtan.lottolearn.domain.user.response.UserOfAccount;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    @DubboReference(version = "0.0.1")
+    @DubboReference
     private UserAccountService userAccountService;
 
     @Override

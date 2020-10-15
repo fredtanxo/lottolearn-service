@@ -34,10 +34,10 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class ChapterFileServiceImpl extends AbstractTusUploadService implements ChapterFileService {
-    @DubboReference(version = "0.0.1")
+    @DubboReference
     private ChapterResourceService chapterResourceService;
 
-    @DubboReference(version = "0.0.1")
+    @DubboReference
     private ResourceLibraryService resourceLibraryService;
 
     @Value("${lottolearn.storage.base-path}")

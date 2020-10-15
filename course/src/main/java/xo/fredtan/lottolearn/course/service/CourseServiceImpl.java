@@ -2,7 +2,6 @@ package xo.fredtan.lottolearn.course.service;
 
 import com.alibaba.fastjson.JSON;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -18,6 +17,7 @@ import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import xo.fredtan.lottolearn.api.course.constants.CourseConstants;
@@ -55,8 +55,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Slf4j
-@DubboService(version = "0.0.1")
+@Service
+@DubboService
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
@@ -75,7 +75,7 @@ public class CourseServiceImpl implements CourseService {
 
     private static final Random random = new Random();
 
-    @DubboReference(version = "0.0.1")
+    @DubboReference
     private UserService userService;
 
     @Override

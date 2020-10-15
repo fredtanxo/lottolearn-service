@@ -1,11 +1,11 @@
 package xo.fredtan.lottolearn.course.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.course.constants.ChapterConstants;
 import xo.fredtan.lottolearn.api.course.service.ChapterService;
@@ -20,7 +20,7 @@ import xo.fredtan.lottolearn.domain.course.Chapter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@DubboService(version = "0.0.1")
+@Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ChapterServiceImpl implements ChapterService {
     private final ChapterRepository chapterRepository;

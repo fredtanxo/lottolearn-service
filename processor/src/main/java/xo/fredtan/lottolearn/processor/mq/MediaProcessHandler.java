@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @Component
 public class MediaProcessHandler {
-    @DubboReference(version = "0.0.1")
+    @DubboReference
     private ResourceLibraryService resourceLibraryService;
 
     @Value("${lottolearn.media.base-url}")

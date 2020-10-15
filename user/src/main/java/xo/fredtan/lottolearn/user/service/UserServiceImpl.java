@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import xo.fredtan.lottolearn.api.user.constants.UserConstants;
@@ -30,7 +31,8 @@ import xo.fredtan.lottolearn.user.dao.UserRoleRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@DubboService(version = "0.0.1")
+@Service
+@DubboService
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;

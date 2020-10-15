@@ -1,9 +1,9 @@
 package xo.fredtan.lottolearn.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.user.service.MenuService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
@@ -16,7 +16,7 @@ import xo.fredtan.lottolearn.user.util.MenuTreeBuilder;
 
 import java.util.List;
 
-@DubboService(version = "0.0.1")
+@Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MenuServiceImpl implements MenuService {
     private final MenuRepository menuRepository;

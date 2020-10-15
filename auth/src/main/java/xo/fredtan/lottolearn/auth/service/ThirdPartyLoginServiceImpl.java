@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ThirdPartyLoginServiceImpl implements ThirdPartyLoginService {
-    @DubboReference(version = "0.0.1")
+    @DubboReference
     private UserAccountService userAccountService;
 
     public JwtPair findOrCreateUserToken(OAuth2AuthorizedClient authorizedClient, OAuth2User oAuth2User) {

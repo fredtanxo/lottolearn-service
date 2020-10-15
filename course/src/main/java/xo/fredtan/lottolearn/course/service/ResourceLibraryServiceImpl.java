@@ -3,6 +3,7 @@ package xo.fredtan.lottolearn.course.service;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.course.service.ResourceLibraryService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
@@ -15,7 +16,8 @@ import xo.fredtan.lottolearn.domain.storage.constant.FileUploadType;
 
 import java.util.List;
 
-@DubboService(version = "0.0.1")
+@Service
+@DubboService
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ResourceLibraryServiceImpl implements ResourceLibraryService {
     private final ResourceLibraryRepository resourceLibraryRepository;

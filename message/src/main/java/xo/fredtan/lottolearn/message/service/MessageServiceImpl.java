@@ -19,7 +19,7 @@ import java.util.Objects;
 public class MessageServiceImpl implements MessageService {
     private final RedisTemplate<String, String> stringRedisTemplate;
 
-    @DubboReference(version = "0.0.1")
+    @DubboReference
     private CourseService courseService;
 
     public UserCourse findUserCourseLive(Long userId, String roomId) {

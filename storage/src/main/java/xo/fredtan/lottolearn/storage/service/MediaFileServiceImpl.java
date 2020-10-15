@@ -31,7 +31,7 @@ import java.util.Map;
 public class MediaFileServiceImpl extends AbstractTusUploadService implements MediaFileService {
     private final RabbitTemplate rabbitTemplate;
 
-    @DubboReference(version = "0.0.1")
+    @DubboReference
     private ResourceLibraryService resourceLibraryService;
 
     @Value("${lottolearn.media.base-path}")
