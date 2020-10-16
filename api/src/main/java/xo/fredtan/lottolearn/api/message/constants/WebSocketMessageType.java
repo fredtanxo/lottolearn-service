@@ -6,5 +6,6 @@ public enum WebSocketMessageType {
     ELECT,
     MEMBERS,
     NEW_MEMBER,
-    MEMBER_LEAVE;
+    MEMBER_LEAVE,
+    MEMBER_NICKNAME_CHANGED;
 }

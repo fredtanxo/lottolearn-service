@@ -7,7 +7,11 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.messaging.simp.user.SimpSession;
+import org.springframework.messaging.simp.user.SimpUser;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import xo.fredtan.lottolearn.api.message.constants.WebSocketMessageType;
@@ -17,12 +21,16 @@ import xo.fredtan.lottolearn.domain.message.WebSocketMessage;
 import xo.fredtan.lottolearn.message.dao.ActiveWebSocketUserRepository;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MessageController implements MessageControllerApi {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ActiveWebSocketUserRepository activeWebSocketUserRepository;
+    private final SimpUserRegistry simpUserRegistry;
 
     /**
      * 消息发送端 -> /in/{roomId} ---
@@ -35,8 +43,26 @@ public class MessageController implements MessageControllerApi {
     @Override
     @MessageMapping("/in/{roomId}")
     public void classroomChat(@DestinationVariable String roomId, WebSocketMessage webSocketMessage) {
-        System.out.println(webSocketMessage);
+        if (WebSocketMessageType.MEMBER_NICKNAME_CHANGED.name().equals(webSocketMessage.getType())) {
+            this.updateNickname(webSocketMessage.getContent());
+        }
+
         simpMessagingTemplate.convertAndSend("/out/" + roomId, webSocketMessage);
+    }
+
+    private void updateNickname(String newNickname) {
+        String uid = SecurityContextHolder.getContext().getAuthentication().getName();
+        SimpUser user = simpUserRegistry.getUser(uid);
+        if (Objects.nonNull(user)) {
+            Set<SimpSession> sessions = user.getSessions();
+            if (sessions.size() == 1) {
+                SimpSession simpSession = sessions.stream().collect(Collectors.toUnmodifiableList()).get(0);
+                activeWebSocketUserRepository.findById(simpSession.getId()).ifPresent(activeWebSocketUser -> {
+                    activeWebSocketUser.setUserNickname(newNickname);
+                    activeWebSocketUserRepository.save(activeWebSocketUser);
+                });
+            }
+        }
     }
 
     @Override
