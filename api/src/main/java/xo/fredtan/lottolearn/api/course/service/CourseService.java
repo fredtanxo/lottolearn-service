@@ -12,7 +12,7 @@ import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
-import xo.fredtan.lottolearn.domain.message.ChatMessage;
+import xo.fredtan.lottolearn.domain.message.WebSocketMessage;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,7 +38,7 @@ public interface CourseService {
 
     BasicResponseData requestLiveCourseEnd(Long courseId);
 
-    BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, Long courseId, Long timeout);
+    BasicResponseData requestLiveCourseSign(WebSocketMessage webSocketMessage, Long courseId, Long timeout);
 
     BasicResponseData handleLiveCourseSign(@RequestBody SignRecord signRecord);
 

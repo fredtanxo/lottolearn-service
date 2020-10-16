@@ -1,6 +1,11 @@
 spring:
   application:
     name: lottolearn-message
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:websocket
+    username: ${H2_USERNAME}
+    password: ${H2_PASSWORD}
   security:
     oauth2:
       resourceserver:

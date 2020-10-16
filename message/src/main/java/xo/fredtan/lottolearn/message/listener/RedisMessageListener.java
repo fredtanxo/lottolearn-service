@@ -9,7 +9,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import xo.fredtan.lottolearn.api.message.constants.MessageConstants;
 import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
-import xo.fredtan.lottolearn.domain.message.ChatMessage;
+import xo.fredtan.lottolearn.domain.message.WebSocketMessage;
 
 @Component
 public class RedisMessageListener extends MessageListenerAdapter {
@@ -31,8 +31,8 @@ public class RedisMessageListener extends MessageListenerAdapter {
         String topic = stringSerializer.deserialize(channel);
         if (MessageConstants.LIVE_DISTRIBUTION_CHANNEL.equals(topic)) {
             byte[] deserialize = (byte[]) valueSerializer.deserialize(body);
-            ChatMessage chatMessage = ProtostuffSerializeUtils.deserialize(deserialize, ChatMessage.class);
-            simpMessagingTemplate.convertAndSend("/out/" + chatMessage.getRoomId(), chatMessage);
+            WebSocketMessage webSocketMessage = ProtostuffSerializeUtils.deserialize(deserialize, WebSocketMessage.class);
+            simpMessagingTemplate.convertAndSend("/out/" + webSocketMessage.getRoomId(), webSocketMessage);
         }
     }
 }

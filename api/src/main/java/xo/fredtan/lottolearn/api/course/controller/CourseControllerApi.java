@@ -13,7 +13,7 @@ import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
-import xo.fredtan.lottolearn.domain.message.ChatMessage;
+import xo.fredtan.lottolearn.domain.message.WebSocketMessage;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,7 +44,7 @@ public interface CourseControllerApi {
     BasicResponseData requestLiveCourseEnd(Long courseId);
 
     @ApiOperation("请求课程直播签到")
-    BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, Long courseId, Long timeout);
+    BasicResponseData requestLiveCourseSign(WebSocketMessage webSocketMessage, Long courseId, Long timeout);
 
     @ApiOperation("处理课程直播签到")
     BasicResponseData handleLiveCourseSign(SignRecord signRecord);

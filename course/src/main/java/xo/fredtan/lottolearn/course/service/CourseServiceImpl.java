@@ -43,7 +43,7 @@ import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.CourseCode;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
-import xo.fredtan.lottolearn.domain.message.ChatMessage;
+import xo.fredtan.lottolearn.domain.message.WebSocketMessage;
 import xo.fredtan.lottolearn.domain.user.User;
 
 import javax.servlet.ServletOutputStream;
@@ -256,7 +256,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    public BasicResponseData requestLiveCourseSign(ChatMessage chatMessage, Long courseId, Long timeout) {
+    public BasicResponseData requestLiveCourseSign(WebSocketMessage webSocketMessage, Long courseId, Long timeout) {
         if (timeout < 0) { // fail safe
             timeout = 15L;
         }
@@ -269,9 +269,9 @@ public class CourseServiceImpl implements CourseService {
         sign = signRepository.save(sign);
 
         String content = JSON.toJSONString(Map.of("timeout", timeout, "signId", sign.getId()));
-        chatMessage.setContent(content);
+        webSocketMessage.setContent(content);
 
-        byteRedisTemplate.convertAndSend(MessageConstants.LIVE_DISTRIBUTION_CHANNEL, ProtostuffSerializeUtils.serialize(chatMessage));
+        byteRedisTemplate.convertAndSend(MessageConstants.LIVE_DISTRIBUTION_CHANNEL, ProtostuffSerializeUtils.serialize(webSocketMessage));
         stringRedisTemplate.boundValueOps(CourseConstants.LIVE_SIGN_KEY_PREFIX + sign.getId())
                 .set(courseId.toString(), timeout, TimeUnit.SECONDS);
 

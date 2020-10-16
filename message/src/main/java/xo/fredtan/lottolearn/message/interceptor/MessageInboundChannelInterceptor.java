@@ -1,7 +1,8 @@
 package xo.fredtan.lottolearn.message.interceptor;
 
-import org.springframework.data.redis.core.BoundSetOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessagingException;
@@ -13,10 +14,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import xo.fredtan.lottolearn.api.course.constants.CourseConstants;
 import xo.fredtan.lottolearn.api.message.constants.MessageConstants;
 import xo.fredtan.lottolearn.api.message.service.MessageService;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
@@ -30,20 +32,16 @@ import java.util.regex.Pattern;
 /**
  * 消息传入拦截器
  */
+@Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MessageInboundChannelInterceptor implements ChannelInterceptor {
-    private final JwtDecoder jwtDecoder;
-    private final JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter;
     private final MessageService messageService;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();;
+    private JwtDecoder jwtDecoder;
 
-    public MessageInboundChannelInterceptor(JwtDecoder jwtDecoder,
-                                            JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter,
-                                            MessageService messageService,
-                                            RedisTemplate<String, String> redisTemplate) {
-        this.jwtDecoder = jwtDecoder;
-        this.grantedAuthoritiesConverter = grantedAuthoritiesConverter;
-        this.messageService = messageService;
-        this.redisTemplate = redisTemplate;
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+    public void setJwtDecoder(String jwkSetUri) {
+        jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 
     @Override
@@ -80,54 +78,14 @@ public class MessageInboundChannelInterceptor implements ChannelInterceptor {
                     Long userId = Long.valueOf(user.getName());
                     UserCourse userCourse = messageService.findUserCourseLive(userId, roomId);
                     if (Objects.isNull(userCourse)) {
-                        throw new MessagingException("课程未开始或没有加入课程");
+                        throw new MessagingException("课程未开始直播或没有加入课程");
                     }
-                    headerAccessor.setHeader(MessageConstants.COURSE_ID, userCourse.getCourseId());
+                    headerAccessor.setHeader(MessageConstants.NICKNAME, headerAccessor.getFirstNativeHeader("nickname"));
                 }
             }
         }
 
         return message;
-    }
-
-    @Override
-    public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
-        StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-        if (Objects.isNull(headerAccessor)) {
-            return;
-        }
-        StompCommand command = headerAccessor.getCommand();
-        if (Objects.nonNull(command)) {
-            switch (command) {
-                case SUBSCRIBE -> {
-                    this.userSubscribeEvent(headerAccessor, true);
-                }
-                case UNSUBSCRIBE, DISCONNECT -> {
-                    this.userSubscribeEvent(headerAccessor, false);
-                }
-            }
-        }
-    }
-
-    private void userSubscribeEvent(StompHeaderAccessor accessor, Boolean flag) {
-        String roomId = accessor.getSubscriptionId();
-        Object courseId = accessor.getHeader(MessageConstants.COURSE_ID);
-        if (Objects.isNull(courseId) || StringUtils.isEmpty(roomId)) {
-            return;
-        }
-        Principal principal = accessor.getUser();
-        if (Objects.isNull(principal)) {
-            return;
-        }
-        String userId = principal.getName();
-
-        BoundSetOperations<String, String> ops =
-                redisTemplate.boundSetOps(CourseConstants.COURSE_LIVE_PREFIX + roomId);
-        if (flag) {
-            ops.add(userId);
-        } else {
-            ops.remove(userId);
-        }
     }
 
     private String extractRoomId(StompHeaderAccessor accessor) {

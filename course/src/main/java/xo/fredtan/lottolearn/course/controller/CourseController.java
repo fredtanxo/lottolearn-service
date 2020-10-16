@@ -20,7 +20,7 @@ import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
-import xo.fredtan.lottolearn.domain.message.ChatMessage;
+import xo.fredtan.lottolearn.domain.message.WebSocketMessage;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -102,13 +102,13 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PostMapping("/live/sign/{courseId}/{timeout}")
-    public BasicResponseData requestLiveCourseSign(@RequestBody ChatMessage chatMessage,
+    public BasicResponseData requestLiveCourseSign(@RequestBody WebSocketMessage webSocketMessage,
                                                    @PathVariable Long courseId,
                                                    @PathVariable Long timeout) {
         if (withUserValidationUtils.notCourseOwner(courseId)) {
             ApiExceptionCast.forbidden();
         }
-        return courseService.requestLiveCourseSign(chatMessage, courseId, timeout);
+        return courseService.requestLiveCourseSign(webSocketMessage, courseId, timeout);
     }
 
     @Override
