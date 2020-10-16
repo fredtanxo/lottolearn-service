@@ -3,6 +3,7 @@ package xo.fredtan.lottolearn.common.annotation;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
@@ -17,8 +18,10 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @EnableDubbo
-@EntityScan("xo.fredtan.lottolearn.domain") // 实体类
+@EntityScan // 实体类
 @ComponentScan(basePackages = {"xo.fredtan.lottolearn.common"}) // common包
 @ComponentScan(basePackages = {"xo.fredtan.lottolearn.api"}) // api包
 public @interface LotToLearnApplication {
+    @AliasFor(annotation = EntityScan.class, attribute = "basePackages")
+    String[] value() default "xo.fredtan.lottolearn.domain";
 }
