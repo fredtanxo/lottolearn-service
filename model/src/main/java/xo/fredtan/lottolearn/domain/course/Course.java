@@ -38,4 +38,6 @@ public class Course implements Serializable {
     private String teacherName;
     @Transient
     private String termName;
+    @Transient
+    private Boolean isTeacher;
 }

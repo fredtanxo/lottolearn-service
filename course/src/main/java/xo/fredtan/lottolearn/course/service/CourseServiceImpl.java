@@ -123,6 +123,10 @@ public class CourseServiceImpl implements CourseService {
                 );
             }
         }
+        if (Objects.nonNull(course)) {
+            Long userId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+            course.setIsTeacher(course.getTeacherId().equals(userId));
+        }
         return UniqueQueryResponseData.ok(course);
     }
 
