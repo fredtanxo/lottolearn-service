@@ -6,7 +6,7 @@ LotToLearn 是一个简易的网课平台。
 
 ## 功能
 
-* GitHub 第三方登录
+* GitHub、微博第三方登录
 * 通过邀请码加入课程
 * 发布、查看课程公告
 * 对课程评分
@@ -19,13 +19,13 @@ LotToLearn 是一个简易的网课平台。
 
 ## 主要模块
 
-* **auth**：用户登录鉴权和授权、令牌刷新
-* **course**：课程、章节、公告、签到
-* **message**：直播聊天、系统消息
-* **processor**：文件处理
-* **storage**：文件上传下载
-* **system**：日志记录、数据统计
-* **user**：用户、角色、权限管理
+* [auth](https://github.com/fredtanxo/lottolearn-service/tree/master/auth) ：用户登录鉴权和授权、令牌刷新
+* [course](https://github.com/fredtanxo/lottolearn-service/tree/master/course) ：课程、章节、公告、签到
+* [message](https://github.com/fredtanxo/lottolearn-service/tree/master/message) ：直播聊天、系统消息
+* [processor](https://github.com/fredtanxo/lottolearn-service/tree/master/processor) ：文件处理
+* [storage](https://github.com/fredtanxo/lottolearn-service/tree/master/storage) ：文件存储与上传下载
+* [system](https://github.com/fredtanxo/lottolearn-service/tree/master/system) ：日志记录、数据统计
+* [user](https://github.com/fredtanxo/lottolearn-service/tree/master/user) ：用户、角色、权限管理
 
 ## 部署并运行
 
@@ -77,14 +77,14 @@ LotToLearn 是一个简易的网课平台。
      $ cp lottolearn.com+4-key.pem lottolearn.com+4.pem /usr/local/etc/nginx/
      ```
 
-2. 启动 MySQL、Redis、RabbitMQ、Nacos、nginx
+2. 启动 nginx、MySQL、Redis、RabbitMQ、Nacos
 
    ```shell
+   $ nginx
    $ mysql.server start
    $ redis-server
    $ /usr/local/sbin/rabbitmq-server
    $ ~/Downloads/nacos/bin/startup.sh -m standalone
-   $ nginx
    ```
 
 3. 根据每个模块的 `application.yml` 配置启动参数
@@ -94,10 +94,12 @@ LotToLearn 是一个简易的网课平台。
 4. 按顺序启动模块
 
    ```
-   user -> auth -> system -> (course | message | processor | storage)
+   user -> auth -> course -> (message | processor | storage | system)
    ```
 
 5. 启动 [前端项目](https://github.com/fredtanxo/lottolearn-web) 和 [附加项目](https://github.com/fredtanxo/lottolearn-other)
+
+6. 访问项目
 
 ## License
 
