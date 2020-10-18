@@ -331,6 +331,7 @@ public class CourseServiceImpl implements CourseService {
             content[i][1] = signRecord.getUserNickname();
             content[i][2] = dateFormat.format(signRecord.getSignTime());
             content[i][3] = signRecord.getSuccess() ? "成功" : "失败";
+            i++;
         }
         HSSFWorkbook workbook = ExcelUtils.generateBasicExcelFile("签到记录", headers, content);
         try (ServletOutputStream outputStream = response.getOutputStream()) {
