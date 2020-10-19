@@ -33,14 +33,22 @@ public class WebSocketSessionListener {
         String sessionId = StompHeaderAccessor.getSessionId(headers);
 
         assert user != null;
+        Long userId = Long.valueOf(user.getName());
+        String nickname = headers.get(MessageConstants.NICKNAME, String.class);
 
         ActiveWebSocketUser webSocketUser = new ActiveWebSocketUser();
         webSocketUser.setId(sessionId);
         webSocketUser.setRoomId(roomId);
-        webSocketUser.setUserId(Long.valueOf(user.getName()));
-        webSocketUser.setUserNickname(headers.get(MessageConstants.NICKNAME, String.class));
-
+        webSocketUser.setUserId(userId);
+        webSocketUser.setUserNickname(nickname);
         activeWebSocketUserRepository.save(webSocketUser);
+
+        WebSocketMessage message = new WebSocketMessage();
+        message.setType(WebSocketMessageType.NEW_MEMBER.name());
+        message.setUserId(userId);
+        message.setContent(nickname);
+        message.setRoomId(roomId);
+        simpMessagingTemplate.convertAndSend("/out/" + roomId, message);
     }
 
     @EventListener
