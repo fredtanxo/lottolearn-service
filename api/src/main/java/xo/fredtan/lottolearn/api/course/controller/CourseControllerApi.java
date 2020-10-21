@@ -58,14 +58,20 @@ public interface CourseControllerApi {
     @ApiOperation("下载课程签到记录详细信息")
     void downloadCourseSignRecord(Long signId, Long courseId, HttpServletResponse response);
 
-    @ApiOperation("增加课程")
-    AddCourseResult addCourse(Course course);
+    @ApiOperation("创建课程")
+    String addCourse(Course course);
+
+    @ApiOperation("查询创建课程状态")
+    AddCourseResult findAddCourseResult(String addCourseId);
 
     @ApiOperation("修改课程")
     BasicResponseData updateCourse(Long courseId, Course course);
 
     @ApiOperation("凭课程邀请码加入课程")
-    JoinCourseResult joinCourse(String invitationCode);
+    String joinCourse(String invitationCode);
+
+    @ApiOperation("查询加入课程状态")
+    JoinCourseResult findJoinCourseResult(String joinCourseId);
 
     @ApiOperation("退出课程")
     BasicResponseData quitCourse(Long courseId);

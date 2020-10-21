@@ -147,8 +147,14 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PostMapping("/new")
-    public AddCourseResult addCourse(@Valid @RequestBody Course course) {
+    public String addCourse(@Valid @RequestBody Course course) {
         return courseService.addCourse(course);
+    }
+
+    @Override
+    @GetMapping("/new/status/{addCourseId}")
+    public AddCourseResult findAddCourseResult(@PathVariable String addCourseId) {
+        return courseService.findAddCourseResult(addCourseId);
     }
 
     @Override
@@ -162,8 +168,14 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PutMapping("/invitation/{invitationCode}")
-    public JoinCourseResult joinCourse(@PathVariable String invitationCode) {
+    public String joinCourse(@PathVariable String invitationCode) {
         return courseService.joinCourse(invitationCode);
+    }
+
+    @Override
+    @GetMapping("/invitation/status/{joinCourseId}")
+    public JoinCourseResult findJoinCourseResult(@PathVariable String joinCourseId) {
+        return courseService.findJoinCourseResult(joinCourseId);
     }
 
     @Override

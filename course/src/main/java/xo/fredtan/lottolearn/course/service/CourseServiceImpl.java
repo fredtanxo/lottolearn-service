@@ -38,10 +38,11 @@ import xo.fredtan.lottolearn.domain.course.Course;
 import xo.fredtan.lottolearn.domain.course.Sign;
 import xo.fredtan.lottolearn.domain.course.SignRecord;
 import xo.fredtan.lottolearn.domain.course.UserCourse;
+import xo.fredtan.lottolearn.domain.course.request.AddCourseRequest;
+import xo.fredtan.lottolearn.domain.course.request.JoinCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
-import xo.fredtan.lottolearn.domain.course.response.CourseCode;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
 import xo.fredtan.lottolearn.domain.message.WebSocketMessage;
 import xo.fredtan.lottolearn.domain.user.User;
@@ -297,7 +298,8 @@ public class CourseServiceImpl implements CourseService {
         signRecord.setSuccess(success);
 
         rabbitTemplate.convertAndSend(
-                RabbitMqConfig.EXCHANGE_COURSE_SIGN, RabbitMqConfig.ROUTING_KEY_COURSE_SIGN, signRecord);
+                RabbitMqConfig.EXCHANGE_COURSE_SIGN, RabbitMqConfig.ROUTING_KEY_COURSE_SIGN, signRecord
+        );
 
         return success ? BasicResponseData.ok() : BasicResponseData.invalid();
     }
@@ -349,75 +351,30 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @Transactional
-    public AddCourseResult addCourse(Course course) {
+    public String addCourse(Course course) {
+        String uuid = UUID.randomUUID().toString();
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-        UniqueQueryResponseData<User> userPre = userService.findUserById(userId);
-        User user = userPre.getPayload();
 
-        if (Objects.isNull(user)) {
-            ApiExceptionCast.internalError();
-        }
+        AddCourseRequest addCourseRequest = new AddCourseRequest();
+        addCourseRequest.setId(uuid);
+        addCourseRequest.setUserId(userId);
+        addCourseRequest.setCourse(course);
 
-        course.setId(null);
-        course.setTeacherId(userId);
-        course.setPubDate(new Date());
-
-        UUID uuid = UUID.randomUUID();
-        course.setLive(uuid.toString());
-
-        // 根据学期判断课程是否应该开始
-        if (Objects.isNull(course.getStatus()) || course.getStatus() <= 0) {
-            termRepository.findById(course.getTermId()).ifPresent(term -> {
-                if (term.getTermStart().before(new Date())) {
-                    course.setStatus(1);
-                } else {
-                    course.setStatus(0);
-                }
-            });
-        }
-
-        Course savedCourse = courseRepository.save(course);
-
-        // 生成课程邀请码
-        int codePre = Objects.hash(
-                user.getId(),
-                user.getNickname(),
-                user.getGender(),
-                user.getAvatar(),
-                user.getDescription(),
-                savedCourse.getId(),
-                savedCourse.getName(),
-                savedCourse.getVisibility(),
-                savedCourse.getDescription(),
-                savedCourse.getTeacherId(),
-                savedCourse.getTermId(),
-                savedCourse.getCredit(),
-                savedCourse.getPubDate(),
-                savedCourse.getStatus(),
-                System.nanoTime(),
-                Thread.currentThread(),
-                uuid
+        rabbitTemplate.convertAndSend(
+                RabbitMqConfig.EXCHANGE_ADD_COURSE, RabbitMqConfig.ROUTING_KEY_ADD_COURSE, addCourseRequest
         );
-        codePre &= Integer.MAX_VALUE;
-        String code = Integer.toString(codePre, 36);
-        course.setCode(code);
 
-        savedCourse = courseRepository.save(course);
+        return uuid;
+    }
 
-        UserCourse userCourse = new UserCourse();
-        userCourse.setUserId(userId);
-        userCourse.setCourseId(course.getId());
-        userCourse.setIsTeacher(true);
-        userCourse.setEnrollDate(new Date());
-        userCourse.setStatus(true);
-
-        userCourseRepository.save(userCourse);
-
-        // 清除缓存
-        RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + userId + "*", stringRedisTemplate);
-
-        return new AddCourseResult(CourseCode.ADD_SUCCESS, savedCourse.getCode(), savedCourse.getId());
+    @Override
+    public AddCourseResult findAddCourseResult(String addCourseId) {
+        byte[] bytes = byteRedisTemplate.opsForValue().get(CourseConstants.ADD_COURSE_KEY_PREFIX + addCourseId);
+        if (Objects.isNull(bytes) || bytes.length == 0) {
+            return null;
+        } else {
+            return ProtostuffSerializeUtils.deserialize(bytes, AddCourseResult.class);
+        }
     }
 
     @Override
@@ -442,43 +399,29 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @Transactional
-    public JoinCourseResult joinCourse(String invitationCode) {
-        Course course = courseRepository.findByCode(invitationCode);
-        if (Objects.isNull(course)) {
-            return new JoinCourseResult(CourseCode.COURSE_NOT_EXISTS, null);
-        } else if (course.getStatus() == 2) {
-            return new JoinCourseResult(CourseCode.COURSE_IS_CLOSED, null);
+    public String joinCourse(String invitationCode) {
+        String uuid = UUID.randomUUID().toString();
+
+        JoinCourseRequest joinCourseRequest = new JoinCourseRequest();
+        joinCourseRequest.setId(uuid);
+        joinCourseRequest.setInvitationCode(invitationCode);
+        joinCourseRequest.setUserId(Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()));
+
+        rabbitTemplate.convertAndSend(
+                RabbitMqConfig.EXCHANGE_JOIN_COURSE, RabbitMqConfig.ROUTING_KEY_JOIN_COURSE, joinCourseRequest
+        );
+
+        return uuid;
+    }
+
+    @Override
+    public JoinCourseResult findJoinCourseResult(String joinCourseId) {
+        byte[] bytes = byteRedisTemplate.boundValueOps(CourseConstants.JOIN_COURSE_KEY_PREFIX + joinCourseId).get();
+        if (Objects.isNull(bytes) || bytes.length == 0) {
+            return null;
+        } else {
+            return ProtostuffSerializeUtils.deserialize(bytes, JoinCourseResult.class);
         }
-
-        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-        UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(userId, course.getId());
-
-        // 此前加入过该课程
-        if (Objects.nonNull(userCourse)) {
-            if (userCourse.getStatus()) {
-                return new JoinCourseResult(CourseCode.ALREADY_JOINED, course.getId());
-            } else {
-                userCourse.setStatus(true);
-                userCourseRepository.save(userCourse);
-                return new JoinCourseResult(CourseCode.JOIN_SUCCESS, course.getId());
-            }
-        }
-
-        // 此前未加入过该课程
-        userCourse = new UserCourse();
-        userCourse.setUserId(userId);
-        userCourse.setCourseId(course.getId());
-        userCourse.setIsTeacher(false);
-        userCourse.setEnrollDate(new Date());
-        userCourse.setStatus(true);
-
-        userCourseRepository.save(userCourse);
-
-        // 清除缓存
-        RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + userId + "*", stringRedisTemplate);
-
-        return new JoinCourseResult(CourseCode.JOIN_SUCCESS, course.getId());
     }
 
     @Override

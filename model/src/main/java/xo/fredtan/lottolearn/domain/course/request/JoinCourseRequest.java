@@ -4,7 +4,8 @@ import lombok.Data;
 import xo.fredtan.lottolearn.common.model.request.RequestData;
 
 @Data
-public class QueryDiscussionRequest implements RequestData {
-    private Boolean reverse;
-    private Boolean trend;
+public class JoinCourseRequest implements RequestData {
+    private String id;
+    private Long userId;
+    private String invitationCode;
 }

@@ -50,11 +50,15 @@ public interface CourseService {
 
     UniqueQueryResponseData<UserCourse> findUserCourse(Long userId, Long courseId);
 
-    AddCourseResult addCourse(Course course);
+    String addCourse(Course course);
+
+    AddCourseResult findAddCourseResult(String addCourseId);
 
     BasicResponseData updateCourse(Long courseId, Course course);
 
-    JoinCourseResult joinCourse(String invitationCode);
+    String joinCourse(String invitationCode);
+
+    JoinCourseResult findJoinCourseResult(String joinCourseId);
 
     BasicResponseData quitCourse(Long courseId);
 
