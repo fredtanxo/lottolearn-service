@@ -2,29 +2,37 @@ package xo.fredtan.lottolearn.domain.course;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
 @Table(name = "discussion")
-@GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
 public class Discussion implements Serializable {
     @Id
-    @GeneratedValue(generator = "uuid")
-    private String id;
-    @Column(name = "course_id")
-    private String courseId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "chapter_id")
+    private Long chapterId;
     private String content;
     @Column(name = "reply_to")
-    private String replyTo;
-    @Column(name = "poster_id")
-    private String posterId;
+    private Long replyTo;
+    @Column(name = "user_id")
+    private Long userId;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "pub_date")
     private Date pubDate;
-    private Integer votes;
+    private Long votes;
+    private Long replies;
+    private Long interactions;
+
+    @Transient
+    private String userNickname;
+    @Transient
+    private String userAvatar;
+    @Transient
+    private List<Discussion> replyList;
 }

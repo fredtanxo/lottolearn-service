@@ -1,21 +1,32 @@
 package xo.fredtan.lottolearn.course.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xo.fredtan.lottolearn.api.course.constants.ChapterConstants;
 import xo.fredtan.lottolearn.api.course.service.ChapterService;
+import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResult;
+import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
 import xo.fredtan.lottolearn.common.util.RedisCacheUtils;
 import xo.fredtan.lottolearn.course.dao.ChapterRepository;
+import xo.fredtan.lottolearn.course.dao.DiscussionRepository;
 import xo.fredtan.lottolearn.domain.course.Chapter;
+import xo.fredtan.lottolearn.domain.course.Discussion;
+import xo.fredtan.lottolearn.domain.course.request.PostDiscussionRequest;
+import xo.fredtan.lottolearn.domain.course.request.QueryDiscussionRequest;
+import xo.fredtan.lottolearn.domain.user.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +34,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ChapterServiceImpl implements ChapterService {
+    @DubboReference
+    private UserService userService;
+
     private final ChapterRepository chapterRepository;
+    private final DiscussionRepository discussionRepository;
 
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisTemplate<String, byte[]> byteRedisTemplate;
@@ -120,6 +135,109 @@ public class ChapterServiceImpl implements ChapterService {
             }
         });
 
+        return BasicResponseData.ok();
+    }
+
+    @Override
+    public QueryResponseData<Discussion> findDiscussions(Integer page,
+                                                         Integer size,
+                                                         Long courseId,
+                                                         Long chapterId,
+                                                         QueryDiscussionRequest queryDiscussionRequest) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Discussion> discussionPage;
+
+        Boolean trend = queryDiscussionRequest.getTrend();
+        Boolean reverse = queryDiscussionRequest.getReverse();
+        if (Objects.nonNull(trend) && trend) {
+            discussionPage = discussionRepository.findByChapterIdAndReplyToOrderByInteractionsDesc(pageRequest, chapterId, null);
+        } else if (Objects.isNull(reverse) || reverse) {
+            discussionPage = discussionRepository.findByChapterIdAndReplyToOrderByPubDateDesc(pageRequest, chapterId, null);
+        } else {
+            discussionPage = discussionRepository.findByChapterIdAndReplyToOrderByPubDateAsc(pageRequest, chapterId, null);
+        }
+        List<Discussion> content = discussionPage.getContent();
+        populateChapterDiscussions(content);
+        QueryResult<Discussion> queryResult = new QueryResult<>(discussionPage.getTotalElements(), content);
+        return QueryResponseData.ok(queryResult);
+    }
+
+    @Override
+    public QueryResponseData<Discussion> findDiscussionReplies(Integer page,
+                                                               Integer size,
+                                                               Long courseId,
+                                                               Long discussionId,
+                                                               QueryDiscussionRequest queryDiscussionRequest) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Discussion> discussionPage;
+
+        Boolean trend = queryDiscussionRequest.getTrend();
+        Boolean reverse = queryDiscussionRequest.getReverse();
+        if (Objects.nonNull(trend) && trend) {
+            discussionPage = discussionRepository.findByReplyToOrderByInteractionsDesc(pageRequest, discussionId);
+        } else if (Objects.isNull(reverse) || reverse) {
+            discussionPage = discussionRepository.findByReplyToOrderByPubDateDesc(pageRequest, discussionId);
+        } else {
+            discussionPage = discussionRepository.findByReplyToOrderByPubDateAsc(pageRequest, discussionId);
+        }
+        List<Discussion> content = discussionPage.getContent();
+        populateChapterDiscussions(content);
+        QueryResult<Discussion> queryResult = new QueryResult<>(discussionPage.getTotalElements(), content);
+        return QueryResponseData.ok(queryResult);
+    }
+
+    private void populateChapterDiscussions(List<Discussion> content) {
+        List<Long> userIds = content.stream().map(Discussion::getUserId).collect(Collectors.toList());
+        List<User> users = userService.batchFindUserById(userIds);
+        for (int i = 0; i < content.size(); i++) {
+            Discussion discussion = content.get(i);
+            User user = users.get(i);
+            discussion.setUserNickname(user.getNickname());
+            discussion.setUserAvatar(user.getAvatar());
+        }
+    }
+
+    @Override
+    @Transactional
+    public UniqueQueryResponseData<Discussion> postDiscussion(Long courseId,
+                                                              Long chapterId,
+                                                              PostDiscussionRequest postDiscussionRequest) {
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        String content = postDiscussionRequest.getContent();
+        Long replyTo = postDiscussionRequest.getReplyTo();
+
+        Discussion discussion = new Discussion();
+        discussion.setChapterId(chapterId);
+        discussion.setContent(content);
+        discussion.setReplyTo(replyTo);
+        discussion.setUserId(userId);
+        discussion.setPubDate(new Date());
+        discussion.setVotes(0L);
+        discussion.setReplies(0L);
+        discussion.setInteractions(0L);
+
+        discussionRepository.save(discussion);
+
+        if (Objects.nonNull(replyTo)) {
+            discussionRepository.findById(replyTo).ifPresent(mainDiscussion -> {
+                mainDiscussion.setReplies(mainDiscussion.getReplies() + 1);
+                mainDiscussion.setInteractions(mainDiscussion.getVotes() + mainDiscussion.getReplies());
+                discussionRepository.save(mainDiscussion);
+            });
+        }
+
+        return UniqueQueryResponseData.ok(discussion);
+    }
+
+    @Override
+    @Transactional
+    public BasicResponseData likeDiscussion(Long courseId, Long discussionId) {
+        discussionRepository.findById(discussionId).ifPresent(discussion -> {
+            discussion.setVotes(discussion.getVotes() + 1);
+            discussion.setInteractions(discussion.getVotes() + discussion.getReplies());
+            discussionRepository.save(discussion);
+        });
         return BasicResponseData.ok();
     }
 }
