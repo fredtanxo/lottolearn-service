@@ -5,6 +5,8 @@ spring:
     host: localhost
     port: 5672
     virtual-host: /
+  jackson:
+    time-zone: GMT+8
 server:
   port: 51209
 dubbo:
@@ -20,3 +22,5 @@ dubbo:
 lottolearn:
   media:
     base-url: https://media.lottolearn.com
+    ffmpeg-path: ${FFMPEG_PATH:/usr/local/bin/ffmpeg}
+    bento4-path: ${BENTO4_PATH:/usr/local/}

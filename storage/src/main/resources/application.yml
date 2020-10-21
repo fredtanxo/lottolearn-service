@@ -14,6 +14,8 @@ spring:
         jwt:
           issuer-uri: https://lottolearn.com
           jwk-set-uri: http://localhost:51200/.well-known/jwks.json
+  jackson:
+    time-zone: GMT+8
 server:
   port: 51206
 dubbo:
