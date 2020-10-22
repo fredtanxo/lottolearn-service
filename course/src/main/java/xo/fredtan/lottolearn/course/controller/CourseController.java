@@ -13,6 +13,7 @@ import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
 import xo.fredtan.lottolearn.domain.course.*;
+import xo.fredtan.lottolearn.domain.course.request.JoinCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
@@ -143,6 +144,26 @@ public class CourseController implements CourseControllerApi {
     }
 
     @Override
+    @GetMapping("/user/{courseId}")
+    public UniqueQueryResponseData<UserCourse> findUserCourse(@PathVariable Long courseId) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        return courseService.findUserCourse(userId, courseId);
+    }
+
+    @Override
+    @PutMapping("/user/{courseId}")
+    public BasicResponseData updateUserCourseNickname(@PathVariable Long courseId, @RequestBody UserCourse userCourse) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        return courseService.updateUserCourseNickname(userId, courseId, userCourse);
+    }
+
+    @Override
     @PostMapping("/new")
     public String addCourse(@Valid @RequestBody Course course) {
         return courseService.addCourse(course);
@@ -164,9 +185,9 @@ public class CourseController implements CourseControllerApi {
     }
 
     @Override
-    @PutMapping("/invitation/{invitationCode}")
-    public String joinCourse(@PathVariable String invitationCode) {
-        return courseService.joinCourse(invitationCode);
+    @PutMapping("/invitation")
+    public String joinCourse(@RequestBody JoinCourseRequest joinCourseRequest) {
+        return courseService.joinCourse(joinCourseRequest);
     }
 
     @Override

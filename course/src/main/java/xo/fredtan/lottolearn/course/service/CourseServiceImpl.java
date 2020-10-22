@@ -152,7 +152,6 @@ public class CourseServiceImpl implements CourseService {
         Map<Long, User> users = userService.batchFindUserById(userIds);
         for (UserCourse userCourse : all) {
             User user = users.get(userCourse.getUserId());
-            userCourse.setUserNickname(user.getNickname());
             userCourse.setUserAvatar(user.getAvatar());
         }
         QueryResult<UserCourse> queryResult = new QueryResult<>(pg.getTotalElements(), all);
@@ -348,6 +347,20 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    @Transactional
+    public BasicResponseData updateUserCourseNickname(Long userId, Long courseId, UserCourse userCourse) {
+        if (!StringUtils.hasText(userCourse.getUserNickname())) {
+            ApiExceptionCast.invalidParam();
+        }
+        UserCourse dbUserCourse = userCourseRepository.findByUserIdAndCourseId(userId, courseId);
+        if (Objects.nonNull(dbUserCourse)) {
+            dbUserCourse.setUserNickname(userCourse.getUserNickname());
+            userCourseRepository.save(dbUserCourse);
+        }
+        return BasicResponseData.ok();
+    }
+
+    @Override
     public String addCourse(Course course) {
         String uuid = UUID.randomUUID().toString();
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -396,12 +409,14 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public String joinCourse(String invitationCode) {
+    public String joinCourse(JoinCourseRequest joinCourseRequest) {
+        if (!StringUtils.hasText(joinCourseRequest.getInvitationCode())) {
+            ApiExceptionCast.invalidParam();
+        }
+
         String uuid = UUID.randomUUID().toString();
 
-        JoinCourseRequest joinCourseRequest = new JoinCourseRequest();
         joinCourseRequest.setId(uuid);
-        joinCourseRequest.setInvitationCode(invitationCode);
         joinCourseRequest.setUserId(Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()));
 
         rabbitTemplate.convertAndSend(

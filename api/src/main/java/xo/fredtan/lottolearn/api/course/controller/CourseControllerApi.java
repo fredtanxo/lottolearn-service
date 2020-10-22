@@ -6,6 +6,7 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.*;
+import xo.fredtan.lottolearn.domain.course.request.JoinCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
@@ -28,7 +29,7 @@ public interface CourseControllerApi {
     @ApiOperation("查询课程成员")
     QueryResponseData<UserCourse> findCourseMembers(Integer page, Integer size, Long courseId);
 
-    @ApiOperation("查询用户课程")
+    @ApiOperation("查询用户课程列表")
     QueryResponseData<Course> findUserCourses(Integer page, Integer size, QueryUserCourseRequest queryUserCourseRequest);
 
     @ApiOperation("请求课程直播")
@@ -55,6 +56,12 @@ public interface CourseControllerApi {
     @ApiOperation("下载课程签到记录详细信息")
     void downloadCourseSignRecord(Long signId, Long courseId, HttpServletResponse response);
 
+    @ApiOperation("查询用户课程")
+    UniqueQueryResponseData<UserCourse> findUserCourse(Long courseId);
+
+    @ApiOperation("修改用户课程身份")
+    BasicResponseData updateUserCourseNickname(Long courseId, UserCourse userCourse);
+
     @ApiOperation("创建课程")
     String addCourse(Course course);
 
@@ -65,7 +72,7 @@ public interface CourseControllerApi {
     BasicResponseData updateCourse(Long courseId, Course course);
 
     @ApiOperation("凭课程邀请码加入课程")
-    String joinCourse(String invitationCode);
+    String joinCourse(JoinCourseRequest joinCourseRequest);
 
     @ApiOperation("查询加入课程状态")
     JoinCourseResult findJoinCourseResult(String joinCourseId);

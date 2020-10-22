@@ -7,5 +7,6 @@ import xo.fredtan.lottolearn.common.model.request.RequestData;
 public class JoinCourseRequest implements RequestData {
     private String id;
     private Long userId;
+    private String userNickname;
     private String invitationCode;
 }

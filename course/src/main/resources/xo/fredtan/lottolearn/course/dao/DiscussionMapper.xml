@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xo.fredtan.lottolearn.course.dao.DiscussionMapper">
+    <sql id="baseSql">
+        select d.*,
+               uc.user_nickname
+        from discussion d
+                 left join user_course uc
+                           on
+                                   d.user_id = uc.user_id
+                                   and
+                                   uc.course_id = (
+                                       select c.course_id
+                                       from chapter c
+                                       where c.id = d.chapter_id)
+    </sql>
+
+
+    <sql id="selectChapterDiscussions">
+        <include refid="baseSql"/>
+        where
+        d.chapter_id = #{chapterId}
+        and
+        reply_to is null
+    </sql>
+
+    <select id="selectChapterDiscussionsByDate" resultType="xo.fredtan.lottolearn.domain.course.Discussion">
+        <include refid="selectChapterDiscussions"/>
+        order by d.pub_date
+        <if test="reverse == null or reverse">
+            desc
+        </if>
+    </select>
+
+    <select id="selectChapterDiscussionsByTrend" resultType="xo.fredtan.lottolearn.domain.course.Discussion">
+        <include refid="selectChapterDiscussions"/>
+        order by d.interactions
+        <if test="reverse == null or reverse">
+            desc
+        </if>
+    </select>
+
+
+    <sql id="selectDiscussionReplies">
+        <include refid="baseSql"/>
+        where d.reply_to = #{replyTo}
+    </sql>
+
+    <select id="selectDiscussionRepliesByDate" resultType="xo.fredtan.lottolearn.domain.course.Discussion">
+        <include refid="selectDiscussionReplies"/>
+        order by d.pub_date
+        <if test="reverse == null or reverse">
+            desc
+        </if>
+    </select>
+
+    <select id="selectDiscussionRepliesByTrend" resultType="xo.fredtan.lottolearn.domain.course.Discussion">
+        <include refid="selectDiscussionReplies"/>
+        order by d.interactions
+        <if test="reverse == null or reverse">
+            desc
+        </if>
+    </select>
+</mapper>

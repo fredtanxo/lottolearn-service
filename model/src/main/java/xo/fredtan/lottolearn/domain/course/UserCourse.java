@@ -16,6 +16,8 @@ public class UserCourse implements Serializable {
     private Long id;
     @Column(name = "user_id")
     private Long userId;
+    @Column(name = "user_nickname")
+    private String userNickname;
     @Column(name = "course_id")
     private Long courseId;
     @Column(name = "is_teacher")
@@ -25,8 +27,6 @@ public class UserCourse implements Serializable {
     private Date enrollDate;
     private Boolean status;
 
-    @Transient
-    private String userNickname;
     @Transient
     private String userAvatar;
 }

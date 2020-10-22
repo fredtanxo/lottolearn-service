@@ -1,11 +1,12 @@
 package xo.fredtan.lottolearn.course.service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,7 @@ import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
 import xo.fredtan.lottolearn.common.util.RedisCacheUtils;
 import xo.fredtan.lottolearn.course.dao.ChapterRepository;
+import xo.fredtan.lottolearn.course.dao.DiscussionMapper;
 import xo.fredtan.lottolearn.course.dao.DiscussionRepository;
 import xo.fredtan.lottolearn.domain.course.Chapter;
 import xo.fredtan.lottolearn.domain.course.Discussion;
@@ -39,6 +41,8 @@ public class ChapterServiceImpl implements ChapterService {
 
     private final ChapterRepository chapterRepository;
     private final DiscussionRepository discussionRepository;
+
+    private final DiscussionMapper discussionMapper;
 
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisTemplate<String, byte[]> byteRedisTemplate;
@@ -144,21 +148,17 @@ public class ChapterServiceImpl implements ChapterService {
                                                          Long courseId,
                                                          Long chapterId,
                                                          QueryDiscussionRequest queryDiscussionRequest) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageHelper.startPage(page + 1, size);
         Page<Discussion> discussionPage;
 
         Boolean trend = queryDiscussionRequest.getTrend();
         Boolean reverse = queryDiscussionRequest.getReverse();
         if (Objects.nonNull(trend) && trend) {
-            discussionPage = discussionRepository.findByChapterIdAndReplyToOrderByInteractionsDesc(pageRequest, chapterId, null);
-        } else if (Objects.isNull(reverse) || reverse) {
-            discussionPage = discussionRepository.findByChapterIdAndReplyToOrderByPubDateDesc(pageRequest, chapterId, null);
+            discussionPage = discussionMapper.selectChapterDiscussionsByTrend(chapterId, reverse);
         } else {
-            discussionPage = discussionRepository.findByChapterIdAndReplyToOrderByPubDateAsc(pageRequest, chapterId, null);
+            discussionPage = discussionMapper.selectChapterDiscussionsByDate(chapterId, reverse);
         }
-        List<Discussion> content = discussionPage.getContent();
-        populateChapterDiscussions(content);
-        QueryResult<Discussion> queryResult = new QueryResult<>(discussionPage.getTotalElements(), content);
+        QueryResult<Discussion> queryResult = generateDiscussionQueryResult(discussionPage);
         return QueryResponseData.ok(queryResult);
     }
 
@@ -168,22 +168,25 @@ public class ChapterServiceImpl implements ChapterService {
                                                                Long courseId,
                                                                Long discussionId,
                                                                QueryDiscussionRequest queryDiscussionRequest) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageHelper.startPage(page + 1, size);
         Page<Discussion> discussionPage;
 
         Boolean trend = queryDiscussionRequest.getTrend();
         Boolean reverse = queryDiscussionRequest.getReverse();
         if (Objects.nonNull(trend) && trend) {
-            discussionPage = discussionRepository.findByReplyToOrderByInteractionsDesc(pageRequest, discussionId);
-        } else if (Objects.isNull(reverse) || reverse) {
-            discussionPage = discussionRepository.findByReplyToOrderByPubDateDesc(pageRequest, discussionId);
+            discussionPage = discussionMapper.selectDiscussionRepliesByTrend(discussionId, reverse);
         } else {
-            discussionPage = discussionRepository.findByReplyToOrderByPubDateAsc(pageRequest, discussionId);
+            discussionPage = discussionMapper.selectDiscussionRepliesByDate(discussionId, reverse);
         }
-        List<Discussion> content = discussionPage.getContent();
-        populateChapterDiscussions(content);
-        QueryResult<Discussion> queryResult = new QueryResult<>(discussionPage.getTotalElements(), content);
+        QueryResult<Discussion> queryResult = generateDiscussionQueryResult(discussionPage);
         return QueryResponseData.ok(queryResult);
+    }
+
+    private QueryResult<Discussion> generateDiscussionQueryResult(Page<Discussion> discussionPage) {
+        PageInfo<Discussion> pageInfo = new PageInfo<>(discussionPage);
+        List<Discussion> content = pageInfo.getList();
+        populateChapterDiscussions(content);
+        return new QueryResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
 
     private void populateChapterDiscussions(List<Discussion> content) {
@@ -191,7 +194,6 @@ public class ChapterServiceImpl implements ChapterService {
         Map<Long, User> users = userService.batchFindUserById(userIds);
         for (Discussion discussion : content) {
             User user = users.get(discussion.getUserId());
-            discussion.setUserNickname(user.getNickname());
             discussion.setUserAvatar(user.getAvatar());
         }
     }

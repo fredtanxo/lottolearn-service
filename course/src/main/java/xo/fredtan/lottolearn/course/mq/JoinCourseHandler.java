@@ -1,12 +1,16 @@
 package xo.fredtan.lottolearn.course.mq;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import xo.fredtan.lottolearn.api.course.constants.CourseConstants;
+import xo.fredtan.lottolearn.api.user.service.UserService;
+import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
 import xo.fredtan.lottolearn.common.util.RedisCacheUtils;
 import xo.fredtan.lottolearn.course.config.RabbitMqConfig;
@@ -17,6 +21,7 @@ import xo.fredtan.lottolearn.domain.course.UserCourse;
 import xo.fredtan.lottolearn.domain.course.request.JoinCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.CourseCode;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
+import xo.fredtan.lottolearn.domain.user.User;
 
 import java.util.Date;
 import java.util.Objects;
@@ -28,6 +33,9 @@ public class JoinCourseHandler {
     private final UserCourseRepository userCourseRepository;
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisTemplate<String, byte[]> byteRedisTemplate;
+
+    @DubboReference
+    private UserService userService;
 
     @RabbitListener(queues = RabbitMqConfig.QUEUE_JOIN_COURSE)
     @Transactional
@@ -58,9 +66,18 @@ public class JoinCourseHandler {
                 return;
             }
 
+            String userNickname = request.getUserNickname();
+            if (!StringUtils.hasText(userNickname)) {
+                UniqueQueryResponseData<User> serviceUserById = userService.findUserById(userId);
+                User user = serviceUserById.getPayload();
+                userNickname = user.getNickname();
+            }
+
+
             // 此前未加入过该课程
             userCourse = new UserCourse();
             userCourse.setUserId(userId);
+            userCourse.setUserNickname(userNickname);
             userCourse.setCourseId(course.getId());
             userCourse.setIsTeacher(false);
             userCourse.setEnrollDate(new Date());

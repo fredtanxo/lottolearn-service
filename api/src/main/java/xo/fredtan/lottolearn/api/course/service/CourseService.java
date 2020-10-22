@@ -5,6 +5,7 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.domain.course.*;
+import xo.fredtan.lottolearn.domain.course.request.JoinCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
@@ -47,13 +48,15 @@ public interface CourseService {
 
     UniqueQueryResponseData<UserCourse> findUserCourse(Long userId, Long courseId);
 
+    BasicResponseData updateUserCourseNickname(Long userId, Long courseId, UserCourse userCourse);
+
     String addCourse(Course course);
 
     AddCourseResult findAddCourseResult(String addCourseId);
 
     BasicResponseData updateCourse(Long courseId, Course course);
 
-    String joinCourse(String invitationCode);
+    String joinCourse(JoinCourseRequest joinCourseRequest);
 
     JoinCourseResult findJoinCourseResult(String joinCourseId);
 
