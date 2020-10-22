@@ -12,10 +12,7 @@ import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.course.utils.WithUserValidationUtils;
-import xo.fredtan.lottolearn.domain.course.Course;
-import xo.fredtan.lottolearn.domain.course.Sign;
-import xo.fredtan.lottolearn.domain.course.SignRecord;
-import xo.fredtan.lottolearn.domain.course.UserCourse;
+import xo.fredtan.lottolearn.domain.course.*;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
@@ -194,5 +191,33 @@ public class CourseController implements CourseControllerApi {
             ApiExceptionCast.forbidden();
         }
         return courseService.closeCourse(courseId);
+    }
+
+    @Override
+    @GetMapping("/rating/{courseId}")
+    @ValidatePagination
+    public QueryResponseData<CourseRating> findCourseRatingsByCourseId(Integer page, Integer size, @PathVariable Long courseId) {
+        if (withUserValidationUtils.notCourseOwner(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        return courseService.findCourseRatingsByCourseId(page, size, courseId);
+    }
+
+    @Override
+    @GetMapping("/rating/{courseId}/user")
+    public UniqueQueryResponseData<CourseRating> findUserCourseRating(@PathVariable Long courseId) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        return courseService.findUserCourseRating(courseId);
+    }
+
+    @Override
+    @PutMapping("/rating/{courseId}")
+    public BasicResponseData updateCourseRating(@PathVariable Long courseId, @RequestBody CourseRating courseRating) {
+        if (withUserValidationUtils.notParticipate(courseId)) {
+            ApiExceptionCast.forbidden();
+        }
+        return courseService.updateCourseRating(courseId, courseRating);
     }
 }

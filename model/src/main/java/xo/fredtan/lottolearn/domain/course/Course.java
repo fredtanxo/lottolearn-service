@@ -29,6 +29,7 @@ public class Course implements Serializable {
     private Long termId;
     @NotNull(message = "必须提供学分")
     private Integer credit;
+    private Double rating;
     @Column(name = "pub_date")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date pubDate;

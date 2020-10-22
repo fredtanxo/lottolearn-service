@@ -7,7 +7,7 @@ import xo.fredtan.lottolearn.domain.course.Course;
 
 @Mapper
 public interface CourseMapper {
-    @Select("select c.id, c.name, c.visibility, c.description, c.teacher_id, t.name as term_name, c.credit, c.pub_date, c.status " +
+    @Select("select c.id, c.name, c.visibility, c.description, c.teacher_id, t.name as term_name, c.credit, c.rating, c.pub_date, c.status " +
             "from course c " +
             "left join term t " +
             "on c.term_id = t.id " +

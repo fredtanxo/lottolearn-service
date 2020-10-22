@@ -4,10 +4,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
-import xo.fredtan.lottolearn.domain.course.Course;
-import xo.fredtan.lottolearn.domain.course.Sign;
-import xo.fredtan.lottolearn.domain.course.SignRecord;
-import xo.fredtan.lottolearn.domain.course.UserCourse;
+import xo.fredtan.lottolearn.domain.course.*;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
@@ -64,4 +61,9 @@ public interface CourseService {
 
     BasicResponseData closeCourse(Long courseId);
 
+    QueryResponseData<CourseRating> findCourseRatingsByCourseId(Integer page, Integer size, Long courseId);
+
+    UniqueQueryResponseData<CourseRating> findUserCourseRating(Long courseId);
+
+    BasicResponseData updateCourseRating(Long courseId, CourseRating courseRating);
 }

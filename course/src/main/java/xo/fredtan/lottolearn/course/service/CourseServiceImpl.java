@@ -34,10 +34,7 @@ import xo.fredtan.lottolearn.common.util.RedisCacheUtils;
 import xo.fredtan.lottolearn.course.config.RabbitMqConfig;
 import xo.fredtan.lottolearn.course.dao.*;
 import xo.fredtan.lottolearn.course.utils.ExcelUtils;
-import xo.fredtan.lottolearn.domain.course.Course;
-import xo.fredtan.lottolearn.domain.course.Sign;
-import xo.fredtan.lottolearn.domain.course.SignRecord;
-import xo.fredtan.lottolearn.domain.course.UserCourse;
+import xo.fredtan.lottolearn.domain.course.*;
 import xo.fredtan.lottolearn.domain.course.request.AddCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.JoinCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
@@ -65,6 +62,7 @@ public class CourseServiceImpl implements CourseService {
     private final UserCourseRepository userCourseRepository;
     private final SignRepository signRepository;
     private final SignRecordRepository signRecordRepository;
+    private final CourseRatingRepository courseRatingRepository;
 
     private final CourseMapper courseMapper;
     private final UserCourseMapper userCourseMapper;
@@ -447,6 +445,37 @@ public class CourseServiceImpl implements CourseService {
             course.setStatus(3);
             courseRepository.save(course);
         });
+        return BasicResponseData.ok();
+    }
+
+    @Override
+    public QueryResponseData<CourseRating> findCourseRatingsByCourseId(Integer page, Integer size, Long courseId) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<CourseRating> ratings = courseRatingRepository.findByCourseIdOrderByRateDateDesc(pageRequest, courseId);
+        QueryResult<CourseRating> queryResult = new QueryResult<>(ratings.getTotalElements(), ratings.getContent());
+        return QueryResponseData.ok(queryResult);
+    }
+
+    @Override
+    public UniqueQueryResponseData<CourseRating> findUserCourseRating(Long courseId) {
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        CourseRating rating = courseRatingRepository.findByCourseIdAndUserId(courseId, userId);
+        return UniqueQueryResponseData.ok(rating);
+    }
+
+    @Override
+    @Transactional
+    public BasicResponseData updateCourseRating(Long courseId, CourseRating courseRating) {
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        CourseRating rating = courseRatingRepository.findByCourseIdAndUserId(courseId, userId);
+        if (Objects.isNull(rating)) {
+            rating = courseRating;
+        }
+        rating.setCourseId(courseId);
+        rating.setUserId(userId);
+        rating.setComment(courseRating.getComment());
+        rating.setRateDate(new Date());
+        courseRatingRepository.save(rating);
         return BasicResponseData.ok();
     }
 }

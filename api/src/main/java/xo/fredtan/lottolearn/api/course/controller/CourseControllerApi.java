@@ -5,10 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import xo.fredtan.lottolearn.common.model.response.BasicResponseData;
 import xo.fredtan.lottolearn.common.model.response.QueryResponseData;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
-import xo.fredtan.lottolearn.domain.course.Course;
-import xo.fredtan.lottolearn.domain.course.Sign;
-import xo.fredtan.lottolearn.domain.course.SignRecord;
-import xo.fredtan.lottolearn.domain.course.UserCourse;
+import xo.fredtan.lottolearn.domain.course.*;
 import xo.fredtan.lottolearn.domain.course.request.QueryCourseRequest;
 import xo.fredtan.lottolearn.domain.course.request.QueryUserCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.AddCourseResult;
@@ -78,4 +75,13 @@ public interface CourseControllerApi {
 
     @ApiOperation("关闭课程")
     BasicResponseData closeCourse(Long courseId);
+
+    @ApiOperation("根据课程ID查询所有课程评价")
+    QueryResponseData<CourseRating> findCourseRatingsByCourseId(Integer page, Integer size, Long courseId);
+
+    @ApiOperation("查询用户课程评价")
+    UniqueQueryResponseData<CourseRating> findUserCourseRating(Long courseId);
+
+    @ApiOperation("修改课程评价")
+    BasicResponseData updateCourseRating(Long courseId, CourseRating courseRating);
 }
