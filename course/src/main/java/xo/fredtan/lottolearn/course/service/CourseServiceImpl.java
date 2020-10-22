@@ -149,10 +149,9 @@ public class CourseServiceImpl implements CourseService {
         Page<UserCourse> pg = userCourseRepository.findAllByCourseIdAndStatusOrderByEnrollDateDesc(pageRequest, courseId, true);
         List<UserCourse> all = pg.getContent();
         List<Long> userIds = all.stream().map(UserCourse::getUserId).collect(Collectors.toList());
-        List<User> users = userService.batchFindUserById(userIds);
-        for (int i = 0; i < all.size(); i++) {
-            UserCourse userCourse = all.get(i);
-            User user = users.get(i);
+        Map<Long, User> users = userService.batchFindUserById(userIds);
+        for (UserCourse userCourse : all) {
+            User user = users.get(userCourse.getUserId());
             userCourse.setUserNickname(user.getNickname());
             userCourse.setUserAvatar(user.getAvatar());
         }

@@ -29,7 +29,6 @@ import xo.fredtan.lottolearn.user.dao.UserRoleMapper;
 import xo.fredtan.lottolearn.user.dao.UserRoleRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @DubboService
@@ -71,12 +70,17 @@ public class UserServiceImpl implements UserService {
         return UniqueQueryResponseData.ok(user);
     }
 
+    /**
+     * 根据用户ID批量获取用户信息
+     * @param userIds 用户ID列表
+     * @return Key为{@code userId}，value为{@link User}的Map
+     */
     @Override
-    public List<User> batchFindUserById(List<Long> userIds) {
+    public Map<Long, User> batchFindUserById(List<Long> userIds) {
         List<User> users = userRepository.findAllById(userIds);
         Map<Long, User> map = new HashMap<>(userIds.size());
         users.forEach(user -> map.put(user.getId(), user));
-        return userIds.stream().map(map::get).collect(Collectors.toList());
+        return map;
     }
 
     @Override

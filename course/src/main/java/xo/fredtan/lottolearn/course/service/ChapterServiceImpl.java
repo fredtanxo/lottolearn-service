@@ -188,10 +188,9 @@ public class ChapterServiceImpl implements ChapterService {
 
     private void populateChapterDiscussions(List<Discussion> content) {
         List<Long> userIds = content.stream().map(Discussion::getUserId).collect(Collectors.toList());
-        List<User> users = userService.batchFindUserById(userIds);
-        for (int i = 0; i < content.size(); i++) {
-            Discussion discussion = content.get(i);
-            User user = users.get(i);
+        Map<Long, User> users = userService.batchFindUserById(userIds);
+        for (Discussion discussion : content) {
+            User user = users.get(discussion.getUserId());
             discussion.setUserNickname(user.getNickname());
             discussion.setUserAvatar(user.getAvatar());
         }
