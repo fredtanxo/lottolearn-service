@@ -62,6 +62,7 @@ public class JoinCourseHandler {
                     userCourse.setStatus(true);
                     userCourseRepository.save(userCourse);
                     result = new JoinCourseResult(CourseCode.JOIN_SUCCESS, course.getId());
+                    clearCache(userId);
                 }
                 return;
             }
@@ -87,9 +88,7 @@ public class JoinCourseHandler {
 
             result = new JoinCourseResult(CourseCode.JOIN_SUCCESS, course.getId());
 
-            // 清除缓存
-            RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + userId + "*", stringRedisTemplate);
-
+            clearCache(userId);
         } finally {
             byteRedisTemplate.opsForValue().set(
                     CourseConstants.JOIN_COURSE_KEY_PREFIX + request.getId(),
@@ -97,5 +96,9 @@ public class JoinCourseHandler {
                     CourseConstants.JOIN_COURSE_KEY_EXPIRATION
             );
         }
+    }
+
+    private void clearCache(Long userId) {
+        RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + userId + "*", stringRedisTemplate);
     }
 }
