@@ -104,6 +104,7 @@ public class AddCourseHandler {
 
             UserCourse userCourse = new UserCourse();
             userCourse.setUserId(userId);
+            userCourse.setUserNickname(user.getNickname());
             userCourse.setCourseId(course.getId());
             userCourse.setIsTeacher(true);
             userCourse.setEnrollDate(now);

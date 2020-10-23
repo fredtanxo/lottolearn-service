@@ -1,5 +1,6 @@
 package xo.fredtan.lottolearn.course.mq;
 
+import com.alibaba.fastjson.JSON;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import xo.fredtan.lottolearn.api.course.constants.CourseConstants;
+import xo.fredtan.lottolearn.api.message.constants.MessageConstants;
+import xo.fredtan.lottolearn.api.message.constants.WebSocketMessageType;
 import xo.fredtan.lottolearn.api.user.service.UserService;
 import xo.fredtan.lottolearn.common.model.response.UniqueQueryResponseData;
 import xo.fredtan.lottolearn.common.util.ProtostuffSerializeUtils;
@@ -21,6 +24,7 @@ import xo.fredtan.lottolearn.domain.course.UserCourse;
 import xo.fredtan.lottolearn.domain.course.request.JoinCourseRequest;
 import xo.fredtan.lottolearn.domain.course.response.CourseCode;
 import xo.fredtan.lottolearn.domain.course.response.JoinCourseResult;
+import xo.fredtan.lottolearn.domain.message.WebSocketMessage;
 import xo.fredtan.lottolearn.domain.user.User;
 
 import java.util.Date;
@@ -43,7 +47,21 @@ public class JoinCourseHandler {
         JoinCourseResult result = new JoinCourseResult(CourseCode.JOIN_FAILED, null);
         try {
             Date now = new Date();
+            Long userId = request.getUserId();
+            String userNickname = request.getUserNickname();
+
             Course course = courseRepository.findByCode(request.getInvitationCode());
+            UniqueQueryResponseData<User> serviceUserById = userService.findUserById(userId);
+            User user = serviceUserById.getPayload();
+
+            if (Objects.isNull(user)) {
+                return;
+            }
+
+            if (!StringUtils.hasText(userNickname)) {
+                userNickname = user.getNickname();
+            }
+
             if (Objects.isNull(course)) {
                 result = new JoinCourseResult(CourseCode.COURSE_NOT_EXISTS, null);
                 return;
@@ -52,7 +70,6 @@ public class JoinCourseHandler {
                 return;
             }
 
-            Long userId = request.getUserId();
             UserCourse userCourse = userCourseRepository.findByUserIdAndCourseId(userId, course.getId());
 
             // 此前加入过该课程
@@ -60,22 +77,15 @@ public class JoinCourseHandler {
                 if (userCourse.getStatus()) {
                     result = new JoinCourseResult(CourseCode.ALREADY_JOINED, course.getId());
                 } else {
+                    userCourse.setUserNickname(userNickname);
                     userCourse.setStatus(true);
                     userCourse.setEnrollDate(now);
                     userCourseRepository.save(userCourse);
                     result = new JoinCourseResult(CourseCode.JOIN_SUCCESS, course.getId());
-                    clearCache(userId);
+                    afterJoinSuccess(user, course, userCourse);
                 }
                 return;
             }
-
-            String userNickname = request.getUserNickname();
-            if (!StringUtils.hasText(userNickname)) {
-                UniqueQueryResponseData<User> serviceUserById = userService.findUserById(userId);
-                User user = serviceUserById.getPayload();
-                userNickname = user.getNickname();
-            }
-
 
             // 此前未加入过该课程
             userCourse = new UserCourse();
@@ -90,7 +100,7 @@ public class JoinCourseHandler {
 
             result = new JoinCourseResult(CourseCode.JOIN_SUCCESS, course.getId());
 
-            clearCache(userId);
+            afterJoinSuccess(user, course, userCourse);
         } finally {
             byteRedisTemplate.opsForValue().set(
                     CourseConstants.JOIN_COURSE_KEY_PREFIX + request.getId(),
@@ -100,7 +110,22 @@ public class JoinCourseHandler {
         }
     }
 
-    private void clearCache(Long userId) {
-        RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + userId + "*", stringRedisTemplate);
+    private void afterJoinSuccess(User user, Course course, UserCourse userCourse) {
+        // 清理用户课程缓存
+        RedisCacheUtils.clearCache(CourseConstants.USER_COURSE_CACHE_PREFIX + user.getId() + "*", stringRedisTemplate);
+        // 清理课程成员列表缓存
+        RedisCacheUtils.clearCache(CourseConstants.COURSE_MEMBERS_CACHE_PREFIX + course.getId(), stringRedisTemplate);
+        // 如果课程在直播，通知插入新成员
+        String s = (String) stringRedisTemplate.boundHashOps(CourseConstants.COURSE_LIVE_KEY).get(course.getId().toString());
+        if (StringUtils.hasText(s)) {
+            WebSocketMessage message = new WebSocketMessage();
+            message.setType(WebSocketMessageType.MEMBER_JOIN.name());
+            message.setUserId(user.getId());
+            message.setRoomId(course.getLive());
+            userCourse.setUserAvatar(user.getAvatar());
+            String content = JSON.toJSONString(userCourse);
+            message.setContent(content);
+            byteRedisTemplate.convertAndSend(MessageConstants.LIVE_DISTRIBUTION_CHANNEL, ProtostuffSerializeUtils.serialize(message));
+        }
     }
 }

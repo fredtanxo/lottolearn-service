@@ -6,6 +6,7 @@ public enum WebSocketMessageType {
     NEW_MEMBER,
     MEMBER_LEAVE,
     MEMBER_NICKNAME_CHANGED,
+    MEMBER_JOIN,
     /* 消息命令相关 */
     CHAT,
     SIGN,
