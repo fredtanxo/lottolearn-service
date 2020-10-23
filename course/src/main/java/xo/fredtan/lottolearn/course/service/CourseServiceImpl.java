@@ -178,13 +178,7 @@ public class CourseServiceImpl implements CourseService {
                                                      Integer size,
                                                      Long userId,
                                                      QueryUserCourseRequest queryUserCourseRequest) {
-        String key = String.format(
-                "%s%s:%s:%s",
-                CourseConstants.USER_COURSE_CACHE_PREFIX,
-                userId,
-                queryUserCourseRequest.getTeacher(),
-                queryUserCourseRequest.getStatus()
-        );
+        String key = CourseConstants.USER_COURSE_CACHE_PREFIX + ":" + userId + ":" + queryUserCourseRequest.getTeacher() + ":" + queryUserCourseRequest.getStatus();
         Long count = stringRedisTemplate.opsForZSet().zCard(key);
         int start = page * size;
         int end = start + size - 1;
@@ -212,22 +206,14 @@ public class CourseServiceImpl implements CourseService {
                     stringRedisTemplate
             );
 
-            // 打开首页，不可能所有课程都有用，因此只缓存第一页
+            // 打开首页，不可能所有课程都有用，因此只缓存一页
             List<Course> result = courses.subList(start, Math.min(end + 1, courses.size()));
             ValueOperations<String, byte[]> ops = byteRedisTemplate.opsForValue();
-            result.forEach(course -> {
-                UniqueQueryResponseData<User> data = userService.findUserById(course.getTeacherId());
-                User user = data.getPayload();
-                if (Objects.nonNull(user)) {
-                    course.setTeacherName(user.getNickname());
-                }
-                String k = CourseConstants.COURSE_CACHE_PREFIX + course.getId();
-                ops.set(
-                        k,
-                        ProtostuffSerializeUtils.serialize(course),
-                        CourseConstants.COURSE_CACHE_EXPIRATION.plusDays(3)
-                );
-            });
+            result.forEach(course -> ops.set(
+                    CourseConstants.COURSE_CACHE_PREFIX + course.getId(),
+                    ProtostuffSerializeUtils.serialize(course),
+                    CourseConstants.COURSE_CACHE_EXPIRATION.plusDays(random.nextInt(3))
+            ));
             queryResult = new QueryResult<>((long) courses.size(), result);
         }
 

@@ -11,13 +11,16 @@
                t.name as term_name,
                c.credit,
                c.pub_date,
-               c.status
+               c.status,
+               uc2.user_nickname as teacherName
         from
              user_course uc
                  left join course c
                      on uc.course_id = c.id
                  left join term t
                      on c.term_id = t.id
+                 left join user_course uc2
+                     on uc2.user_id = c.teacher_id and uc2.course_id = c.id
         where
                 uc.user_id = #{userId} and uc.status = 1
             and

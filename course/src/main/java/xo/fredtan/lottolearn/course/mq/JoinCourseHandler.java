@@ -42,6 +42,7 @@ public class JoinCourseHandler {
     public void handleJoinCourse(JoinCourseRequest request) {
         JoinCourseResult result = new JoinCourseResult(CourseCode.JOIN_FAILED, null);
         try {
+            Date now = new Date();
             Course course = courseRepository.findByCode(request.getInvitationCode());
             if (Objects.isNull(course)) {
                 result = new JoinCourseResult(CourseCode.COURSE_NOT_EXISTS, null);
@@ -60,6 +61,7 @@ public class JoinCourseHandler {
                     result = new JoinCourseResult(CourseCode.ALREADY_JOINED, course.getId());
                 } else {
                     userCourse.setStatus(true);
+                    userCourse.setEnrollDate(now);
                     userCourseRepository.save(userCourse);
                     result = new JoinCourseResult(CourseCode.JOIN_SUCCESS, course.getId());
                     clearCache(userId);
@@ -81,7 +83,7 @@ public class JoinCourseHandler {
             userCourse.setUserNickname(userNickname);
             userCourse.setCourseId(course.getId());
             userCourse.setIsTeacher(false);
-            userCourse.setEnrollDate(new Date());
+            userCourse.setEnrollDate(now);
             userCourse.setStatus(true);
 
             userCourseRepository.save(userCourse);

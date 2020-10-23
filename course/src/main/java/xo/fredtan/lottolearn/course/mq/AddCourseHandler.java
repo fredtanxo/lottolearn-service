@@ -45,7 +45,7 @@ public class AddCourseHandler {
     public void handleAddCourse(AddCourseRequest request) {
         AddCourseResult result = new AddCourseResult(CourseCode.ADD_FAILED, null, null);
         try {
-
+            Date now = new Date();
             Course course = request.getCourse();
             Long userId = request.getUserId();
 
@@ -58,7 +58,7 @@ public class AddCourseHandler {
 
             course.setId(null);
             course.setTeacherId(userId);
-            course.setPubDate(new Date());
+            course.setPubDate(now);
 
             UUID uuid = UUID.randomUUID();
             course.setLive(uuid.toString());
@@ -66,7 +66,7 @@ public class AddCourseHandler {
             // 根据学期判断课程是否应该开始
             if (Objects.isNull(course.getStatus()) || course.getStatus() <= 0) {
                 termRepository.findById(course.getTermId()).ifPresent(term -> {
-                    if (term.getTermStart().before(new Date())) {
+                    if (term.getTermStart().before(now)) {
                         course.setStatus(1);
                     } else {
                         course.setStatus(0);
@@ -106,7 +106,7 @@ public class AddCourseHandler {
             userCourse.setUserId(userId);
             userCourse.setCourseId(course.getId());
             userCourse.setIsTeacher(true);
-            userCourse.setEnrollDate(new Date());
+            userCourse.setEnrollDate(now);
             userCourse.setStatus(true);
 
             userCourseRepository.save(userCourse);
