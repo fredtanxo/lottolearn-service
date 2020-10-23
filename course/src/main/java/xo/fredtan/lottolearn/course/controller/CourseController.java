@@ -22,6 +22,7 @@ import xo.fredtan.lottolearn.domain.message.WebSocketMessage;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/course")
@@ -59,9 +60,12 @@ public class CourseController implements CourseControllerApi {
     @Override
     @GetMapping("/members/id/{courseId}")
     @ValidatePagination
-    public QueryResponseData<UserCourse> findCourseMembers(Integer page, Integer size, @PathVariable Long courseId) {
+    public QueryResponseData<UserCourse> findCourseMembers(Integer page, Integer size, @PathVariable Long courseId, Boolean all) {
         if (withUserValidationUtils.notParticipate(courseId)) {
             ApiExceptionCast.forbidden();
+        }
+        if (Objects.nonNull(all) && all) {
+            return courseService.findAllCourseMembers(courseId);
         }
         return courseService.findCourseMembers(page, size, courseId);
     }

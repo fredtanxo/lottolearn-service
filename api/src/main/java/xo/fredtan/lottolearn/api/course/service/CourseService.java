@@ -25,6 +25,8 @@ public interface CourseService {
 
     QueryResponseData<UserCourse> findCourseMembers(Integer page, Integer size, Long courseId);
 
+    QueryResponseData<UserCourse> findAllCourseMembers(Long courseId);
+
     QueryResponseData<Course> findUserCourses(Integer page,
                                               Integer size,
                                               Long userId,

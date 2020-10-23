@@ -151,14 +151,34 @@ public class CourseServiceImpl implements CourseService {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<UserCourse> pg = userCourseRepository.findAllByCourseIdAndStatusOrderByEnrollDateDesc(pageRequest, courseId, true);
         List<UserCourse> all = pg.getContent();
-        List<Long> userIds = all.stream().map(UserCourse::getUserId).collect(Collectors.toList());
+        populateMembers(all);
+        QueryResult<UserCourse> queryResult = new QueryResult<>(pg.getTotalElements(), all);
+        return QueryResponseData.ok(queryResult);
+    }
+
+    @Override
+    public QueryResponseData<UserCourse> findAllCourseMembers(Long courseId) {
+        BoundValueOperations<String, String> ops = stringRedisTemplate.boundValueOps(CourseConstants.COURSE_MEMBERS_CACHE_PREFIX + courseId);
+        String json = ops.get();
+        List<UserCourse> members;
+        if (Objects.isNull(json) || !StringUtils.hasText(json)) {
+            members = userCourseRepository.findAllByCourseIdAndStatusOrderByEnrollDateDesc(courseId, true);
+            populateMembers(members);
+            ops.set(JSON.toJSONString(members), CourseConstants.COURSE_MEMBERS_CACHE_EXPIRATION);
+        } else {
+            members = JSON.parseArray(json, UserCourse.class);
+        }
+        QueryResult<UserCourse> queryResult = new QueryResult<>((long) members.size(), members);
+        return QueryResponseData.ok(queryResult);
+    }
+
+    private void populateMembers(List<UserCourse> members) {
+        List<Long> userIds = members.stream().map(UserCourse::getUserId).collect(Collectors.toList());
         Map<Long, User> users = userService.batchFindUserById(userIds);
-        for (UserCourse userCourse : all) {
+        for (UserCourse userCourse : members) {
             User user = users.get(userCourse.getUserId());
             userCourse.setUserAvatar(user.getAvatar());
         }
-        QueryResult<UserCourse> queryResult = new QueryResult<>(pg.getTotalElements(), all);
-        return QueryResponseData.ok(queryResult);
     }
 
     private Course findCourseWithDetailsById(Long courseId) {
@@ -178,7 +198,7 @@ public class CourseServiceImpl implements CourseService {
                                                      Integer size,
                                                      Long userId,
                                                      QueryUserCourseRequest queryUserCourseRequest) {
-        String key = CourseConstants.USER_COURSE_CACHE_PREFIX + ":" + userId + ":" + queryUserCourseRequest.getTeacher() + ":" + queryUserCourseRequest.getStatus();
+        String key = CourseConstants.USER_COURSE_CACHE_PREFIX + userId + ":" + queryUserCourseRequest.getTeacher() + ":" + queryUserCourseRequest.getStatus();
         Long count = stringRedisTemplate.opsForZSet().zCard(key);
         int start = page * size;
         int end = start + size - 1;
