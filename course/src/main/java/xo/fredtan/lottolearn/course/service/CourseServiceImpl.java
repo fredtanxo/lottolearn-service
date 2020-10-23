@@ -1,6 +1,8 @@
 package xo.fredtan.lottolearn.course.service;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -66,6 +68,7 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseMapper courseMapper;
     private final UserCourseMapper userCourseMapper;
+    private final CourseRatingMapper courseRatingMapper;
 
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisTemplate<String, byte[]> byteRedisTemplate;
@@ -464,9 +467,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public QueryResponseData<CourseRating> findCourseRatingsByCourseId(Integer page, Integer size, Long courseId) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<CourseRating> ratings = courseRatingRepository.findByCourseIdOrderByRateDateDesc(pageRequest, courseId);
-        QueryResult<CourseRating> queryResult = new QueryResult<>(ratings.getTotalElements(), ratings.getContent());
+        PageHelper.startPage(page + 1, size);
+        PageInfo<CourseRating> pageInfo = new PageInfo<>(courseRatingMapper.selectCourseRatings(courseId));
+        QueryResult<CourseRating> queryResult = new QueryResult<>(pageInfo.getTotal(), pageInfo.getList());
         return QueryResponseData.ok(queryResult);
     }
 
