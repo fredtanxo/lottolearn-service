@@ -1,8 +1,14 @@
-# LotToLearn 网课平台
+<h1 align="center">
+  <img src="https://github.com/fredtanxo/lottolearn-web/raw/master/course-app/public/logo-web.png" alt="LotToLearn" width="200" />
+  <br>LotToLearn</br>
+</h1>
 
-**后端工程** | [前端工程](https://github.com/fredtanxo/lottolearn-web) | [附加工程](https://github.com/fredtanxo/lottolearn-other)
+<h4  align="center">简易的网课平台</h4>
 
-LotToLearn 是一个简易的网课平台。
+<p align="center">
+  <b>后端工程</b> | <a href="https://github.com/fredtanxo/lottolearn-web">前端工程</a> | <a href="https://github.com/fredtanxo/lottolearn-other">附加工程</a>
+</p>
+
 
 ## 功能
 
