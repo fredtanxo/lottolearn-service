@@ -9,7 +9,6 @@
   <b>后端工程</b> | <a href="https://github.com/fredtanxo/lottolearn-web">前端工程</a> | <a href="https://github.com/fredtanxo/lottolearn-other">附加工程</a>
 </p>
 
-
 ## 功能
 
 * 第三方登录（GitHub、微博）
@@ -22,7 +21,7 @@
 * 闪电记录（随时记录想法、笔记、视频帧、视频片段）
 * 热门课程（根据点击量定时更新）
 
-# 模块
+## 模块
 
 * [auth](https://github.com/fredtanxo/lottolearn-service/tree/master/auth) ：用户登录鉴权授权、令牌刷新
 * [course](https://github.com/fredtanxo/lottolearn-service/tree/master/course) ：课程、章节、公告、签到

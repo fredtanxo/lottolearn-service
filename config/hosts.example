@@ -1,6 +1,9 @@
 # LotToLearn
 127.0.0.1    lottolearn.com
 127.0.0.1    www.lottolearn.com
+127.0.0.1    db.lottolearn.com
+127.0.0.1    cache.lottolearn.com
+127.0.0.1    mq.lottolearn.com
 127.0.0.1    registry.lottolearn.com
 127.0.0.1    auth.lottolearn.com
 127.0.0.1    api.lottolearn.com

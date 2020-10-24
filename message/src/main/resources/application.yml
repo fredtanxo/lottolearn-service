@@ -4,14 +4,14 @@ spring:
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:websocket
-    username: ${H2_USERNAME}
-    password: ${H2_PASSWORD}
+    username: ${H2_USERNAME:ws}
+    password: ${H2_PASSWORD:ws}
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://lottolearn.com
-          jwk-set-uri: http://localhost:51200/.well-known/jwks.json
+          jwk-set-uri: http://auth.lottolearn.com:51200/.well-known/jwks.json
   jackson:
     time-zone: GMT+8
 server:
@@ -25,4 +25,4 @@ dubbo:
     name: dubbo
     port: -1
   registry:
-    address: nacos://registry.lottolearn.com:80
+    address: nacos://registry.lottolearn.com:8868

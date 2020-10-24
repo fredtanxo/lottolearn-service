@@ -3,7 +3,7 @@ spring:
     name: lottolearn-system
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql:///lottolearn_system?characterEncoding=UTF-8&serverTimezone=Hongkong
+    url: jdbc:mysql://db.lottolearn.com:3306/lottolearn_system?characterEncoding=UTF-8&serverTimezone=Hongkong
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     druid:
@@ -19,12 +19,16 @@ spring:
       async-init: true
       pool-prepared-statements: true
       max-open-prepared-statements: 20
-  rabbitmq:
-    host: localhost
-    port: 5672
-    virtual-host: /
   jackson:
     time-zone: GMT+8
+  data:
+    redis:
+      repositories:
+        enabled: false
+  rabbitmq:
+    host: mq.lottolearn.com
+    port: ${RABBITMQ_PORT:5672}
+    virtual-host: /
 server:
   port: 51212
 dubbo:
@@ -32,4 +36,4 @@ dubbo:
     name: dubbo
     port: -1
   registry:
-    address: nacos://registry.lottolearn.com:80
+    address: nacos://registry.lottolearn.com:8868

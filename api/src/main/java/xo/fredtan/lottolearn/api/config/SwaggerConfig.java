@@ -52,14 +52,13 @@ public class SwaggerConfig {
         return regex("/course.*")
                 .or(regex("/announcement.*"))
                 .or(regex("/chapter.*"))
-                .or(regex("/exam.*"))
                 .or(regex("/resource.*"))
                 .or(regex("/term.*"));
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("「学无止境」网课平台API接口文档")
+                .title("LotToLearn网课平台API接口文档")
                 .description("LotToLearn online course platform API reference")
                 .contact(new Contact("FredTan", "https://github.com/fredtanxo/lottolearn-service", ""))
                 .version(VERSION)

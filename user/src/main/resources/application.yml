@@ -3,7 +3,7 @@ spring:
     name: lottolearn-user
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql:///lottolearn_user?characterEncoding=UTF-8&serverTimezone=Hongkong
+    url: jdbc:mysql://db.lottolearn.com:3306/lottolearn_user?characterEncoding=UTF-8&serverTimezone=Hongkong
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     druid:
@@ -23,15 +23,19 @@ spring:
     open-in-view: false
   jackson:
     time-zone: GMT+8
+  data:
+    redis:
+      repositories:
+        enabled: false
   redis:
-    host: localhost
-    port: 6379
+    host: cache.lottolearn.com
+    port: ${REDIS_PORT:6379}
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://lottolearn.com
-          jwk-set-uri: http://localhost:51200/.well-known/jwks.json
+          jwk-set-uri: http://auth.lottolearn.com:51200/.well-known/jwks.json
 server:
   port: 51215
 dubbo:
@@ -43,7 +47,7 @@ dubbo:
     name: dubbo
     port: -1
   registry:
-    address: nacos://registry.lottolearn.com:80
+    address: nacos://registry.lottolearn.com:8868
 mybatis:
   configuration:
     map-underscore-to-camel-case: true

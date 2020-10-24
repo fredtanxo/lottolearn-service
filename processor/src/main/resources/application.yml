@@ -2,8 +2,8 @@ spring:
   application:
     name: lottolearn-processor
   rabbitmq:
-    host: localhost
-    port: 5672
+    host: mq.lottolearn.com
+    port: ${RABBITMQ_PORT:5672}
     virtual-host: /
   jackson:
     time-zone: GMT+8
@@ -18,9 +18,9 @@ dubbo:
     name: dubbo
     port: -1
   registry:
-    address: nacos://registry.lottolearn.com:80
+    address: nacos://registry.lottolearn.com:8868
 lottolearn:
   media:
     base-url: https://media.lottolearn.com
     ffmpeg-path: ${FFMPEG_PATH:/usr/local/bin/ffmpeg}
-    bento4-path: ${BENTO4_PATH:/usr/local/}
+    bento4-path: ${BENTO4_PATH:/usr/local/bin/bento4}
